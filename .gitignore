@@ -1,0 +1,6 @@
+vendor/*
+src/templates/cache/*
+!**/.htaccess
+!**/.gitkeep
+composer.lock
+composer.phar

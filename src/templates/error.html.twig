@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="text-centered">
+    <h1>Ah ? Heu ...</h1>
+    <p>{{ message }}</p>
+    {% if details %}
+    <pre>{{ details }}</pre>
+    {% endif %}
+</div>
+{% endblock %}
