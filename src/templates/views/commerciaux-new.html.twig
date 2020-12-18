@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des commerciaux{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    {% include 'components/connected-as.html.twig' %}
+    {% include 'components/back-link.html.twig' with {'href': '/commerciaux', 'text': 'Revenir à la liste des
+    commerciaux'} %}
+
+    <p>
+    <h4>Créer un compte de commercial</h4>
+    </p>
+    <p>
+    <form method="POST">
+        <div class="row mb-2">
+            <div class="col">
+                <label class="form-label">Prénom du commercial</label>
+                <input type="text" class="form-control" name="prenom" />
+            </div>
+            <div class="col">
+                <label class="form-label">Nom du commercial</label>
+                <input type="text" class="form-control" name="nom_famille" />
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Email du commercial</label>
+            <input type="email" class="form-control" name="email" />
+        </div>
+
+        <button class="btn btn-primary mt-2">Créer le compte</button>
+    </form>
+    </p>
+</div>
+{% endblock %}

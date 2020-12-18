@@ -2,6 +2,11 @@
 require_once __DIR__ . '/vendor/autoload.php';
 session_start();
 
+// dotenv
+(new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/.env');
+
+require __DIR__ . '/src/utilities.php';
+
 // Create and configure Slim app
 $app = new \Slim\App(['settings' => [
     'addContentLengthHeader' => false,
@@ -19,7 +24,10 @@ $container['view'] = function ($container) {
         // 'cache' => __DIR__ . '/src/templates/cache',
     ]);
 
-    $twig->addGlobal('current_user', (empty($_SESSION['user']) ? null : $_SESSION['user']));
+    $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
+
+    $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
+    $_SESSION['session_alert'] = null;
 
     return $twig;
 };
@@ -43,7 +51,9 @@ $container['errorHandler'] = function ($c) {
     };
 };
 
-require 'src/routes/sample.php';
+require 'src/routes/signin.php';
+require 'src/routes/settings.php';
+require 'src/routes/views.php';
 
 $app->get('{url:.*}/', function ($request, $response, $args) {
     return $response->withRedirect($args["url"], 301);

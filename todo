@@ -1,0 +1,31 @@
+----------------
+-- 18/12/2020 --
+----------------
+[x] créer un compte depuis la page admin
+[x] envoyer un email à l'email renseigné
+
+[x] créer un token
+[x] envoyer token par email pour reset password
+[x] route pour process token (/?token=...&action=reset_password)
+[x] vérifier le token
+[x] connecter l'utilisateur
+[x] afficher la bonne page pour modifier le mdp
+[x] modifier le mdp en BDD
+
+[ ] permettre à l'admin de RENAME + INSERT un enum (etat_projet, statut_societe)
+    (mime_type c'est automatique, et user_role c'est système, on ne le laisse pas changer ça)
+[ ] init etat_projet : 'proposition commerciale', 'commande validée par le client',
+    'validation commande par le fournisseur', 'installation planifiée', 'instalée'
+[ ] init statut_societe : 'autoentrepreneur', 'entreprise', 'vendeur à domicile'
+
+----------------
+-- 17/12/2020 --
+----------------
+[x] créer un compte admin de base
+[x] init enum_user_role (admin, commercial, client, fournisseur)
+
+[x] pouvoir se connecter (verifier login + mdp, si oui, mettre dans $_SESSION['current_user'] : user_role + user_id + prenom + nom)
+[x] Afficher une page ('/commerciaux')
+[x] pouvoir se déconnnecter (/logout de tifod)
+
+[x] créer une fonction MySQL pour créer un user + user_account (plus précisement pour un commercial)

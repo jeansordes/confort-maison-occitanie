@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des commerciaux{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    {% include 'components/connected-as.html.twig' %}
+    <p>
+    <h4>Liste des commerciaux</h4>
+    </p>
+    <p>
+        <a href="/commerciaux/new" class="btn btn-primary"><i data-feather="plus"></i> Créer un compte de commercial</a>
+    </p>
+    <p>En construction ...</p>
+</div>
+{% endblock %}

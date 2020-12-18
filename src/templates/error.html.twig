@@ -3,11 +3,13 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="text-centered">
+<div class="container mt-5 pt-5">
+    {% include 'components/back-link.html.twig' %}
+    
     <h1>Ah ? Heu ...</h1>
     <p>{{ message }}</p>
     {% if details %}
-    <pre>{{ details }}</pre>
+    <code>{{ details }}</code>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Se connecter{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <h4>Se connecter</h4>
+    <form method="POST">
+        <p>
+            <label class="form-label">Votre email</label>
+            <input type="email" class="form-control" name="email" />
+        </p>
+
+        <p>
+            <label class="form-label">Votre mot de passe</label>
+            <input type="password" class="form-control" name="password" />
+        </p>
+
+        <p>
+            <button class="btn btn-primary">Se connecter</button>
+        </p>
+    </form>
+    <p>
+        <a href="/password-reset">Vous avez oublié votre mot de passe ?</a>
+    </p>
+</div>
+{% endblock %}
