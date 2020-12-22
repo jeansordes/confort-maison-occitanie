@@ -1,22 +1,28 @@
 ----------------
--- 18/12/2020 --
+-- 22/12/2020 --
 ----------------
-[x] créer un compte depuis la page admin
-[x] envoyer un email à l'email renseigné
+[x] refactoriser la BDD et le code pour la gestion des emails, pour permettre la création de clients sans email
+    user_emails (pk_email_id, email_itself, fk_user_id)
+    user_account (..., +fpk_email_id, -fpk_user_id)
+[x] créer une vue pour simplifier l'accès aux informations d'un utilisateur
 
-[x] créer un token
-[x] envoyer token par email pour reset password
-[x] route pour process token (/?token=...&action=reset_password)
-[x] vérifier le token
-[x] connecter l'utilisateur
-[x] afficher la bonne page pour modifier le mdp
-[x] modifier le mdp en BDD
+[ ] afficher les clients (s'il n'y a pas d'infos, afficher "client N° xxx")
+[ ] pouvoir créer un client
 
-[ ] permettre à l'admin de RENAME + INSERT un enum (etat_projet, statut_societe)
+[ ] pouvoir déposer des fichiers
+
+[ ] #conception permettre à l'admin de RENAME + INSERT un enum (etat_projet, statut_societe)
     (mime_type c'est automatique, et user_role c'est système, on ne le laisse pas changer ça)
-[ ] init etat_projet : 'proposition commerciale', 'commande validée par le client',
+[ ] #sql init etat_projet : 'proposition commerciale', 'commande validée par le client',
     'validation commande par le fournisseur', 'installation planifiée', 'instalée'
-[ ] init statut_societe : 'autoentrepreneur', 'entreprise', 'vendeur à domicile'
+[ ] #sql init statut_societe : 'autoentrepreneur', 'entreprise', 'vendeur à domicile'
+[ ] afficher la liste des commerciaux
+
+[ ] #conception faire un système de gestion de permissions
+    (pour le moment, certaines routes sont accessibles au tout venant)
+
+[ ] #conception pouvoir modifier le nom d'un utilisateur
+[ ] #conception pouvoir modifier l'email d'un utilisateur
 
 ----------------
 -- 17/12/2020 --
@@ -29,3 +35,13 @@
 [x] pouvoir se déconnnecter (/logout de tifod)
 
 [x] créer une fonction MySQL pour créer un user + user_account (plus précisement pour un commercial)
+[x] créer un compte depuis la page admin
+[x] envoyer un email à l'email renseigné
+
+[x] créer un token
+[x] envoyer token par email pour reset password
+[x] route pour process token (/?token=...&action=reset_password)
+[x] vérifier le token
+[x] connecter l'utilisateur
+[x] afficher la bonne page pour modifier le mdp
+[x] modifier le mdp en BDD

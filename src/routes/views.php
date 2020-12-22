@@ -24,7 +24,7 @@ $app->post('/commerciaux/new', function ($request, $response, $args) {
     $new_uid = $req->fetch()['new_uid'];
 
     // envoyer un email à l'email renseigné
-    $req = $db->prepare("select last_time_settings_changed from user_account where user_id = :new_uid");
+    $req = $db->prepare("select last_time_settings_changed from user_account_enriched where user_id = :new_uid");
     $req->execute(['new_uid' => $new_uid]);
     $last_time_settings_changed = $req->fetch()['last_time_settings_changed'];
 
@@ -42,6 +42,6 @@ $app->post('/commerciaux/new', function ($request, $response, $args) {
     );
 
     alert("Le compte du commercial <b>" . $_POST['prenom'] . " " . $_POST['nom_famille'] . " ("
-        . $_POST['email'] . ") a bien été créé</b>", 1);
+        . $_POST['email'] . ") a bien été créé, et un email lui a été envoyé</b>", 1);
     return $response->withRedirect('/commerciaux');
 });

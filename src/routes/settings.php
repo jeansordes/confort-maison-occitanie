@@ -21,7 +21,7 @@ $app->post('/password-edit', function ($request, $response, $args) {
             return $response->withRedirect('/password-edit');
         } else {
             $db = getPDO();
-            $req = $db->prepare('update user_account set password_hash = :new_password_hash where user_id = :uid');
+            $req = $db->prepare('update user_account_enriched set password_hash = :new_password_hash where user_id = :uid');
             $req->execute([
                 "uid" => $_SESSION["current_user"]["uid"],
                 "new_password_hash" => password_hash($_POST['password1'], PASSWORD_BCRYPT, ['cost' => 12]),

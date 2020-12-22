@@ -11,13 +11,12 @@ $app->get('/', function ($request, $response, $args) {
         // vérifier le token (et récupérer les infos utiles au cas où)
         $payload = jwt_decode($_GET['token']);
         $db = getPDO();
-        $req = $db->prepare("select last_time_settings_changed, user_role, prenom, nom_famille from user_account, user where user_id = :uid and id = user_id");
+        $req = $db->prepare("select last_time_settings_changed, user_role, email_string from user_account_enriched where user_id = :uid");
         $req->execute(['uid' => $payload['uid']]);
         $res = $req->fetch();
         $user_infos = [
             'uid' => $payload['uid'],
-            'prenom' => $res['prenom'],
-            'nom_famille' => $res['nom_famille'],
+            'email' => $res['email_string'],
             'user_role' => $res['user_role'],
         ];
         if ($res['last_time_settings_changed'] != $payload['last_time_settings_changed']) {
@@ -56,7 +55,8 @@ $app->post('/login', function ($request, $response) {
         throw new Exception("Il manque un des champs suivants [email, password]");
     }
     $db = getPDO();
-    $req = $db->prepare('select id, prenom, nom_famille, user_role, password_hash from user, user_account where email = :email and user_id = id');
+    
+    $req = $db->prepare('select user_id, email_string, user_role, password_hash from user_account_enriched where email_string = :email');
     $req->execute(['email' => $_POST['email']]);
     if ($req->rowCount() == 0) {
         throw new Exception("Cet email est inconnu");
@@ -64,9 +64,8 @@ $app->post('/login', function ($request, $response) {
         // get password hash (and infos at the same time)
         $res = $req->fetch();
         $user_infos = [
-            'uid' => $res['id'],
-            'prenom' => $res['prenom'],
-            'nom_famille' => $res['nom_famille'],
+            'uid' => $res['user_id'],
+            'email' => $res['email_string'],
             'user_role' => $res['user_role'],
         ];
 
@@ -90,15 +89,15 @@ $app->post('/password-reset', function ($request, $response) {
     if (!empty($_POST['email'])) {
         // faire des tests pour vérifier que l'email renseigné existe
         $db = getPDO();
-        $req = $db->prepare('select id from user where email = :email');
+        $req = $db->prepare('select user_id from user_emails where email_string = :email');
         $req->execute(['email' => $_POST['email']]);
         if ($req->rowCount() == 0) {
             alert("Cet email est inconnu", 3);
             return $response->withRedirect('/password-reset');
         } else {
-            $user_id = $req->fetch()['id'];
+            $user_id = $req->fetch()['user_id'];
             // générer un token pour que l'utilisateur puisse réinitialiser son mot de passe
-            $req = $db->prepare('select last_time_settings_changed from user_account where user_id = :user_id');
+            $req = $db->prepare('select last_time_settings_changed from user_account_enriched where user_id = :user_id');
             $req->execute(['user_id' => $user_id]);
             $reponse = $req->fetch();
             console_log([$reponse, 'user_id' => $user_id]);
