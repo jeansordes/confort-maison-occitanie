@@ -18,6 +18,7 @@ insert into enum_etat_projet(description) values ('installation planifiée');
 insert into enum_etat_projet(description) values ('instalée');
 
 -- admin account (admin:admin)
-insert into user () values ();
+insert into user (user_role) values ('admin');
 insert into user_emails (email_string, user_id) values ('admin_cmo@yopmail.com', 1);
-insert into user_account (primary_email_id, password_hash, user_role) values (1, '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', 1);
+insert into user_account (user_id, password_hash, primary_email)
+    values (1, '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', 'admin_cmo@yopmail.com');

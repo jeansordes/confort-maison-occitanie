@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste clients{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    {% include 'components/connected-as.html.twig' %}
+
+    {% if current_user.user_role == 'admin' %}
+    {% include 'components/back-link.html.twig' with {href: '/commerciaux', text: 'Revenir à la liste des commerciaux'} %}
+    {% endif %}
+
+    <h4 class="mb-3">Liste des clients du commercial n°{{ id_commercial }}</h4>
+
+    <p>
+        <a href="/clients/new" class="btn btn-primary"><i data-feather="plus"></i> Ajouter un client</a>
+    </p>
+    <p>En construction ...</p>
+</div>
+{% endblock %}

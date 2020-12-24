@@ -1,8 +1,11 @@
 <?php
 
+use MyApp\EditableException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 function sendEmail($to, $subject, $body)
 {
@@ -75,7 +78,7 @@ function console_log($payload)
 function jwt_encode($payload, $expire_minutes)
 {
     if (array_key_exists('iat', $payload) or array_key_exists('exp', $payload)) {
-        throw new Exception("Attention, il ne faut pas mettre 'iat' et 'exp' dans le payload, c'est géré automatiquement");
+        throw new \Exception("Attention, il ne faut pas mettre 'iat' et 'exp' dans le payload, c'est géré automatiquement");
     }
     $iat = time();
     $exp = $iat + 60 * $expire_minutes;
@@ -102,4 +105,25 @@ function alert($message, $meaning_code)
         'message' => $message,
         'meaning' => $meaning_switch[$meaning_code]
     ];
+}
+
+function loggedInSlimMiddleware(array $allowed_roles)
+{
+    global $_allowed_roles;
+    $_allowed_roles = $allowed_roles;
+
+    return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) {
+        global $_allowed_roles;
+        global $_internal_exception;
+        if (in_array($_SESSION["current_user"]["user_role"], $_allowed_roles)) {
+            return $next($request, $response);
+        } else {
+            $origin = debug_backtrace(1)[0];
+            console_log($origin);
+            $e = new EditableException("Vous devez être <b>" . join(' ou ', $_allowed_roles) . "</b> pour pouvoir visualiser cette page", 0, $_internal_exception);
+            $e->setFile($origin['file']);
+            $e->setLine($origin['line']);
+            throw $e;
+        }
+    };
 }

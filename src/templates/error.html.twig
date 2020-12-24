@@ -7,7 +7,7 @@
     {% include 'components/back-link.html.twig' %}
     
     <h1>Ah ? Heu ...</h1>
-    <p>{{ message }}</p>
+    <p>{{ message|raw }}</p>
     {% if details %}
     <code>{{ details }}</code>
     {% endif %}

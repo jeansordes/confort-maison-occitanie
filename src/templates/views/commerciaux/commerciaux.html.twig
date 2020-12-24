@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des commerciaux{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    {% include 'components/connected-as.html.twig' %}
+    <h4 class="mb-3">Liste des commerciaux</h4>
+    <p>
+        <a href="/commerciaux/new" class="btn btn-primary"><i data-feather="plus"></i> Créer un compte de commercial</a>
+    </p>
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            {% for commercial in commerciaux %}
+            <li class="list-group-item"><a class="text-decoration-none" href="/commerciaux/{{ commercial.id }}/clients">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}
+                    (uid={{ commercial.id }})</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

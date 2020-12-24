@@ -24,7 +24,7 @@
     {% block body %}{% endblock %}
     <script src="/public/index.js"></script>
     <script>feather.replace()</script>
-    <script>console.log('current_user :', {{ current_user| json_encode | raw }})</script>
+    <script>console.log('current user details :');console.log({{ current_user| json_encode | raw }})</script>
 </body>
 
 </html>
