@@ -35,10 +35,7 @@ create or replace table user (
     ville text default null,
     pays text default null,
     tel1 text default null,
-    tel2 text default null,
-    user_role varchar(50) not null,
-    constraint
-        foreign key (user_role) references enum_user_role(description)
+    tel2 text default null
 );
 
 create or replace table user_emails (
@@ -51,45 +48,72 @@ create or replace table user_emails (
 
 create or replace table user_account (
     user_id int(11) primary key not null,
-    password_hash text not null default '',
     last_time_settings_changed timestamp not null default current_timestamp(),
+    user_role varchar(50) not null,
     primary_email varchar(255) not null,
+    password_hash text,
     constraint
+        foreign key (user_role) references enum_user_role(description),
         foreign key (user_id) references user(id),
         foreign key (primary_email) references user_emails(email_string)
 );
 
 create or replace table societe (
-    id int(11) not null primary key,
+    id int(11) not null auto_increment primary key,
     nom_societe text not null,
-    numero_societe text not null,
+    numero_societe text,
     id_contact int(11) not null,
-    statut_societe varchar(50) not null,
+    statut_societe varchar(50),
     constraint
         foreign key (id_contact) references user(id),
         foreign key (statut_societe) references enum_statut_societe(description)
+);
+
+create or replace table produit (
+    id int(11) not null auto_increment primary key,
+    nom_produit text not null,
+    id_fournisseur int(11) not null,
+    description_produit text default null,
+    constraint
+        foreign key (id_fournisseur) references societe(id)
 );
 
 create or replace table projet (
     id int(11) not null auto_increment primary key,
     id_commercial int(11) not null,
     id_client int(11) not null,
-    nom_projet text not null,
-    description_projet text default null,
+    id_produit int(11) not null,
     constraint
         foreign key (id_commercial) references user(id),
-        foreign key (id_client) references user(id)
+        foreign key (id_client) references user(id),
+        foreign key (id_produit) references produit(id)
 );
 
 create or replace table fichiers (
     id int(11) not null auto_increment primary key,
-    id_projet int(11) not null,
     file_url text not null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
     constraint
-        foreign key (id_projet) references projet(id),
         foreign key (mime_type) references enum_mime_type(description)
+);
+
+create or replace table fichiers_produit (
+    id_produit int(11) not null,
+    id_fichier int(11) not null,
+    constraint
+        primary key (id_produit, id_fichier),
+        foreign key (id_produit) references produit(id),
+        foreign key (id_fichier) references fichiers(id)
+);
+
+create or replace table fichiers_projet (
+    id_projet int(11) not null,
+    id_fichier int(11) not null,
+    constraint
+        primary key (id_projet, id_fichier),
+        foreign key (id_projet) references projet(id),
+        foreign key (id_fichier) references fichiers(id)
 );
 
 create or replace table avancement_projet (
@@ -104,3 +128,24 @@ create or replace table avancement_projet (
         foreign key (etat_projet) references enum_etat_projet(description),
         foreign key (id_auteur) references user(id)
 );
+
+create or replace function nouvel_utilisateur (
+    p_role varchar(50),
+    p_prenom text,
+    p_nom_famille text,
+    p_email text
+) returns int(11) comment 'Renvoie l''uid du nouvel utilisateur' begin
+    insert into user(prenom, nom_famille) values (p_prenom, p_nom_famille);
+    set @v_uid = last_insert_id();
+    insert into user_emails(email_string, user_id) values (p_email, @v_uid);
+    insert into user_account(user_id, user_role, primary_email) values (@v_uid, p_role, p_email);
+    return @v_uid;
+end;
+
+create or replace view user_w_role as
+    select * from (
+        select a.user_role, u.* from user u, user_account a where u.id = a.user_id
+        union select 'client' user_role, u.* from user u
+    ) t group by id;
+
+select * from societe;

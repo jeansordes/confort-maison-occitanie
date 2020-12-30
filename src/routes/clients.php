@@ -12,16 +12,17 @@ $app->get('/clients', function (Request $request, Response $response, array $arg
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['admin', 'commercial'])($req, $res, $next));
 
 $app->get('/commerciaux/{idCommercial}/clients', function (Request $request, Response $response, array $args) {
-    // vérifier que le numéro du commercial est bon
+    // vérifier que le numéro du commercial est bon + récupérer ses infos
     $db = getPDO();
-    $req = $db->prepare("select id from user where id = :uid and user_role = 'commercial'");
+    $req = $db->prepare("select id, prenom, nom_famille from user_w_role where id = :uid and user_role = 'commercial'");
     $req->execute(['uid' => $args['idCommercial']]);
     if ($req->rowCount() == 1) {
+        $commercial = $req->fetch();
         // affiche tous les clients du commercial en question
-        $req = $db->prepare("select u.* from user u, projet p where p.id_client = u.id and p.id_commercial = :id_commercial");
+        $req = $db->prepare("select count(p.id) nb_projets, u.* from user u, projet p where p.id_client = u.id and p.id_commercial = :id_commercial group by u.id");
         $req->execute(['id_commercial' => $args['idCommercial']]);
         $clients = $req->fetchAll();
-        return $this->view->render('views/clients/clients.html.twig', ['id_commercial' => $args['idCommercial'], 'clients' => $clients]);
+        return $this->view->render('views/clients/clients.html.twig', ['commercial' => $commercial, 'clients' => $clients]);
     } else {
         throw new Exception("Numéro de commercial inconnu");
     }

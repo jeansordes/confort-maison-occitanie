@@ -14,7 +14,7 @@ $app->get('/', function (Request $request, Response $response, array $args) {
         // vérifier le token (et récupérer les infos utiles au cas où)
         $payload = jwt_decode($_GET['token']);
         $db = getPDO();
-        $req = $db->prepare("select last_time_settings_changed, user_role, primary_email from user_account, user where user_id = :uid and id = user_id");
+        $req = $db->prepare("select last_time_settings_changed, user_role, primary_email from user_account where user_id = :uid");
         $req->execute(['uid' => $payload['uid']]);
         $res = $req->fetch();
         $user_infos = [
@@ -66,7 +66,7 @@ $app->post('/login', function ($request, $response) {
         throw new Exception("Il manque un des champs suivants [email, password]");
     }
     $db = getPDO();
-    $req = $db->prepare('select user_id, primary_email, user_role, password_hash from user_account, user where primary_email = :email and id = user_id');
+    $req = $db->prepare('select user_id, primary_email, user_role, password_hash from user_account where primary_email = :email');
     $req->execute(['email' => $_POST['email']]);
     if ($req->rowCount() == 0) {
         throw new Exception("Cet email est inconnu");

@@ -6,7 +6,7 @@ use Slim\Http\Response;
 
 $app->get('/commerciaux', function (Request $request, Response $response, array $args) {
     $db = getPDO();
-    $commerciaux = $db->query("select * from user where user_role = 'commercial'")->fetchAll();
+    $commerciaux = $db->query("select * from user_w_role where user_role = 'commercial'")->fetchAll();
     console_log($commerciaux);
     return $this->view->render('views/commerciaux/commerciaux.html.twig', ['commerciaux' => $commerciaux]);
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['admin'])($req, $res, $next));
@@ -25,22 +25,13 @@ $app->group('/commerciaux/new', function (App $app) {
 
         // créer le compte (1 : user, 2 : email, 3 : account)
         $db = getPDO();
-        $req = $db->prepare("insert into user(prenom, nom_famille, user_role) values (:prenom, :nom_famille, 'commercial')");
+        $req = $db->prepare("select nouvel_utilisateur('commercial', :prenom, :nom_famille, :email) new_uid;");
         $req->execute([
             'prenom' => $_POST['prenom'],
             'nom_famille' => $_POST['nom_famille'],
+            'email' => $_POST['email'],
         ]);
-        $new_uid = $db->lastInsertId();
-        $req = $db->prepare('insert into user_emails(user_id, email_string) values (:uid, :email_string)');
-        $req->execute([
-            'email_string' => $_POST['email'],
-            'uid' => $new_uid,
-        ]);
-        $req = $db->prepare("insert into user_account(user_id, primary_email) values (:uid, :email_string)");
-        $req->execute([
-            'email_string' => $_POST['email'],
-            'uid' => $new_uid,
-        ]);
+        $new_uid = $req->fetch()['new_uid'];
 
         // envoyer un email à l'email renseigné
         $req = $db->prepare("select last_time_settings_changed from user_account where user_id = :new_uid");

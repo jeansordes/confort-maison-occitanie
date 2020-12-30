@@ -13,7 +13,7 @@
         <ul class="list-group list-group-flush">
             {% for commercial in commerciaux %}
             <li class="list-group-item"><a class="text-decoration-none" href="/commerciaux/{{ commercial.id }}/clients">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}
-                    (uid={{ commercial.id }})</a></li>
+                    (uid:{{ commercial.id }})</a></li>
             {% endfor %}
         </ul>
     </div>
