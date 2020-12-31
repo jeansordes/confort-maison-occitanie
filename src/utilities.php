@@ -41,23 +41,6 @@ function sendEmail($to, $subject, $body)
     }
 }
 
-function getPDO()
-{
-    try {
-        $db = new \PDO(
-            'mysql:host=localhost;dbname=' . $_ENV['db_name'] . ';charset=utf8mb4',
-            $_ENV['db_username'],
-            $_ENV['db_password'],
-        );
-        $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $db->exec("SET SESSION time_zone = '+2:00'");
-    } catch (\Exception $e) {
-        throw $e;
-    }
-
-    return $db;
-}
-
 function getARandomString($length = 18, $keyspace = '')
 {
     $base62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -126,4 +109,33 @@ function loggedInSlimMiddleware(array $allowed_roles)
             throw $e;
         }
     };
+}
+
+function array_special_join(string $glue, string $last_item_glue, array $array)
+{
+    if (count($array) == 1) return $array[0];
+    $last_item = array_pop($array);
+    return join($glue, $array) . $last_item_glue . $last_item;
+}
+
+function get_form_missing_fields_message(array $keys, array $arr)
+{
+    $diff_keys = [];
+    foreach ($keys as $key) {
+        if (empty($arr[$key])) {
+            $diff_keys[] = $key;
+        }
+    }
+    return il_manque_les_champs($diff_keys);
+}
+
+function il_manque_les_champs($fields) {
+    if (count($fields) == 0) return null;
+    if (count($fields) == 1) return 'Il manque le champs <b>' . $fields[0] . '</b>';
+    if (count($fields) > 1) return 'Il manque les champs <b>' . array_special_join('</b>, <b>', '</b> et <b>', $fields) . '</b>';
+}
+
+function array_to_url_encoding($array)
+{
+    return join('&', array_map((fn ($k, $v) => $k . '=' . $v), array_keys($array), $array));
 }

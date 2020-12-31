@@ -4,28 +4,30 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-$app->get('/commerciaux', function (Request $request, Response $response, array $args) {
+$app->get('/commerciaux', function (Request $request, Response $response, array $args): Response {
     $db = getPDO();
-    $commerciaux = $db->query("select * from user_w_role where user_role = 'commercial'")->fetchAll();
+    $commerciaux = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
     console_log($commerciaux);
-    return $this->view->render('views/commerciaux/commerciaux.html.twig', ['commerciaux' => $commerciaux]);
+    return $response->write($this->view->render('views/commerciaux/commerciaux.html.twig', ['commerciaux' => $commerciaux]));
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['admin'])($req, $res, $next));
 // remarque : on execute la fonction pour avoir une trace dans debug_backtrace()
 // car simplement passer un objet ne laisserait aucune trace dans debug_backtrace()
 
 $app->group('/commerciaux/new', function (App $app) {
-    $app->get('', function (Request $request, Response $response, array $args) {
-        return $this->view->render('views/commerciaux/commerciaux-new.html.twig');
+    $app->get('', function (Request $request, Response $response, array $args): Response {
+        return $response->write($this->view->render('views/commerciaux/commerciaux-new.html.twig', $_GET));
     });
 
     $app->post('', function (Request $request, Response $response, array $args) {
-        if (empty($_POST['email']) or empty($_POST['prenom']) or empty($_POST['nom_famille'])) {
-            throw new Exception("Il manque un des arguments suivants : " . join(', ', ['email', 'prenom', 'nom_famille']));
+        $missing_fields_message = get_form_missing_fields_message(['email', 'prenom', 'nom_famille'], $_POST);
+        if ($missing_fields_message) {
+            alert($missing_fields_message, 3);
+            return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
 
         // créer le compte (1 : user, 2 : email, 3 : account)
         $db = getPDO();
-        $req = $db->prepare("select nouvel_utilisateur('commercial', :prenom, :nom_famille, :email) new_uid;");
+        $req = $db->prepare(getSqlQueryString('new_commercial'));
         $req->execute([
             'prenom' => $_POST['prenom'],
             'nom_famille' => $_POST['nom_famille'],
@@ -34,8 +36,8 @@ $app->group('/commerciaux/new', function (App $app) {
         $new_uid = $req->fetch()['new_uid'];
 
         // envoyer un email à l'email renseigné
-        $req = $db->prepare("select last_time_settings_changed from user_account where user_id = :new_uid");
-        $req->execute(['new_uid' => $new_uid]);
+        $req = $db->prepare(getSqlQueryString('last_settings_update'));
+        $req->execute(['uid' => $new_uid]);
         $last_time_settings_changed = $req->fetch()['last_time_settings_changed'];
 
         $jwt = jwt_encode([

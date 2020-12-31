@@ -1,39 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste clients{% endblock %}
+{% block title %}Liste clients
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5 pt-5">
-    {% include 'components/connected-as.html.twig' %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
 
-    {% if current_user.user_role == 'admin' %}
-    {% include 'components/back-link.html.twig' with {href: '/commerciaux', text: 'Revenir à la liste des
-    commerciaux'}%}
-    <h4 class="mb-3">Liste des clients de {{ commercial.prenom ~ ' ' ~ commercial.nom_famille }} (uid:{{ commercial.id
-        }})</h4>
-    {% else %}
-    <h4 class="mb-3">Liste de vos clients</h4>
-    {% endif %}
+		{% if current_user.user_role == 'admin' %}
+			{% if commercial %}
+				<div class="row g-2">
+					<div class="col-auto">
+						{% include 'components/back-link.html.twig'
+                with {href: '/commerciaux', text: 'Revenir à la liste des commerciaux'} %}
+					</div>
+					<div class="col-auto">
+						<a href="/clients" class="btn btn-outline-primary">Voir tous les clients</a>
+					</div>
+				</div>
+				<h4 class="my-3">
+					Liste des clients de
+					{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}
+					(uid:{{ commercial.id }})
+				</h4>
+			{% else %}
+				<a href="/commerciaux" class="btn btn-outline-primary">Voir tous les commerciaux</a>
+				<h4 class="my-3">Liste de tous les clients</h4>
+			{% endif %}
+		{% else %}
+			<h4 class="mb-3">Liste de vos clients</h4>
+			<p>
+				<a href="/clients/new" class="btn btn-primary">
+					<i class="material-icons">add</i>
+					Ajouter un client</a>
+			</p>
+		{% endif %}
 
-    <p>
-        <a href="/clients/new" class="btn btn-primary"><i data-feather="plus"></i> Ajouter un client</a>
-    </p>
-    {% if clients|length > 0 %}
-    <div class="card">
-        <ul class="list-group list-group-flush">
-            {% for client in clients %}
-            <li class="list-group-item">
-                <h5>{{ client.civilite ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</h5>
-                <p>Nombre de produits avec {{ current_user.user_role == 'admin' ? 'ce commercial' :
-                    'vous' }} : {{ client.nb_projets }}</p>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% elseif current_user.user_role == 'admin' %}
-    <p class="text-muted fst-italic">Ce commercial n'a pas de clients</p>
-    {% else %}
-    <p class="text-muted fst-italic">Vous n'avez pas de clients</p>
-    {% endif %}
-</div>
+		{% if clients|length > 0 %}
+			<div class="card">
+				<ul class="list-group list-group-flush">
+					{% for client in clients %}
+						<li class="list-group-item">
+							<h5>{{ client.civilite ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</h5>
+							<p>Nombre de projets
+								{% if current_user.user_role == 'admin' %}
+									{{ (commercial ? 'avec le commercial' : 'en tout') ~ ' : ' ~ client.nb_projets }}
+								{% else %}
+									avec vous :
+									{{ client.nb_projets }}
+								{% endif %}
+							</p>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		{% else %}
+			<p class="text-muted fst-italic">Il n'y a aucun client à afficher</p>
+		{% endif %}
+	</div>
 {% endblock %}

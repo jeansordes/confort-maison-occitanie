@@ -1,34 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des commerciaux{% endblock %}
+{% block title %}Liste des commerciaux
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5 pt-5">
-    {% include 'components/connected-as.html.twig' %}
-    {% include 'components/back-link.html.twig' with {'href': '/commerciaux', 'text': 'Revenir à la liste des
-    commerciaux'} %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+        {% include 'components/back-link.html.twig'
+        with {href: '/clients', text: 'Revenir à la liste des clients'} %}
 
-    <h4 class="mb-3">Créer un compte de commercial</h4>
-    <p>
-    <form method="POST">
-        <div class="row mb-2">
-            <div class="col">
-                <label class="form-label">Prénom du commercial</label>
-                <input type="text" class="form-control" name="prenom" />
-            </div>
-            <div class="col">
-                <label class="form-label">Nom du commercial</label>
-                <input type="text" class="form-control" name="nom_famille" />
-            </div>
-        </div>
+		<h4 class="mb-3">Ajouter un client</h4>
+		<p class="alert alert-warning">
+			Remarque : aucun des champs ci dessous n'est obligatoire (mais on vous conseille d'au moins mettre le nom et le prénom 😉)
+		</p>
+		<p>
+			<form method="POST">
+				<div
+					class="row mb-2">
+					<!-- Identité -->
+					<div class="col">
+						<label class="form-label">Civilité</label>
+						<select name="civilite" class="form-control form-select">
+							<option value="" {{ civilite=='' ? 'selected' : '' }}></option>
+							<option value="mr" {{ civilite=='mr' ? 'selected' : '' }}>Mr</option>
+							<option value="mme" {{ civilite=='mme' ? 'selected' : '' }}>Mme</option>
+						</select>
+					</div>
+					<div class="col">
+						<label class="form-label">Prénom</label>
+						<input name="prenom" value="{{ prenom }}" type="text" class="form-control"/>
+					</div>
+					<div class="col">
+						<label class="form-label">Nom de famille</label>
+						<input name="nom_famille" value="{{ nom_famille }}" type="text" class="form-control"/>
+					</div>
+				</div>
 
-        <div class="mb-2">
-            <label class="form-label">Email du commercial</label>
-            <input type="email" class="form-control" name="email" />
-        </div>
+				<!-- Adresse -->
+				<div class="mb-2">
+					<label class="form-label">Adresse</label>
+					<input name="adresse" value="{{ adresse }}" type="text" class="form-control"/>
+				</div>
 
-        <button class="btn btn-primary mt-2">Créer le compte</button>
-    </form>
-    </p>
-</div>
+				<div class="row mb-2">
+					<div class="col">
+						<label class="form-label">Ville</label>
+						<input name="ville" value="{{ ville }}" type="text" class="form-control"/>
+					</div>
+
+					<div class="col">
+						<label class="form-label">Code postal</label>
+						<input name="code_postal" value="{{ code_postal }}" type="text" class="form-control"/>
+					</div>
+
+					<div class="col">
+						<label class="form-label">Pays</label>
+						<input name="pays" value="{{ pays }}" type="text" class="form-control" value="France"/>
+					</div>
+				</div>
+
+				<!-- Téléphones -->
+				<div class="row mb-2">
+					<div class="col">
+						<label class="form-label">Téléphone 1</label>
+						<input name="tel1" value="{{ tel1 }}" type="tel" class="form-control"/>
+					</div>
+
+					<div class="col">
+						<label class="form-label">Téléphone 2</label>
+						<input name="tel2" value="{{ tel2 }}" type="tel" class="form-control"/>
+					</div>
+				</div>
+
+				<!-- email de contact -->
+				<div class="mb-2">
+					<label class="form-label">Adresse mail</label>
+					<input name="email" value="{{ email }}" type="email" class="form-control"/>
+				</div>
+
+				<button class="btn btn-primary mt-3">Créer le client</button>
+			</form>
+		</p>
+	</div>
 {% endblock %}

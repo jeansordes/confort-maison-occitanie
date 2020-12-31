@@ -3,17 +3,17 @@
 {% block title %}Se connecter{% endblock %}
 
 {% block body %}
-<div class="container mt-5 pt-5">
+<div class="container my-5 pt-5">
     <h4 class="mb-3">Se connecter</h4>
     <form method="POST">
         <p>
             <label class="form-label">Votre email</label>
-            <input type="email" class="form-control" name="email" />
+            <input type="email" class="form-control" name="email" value="{{ email }}" />
         </p>
 
         <p>
             <label class="form-label">Votre mot de passe</label>
-            <input type="password" class="form-control" name="password" />
+            <input type="password" class="form-control" name="password" value="{{ password }}" />
         </p>
 
         <p>

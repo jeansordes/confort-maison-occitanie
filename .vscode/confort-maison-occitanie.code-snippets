@@ -1,0 +1,32 @@
+{
+    // Place your GLOBAL snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+    // description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+    // is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+    // used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+    // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+    // Placeholders with the same ids are connected.
+    "bootstrap input": {
+        "scope": "twig",
+        "prefix": "cmo_input",
+        "body": [
+            "<div class=\"mb-2\">",
+            "   <label class=\"form-label\">$0</label>",
+            "   <input name=\"$1\" value=\"{{ $1 }}\" type=\"$2\" class=\"form-control\" />",
+            "</div>",
+        ],
+    },
+    "redirect to current url": {
+        "scope": "php",
+        "prefix": "redirect_current_url",
+        "body": [
+            "return \\$response->withRedirect(\\$request->getUri()->getPath());$0"
+        ],
+    },
+    "return twig render": {
+        "scope": "php",
+        "prefix": "return_twig_render",
+        "body": [
+            "return \\$response->write(\\$this->view->render('$1'));$0"
+        ],
+    }
+}

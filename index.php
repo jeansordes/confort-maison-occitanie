@@ -9,11 +9,12 @@ session_start();
 // dotenv
 (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/.env');
 
-require 'src/utilities.php';
-require 'src/twig-config.php';
+require_once 'src/utilities.php';
+require_once 'src/sql-utilities.php';
+require_once 'src/twig-config.php';
 
 // routes
-foreach (glob("src/routes/*.php") as $filename) include $filename;
+foreach (glob("src/routes/*.php") as $filename) include_once $filename;
 
 $app->get('{url:.*}/', function (Request $request, Response $response, array $args) {
     return $response->withRedirect($args["url"], 301);
