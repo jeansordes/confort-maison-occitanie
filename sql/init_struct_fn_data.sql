@@ -31,12 +31,8 @@ insert into _enum_etat_projet(description) values ('validation commande par le f
 insert into _enum_etat_projet(description) values ('installation planifiée');
 insert into _enum_etat_projet(description) values ('instalée');
 
-create or replace table user (
-    id int(11) not null auto_increment primary key,
-    prenom text default null,
-    nom_famille text default null,
-    civilite enum('mr', 'mme') default null,
-    -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
+create or replace table coordonnees (
+    id_coordonnees int(11) not null auto_increment primary key,
     adresse text default null,
     code_postal text default null,
     ville text default null,
@@ -45,65 +41,90 @@ create or replace table user (
     tel2 text default null
 );
 
+create or replace table personnes (
+    id_personne int(11) not null auto_increment primary key,
+    prenom text default null,
+    nom_famille text default null,
+    civilite enum('mr', 'mme') default null,
+    -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
+    commentaire_admin text default null,
+    id_coordonnees int(11) default null,
+    constraint
+        foreign key (id_coordonnees) references coordonnees(id_coordonnees)
+);
+
 create or replace table user_emails (
     -- varchar(255) https://stackoverflow.com/a/8242609
     email_string varchar(255) not null primary key check (email_string REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     id_user int(11) not null,
     constraint
-        foreign key (id_user) references user(id)
+        foreign key (id_user) references personnes(id_personne)
 );
 
-create or replace table user_account (
-    id_user int(11) primary key not null,
-    last_time_settings_changed timestamp not null default current_timestamp(),
+create or replace table utilisateurs (
+    id_utilisateur int(11) primary key not null,
+    last_user_update time not null default current_timestamp(),
     user_role varchar(50) not null,
     primary_email varchar(255) not null,
-    password_hash text,
+    password_hash text not null,
     constraint
         foreign key (user_role) references _enum_user_role(description),
-        foreign key (id_user) references user(id),
+        foreign key (id_utilisateur) references personnes(id_personne),
         foreign key (primary_email) references user_emails(email_string)
 );
 
-create or replace table appartenance_client (
+create or replace table clients_des_commerciaux (
     id_client int(11) primary key not null,
     id_commercial int(11) not null,
+    commentaire_commercial text default null,
     constraint
-        foreign key (id_client) references user(id),
-        foreign key (id_commercial) references user(id)
+        foreign key (id_client) references personnes(id_personne),
+        foreign key (id_commercial) references personnes(id_personne)
 );
 
-create or replace table societe (
-    id int(11) not null auto_increment primary key,
+create or replace table societes (
+    id_societe int(11) not null auto_increment primary key,
     nom_societe text not null,
     numero_societe text,
-    id_contact int(11) not null,
+    id_representant int(11) not null,
+    id_coordonnees_entreprise int(11) default null,
     statut_societe varchar(50),
+    commentaire_admin text default null,
     constraint
-        foreign key (id_contact) references user(id),
+        foreign key (id_representant) references personnes(id_personne),
+        foreign key (id_coordonnees_entreprise) references coordonnees(id_coordonnees),
         foreign key (statut_societe) references _enum_statut_societe(description)
 );
 
-create or replace table produit (
-    id int(11) not null auto_increment primary key,
+create or replace table employes (
+    id_employe int(11) primary key not null,
+    id_societe int(11) not null,
+    constraint
+        foreign key (id_employe) references personnes(id_personne),
+        foreign key (id_societe) references societes(id_societe)
+);
+
+create or replace table produits (
+    id_produit int(11) not null auto_increment primary key,
     nom_produit text not null,
     id_fournisseur int(11) not null,
     description_produit text default null,
     constraint
-        foreign key (id_fournisseur) references societe(id)
+        foreign key (id_fournisseur) references societes(id_societe)
 );
 
-create or replace table projet (
-    id int(11) not null auto_increment primary key,
+create or replace table projets (
+    id_projet int(11) not null auto_increment primary key,
     id_client int(11) not null,
     id_produit int(11) not null,
+    date_creation timestamp not null default current_timestamp(),
     constraint
-        foreign key (id_client) references appartenance_client(id_client),
-        foreign key (id_produit) references produit(id)
+        foreign key (id_client) references clients_des_commerciaux (id_client),
+        foreign key (id_produit) references produits(id_produit)
 );
 
 create or replace table fichiers (
-    id int(11) not null auto_increment primary key,
+    id_fichier int(11) not null auto_increment primary key,
     file_url text not null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
@@ -116,8 +137,8 @@ create or replace table fichiers_produit (
     id_fichier int(11) not null,
     constraint
         primary key (id_produit, id_fichier),
-        foreign key (id_produit) references produit(id),
-        foreign key (id_fichier) references fichiers(id)
+        foreign key (id_produit) references produits(id_produit),
+        foreign key (id_fichier) references fichiers(id_fichier)
 );
 
 create or replace table fichiers_projet (
@@ -125,63 +146,73 @@ create or replace table fichiers_projet (
     id_fichier int(11) not null,
     constraint
         primary key (id_projet, id_fichier),
-        foreign key (id_projet) references projet(id),
-        foreign key (id_fichier) references fichiers(id)
+        foreign key (id_projet) references projets(id_projet),
+        foreign key (id_fichier) references fichiers(id_fichier)
 );
 
 create or replace table avancement_projet (
-    id int(11) not null auto_increment primary key,
+    id_avancement int(11) not null auto_increment primary key,
     id_projet int(11) not null,
     date_heure timestamp not null default current_timestamp(),
     etat_projet varchar(50) not null,
     commentaire_avancement text default null,
     id_auteur int(11) not null,
     constraint
-        foreign key (id_projet) references projet(id),
+        foreign key (id_projet) references projets(id_projet),
         foreign key (etat_projet) references _enum_etat_projet(description),
-        foreign key (id_auteur) references user(id)
+        foreign key (id_auteur) references personnes(id_personne)
 );
 
 create or replace function new_user (
     p_role varchar(50),
+    p_email text,
+    p_password_hash text,
     p_prenom text,
-    p_nom_famille text,
-    p_email text
-) returns int(11) comment 'Renvoie l''uid du nouvel utilisateur' begin
-    insert into user(prenom, nom_famille) values (p_prenom, p_nom_famille);
+    p_nom_famille text
+) returns int(11) begin
+    insert into personnes(prenom, nom_famille) values (p_prenom, p_nom_famille);
     set @v_uid = last_insert_id();
     insert into user_emails(email_string, id_user) values (p_email, @v_uid);
-    insert into user_account(id_user, user_role, primary_email) values (@v_uid, p_role, p_email);
+    insert into utilisateurs(id_utilisateur, user_role, primary_email, password_hash) values (@v_uid, p_role, p_email, p_password_hash);
     return @v_uid;
 end;
 
-create or replace function new_user (
-    p_role varchar(50),
-    p_email text
-) returns int(11) comment 'Renvoie l''uid du nouvel utilisateur' begin
-    insert into user() values (p_prenom, p_nom_famille);
-    set @v_uid = last_insert_id();
-    insert into user_emails(email_string, id_user) values (p_email, @v_uid);
-    insert into user_account(id_user, user_role, primary_email) values (@v_uid, p_role, p_email);
-    return @v_uid;
+create or replace function new_client(
+    p_prenom text,
+    p_nom_famille text,
+    p_civilite text,
+    p_adresse text,
+    p_code_postal text,
+    p_ville text,
+    p_pays text,
+    p_tel1 text,
+    p_tel2 text
+) returns int(11) begin
+    insert into coordonnees(adresse, code_postal, ville, pays, tel1, tel2)
+        values (p_adresse, p_code_postal, p_ville, p_pays, p_tel1, p_tel2);
+    set @id_coordonnees = last_insert_id();
+    insert into personnes(prenom, nom_famille, civilite, id_coordonnees)
+        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees);
+    return last_insert_id();
 end;
 
 create or replace view clients as
-    select a.id_commercial, u.* from user u, appartenance_client a, (select id from user, user_account
-    except select id_user from user_account) t where u.id = t.id and a.id_client = u.id;
+select a.id_commercial, u.*
+    from personnes u, clients_des_commerciaux a, (
+        select id_personne from personnes, utilisateurs
+        except select id_utilisateur from utilisateurs
+    ) t where u.id_personne = t.id_personne and a.id_client = u.id_personne;
 
 create or replace view clients_w_nb_projets as
-    select count(p.id) nb_projets, c.* from clients c left join projet p on c.id = p.id_client group by p.id_client;
+    select count(p.id_projet) nb_projets, c.* from clients c left join projets p on c.id_personne = p.id_client group by p.id_client;
 
 create or replace view commerciaux as
-    select u.* from user u, user_account a where u.id = a.id_user and user_role = 'commercial';
+    select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'commercial';
 
 create or replace view fournisseurs as
-    select u.* from user u, user_account a where u.id = a.id_user and user_role = 'fournisseur';
+    select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'fournisseur';
 
--- admin account (admin_cmo@yopmail.com:admin)
-insert into user () values ();
-set @admin_uid = last_insert_id();
-insert into user_emails (email_string, id_user) values ('admin_cmo@yopmail.com', @admin_uid);
-insert into user_account (id_user, password_hash, primary_email, user_role)
-    values (@admin_uid, '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', 'admin_cmo@yopmail.com', 'admin');
+create or replace view projets_enriched as
+    select a.id_commercial, c.nom_produit, b.*
+    from clients_des_commerciaux a, projets b, produits c
+    where a.id_client = b.id_client and b.id_produit = c.id_produit;

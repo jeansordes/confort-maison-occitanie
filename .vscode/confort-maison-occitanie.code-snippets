@@ -6,7 +6,7 @@
     // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
     // Placeholders with the same ids are connected.
     "bootstrap input": {
-        "scope": "twig",
+        "scope": "twig,html",
         "prefix": "cmo_input",
         "body": [
             "<div class=\"mb-2\">",
@@ -15,18 +15,90 @@
             "</div>",
         ],
     },
+    "new template": {
+        "scope": "twig,html",
+        "prefix": "cmo_template",
+        "body": [
+            "{% extends 'base.html.twig' %}",
+            "",
+            "{% block title %}",
+            "    $1",
+            "{% endblock %}",
+            "",
+            "{% block body %}",
+            "    <div class=\"container my-5 pt-5\">",
+            "        {% include 'components/connected-as.html.twig' %}",
+            "        <h4 class=\"my-3\">$1</h4>",
+            "        $0",
+            "    </div>",
+            "{% endblock %}",
+        ],
+    },
+    "html tableau list": {
+        "scope": "twig,html",
+        "prefix": "cmo_list",
+        "body": [
+            "{% if ${1:entites_pluriel}|length > 0 %}",
+            "    <div class=\"card\">",
+            "        <ul class=\"list-group list-group-flush\">",
+            "            {% for ${2:entite_singulier} in ${1:entites_pluriel} %}",
+            "                <li class=\"list-group-item\">",
+            "                    <h5>{{ ${2:entite_singulier} }}</h5>",
+            "                    <p>${3:Description de l'entité en cours}</p>",
+            "                </li>",
+            "            {% endfor %}",
+            "        </ul>",
+            "    </div>",
+            "{% else %}",
+            "    <p class=\"text-muted fst-italic\">Il n'y a aucun ${1:entites_pluriel} à afficher</p>",
+            "{% endif %}",
+        ],
+    },
+    "bootstrap selection option": {
+        "scope": "twig,html",
+        "prefix": "cmo_select_option",
+        "body": [
+            "<div class=\"col\">",
+            "    <label class=\"form-label\">${1:Input description}</label>",
+            "    <select name=\"${2:field name}\" class=\"form-control form-select\">",
+            "        <option value=\"\" {{ ${2:field name}=='' ? 'selected' : '' }}></option>",
+            "        <option value=\"option1\" {{ ${2:field name}=='option1' ? 'selected' : '' }}>Option 1</option>",
+            "    </select>",
+            "</div>",
+        ],
+    },
+    "button add something": {
+        "scope": "twig,html",
+        "prefix": "cmo_add_button",
+        "body": [
+            "<a href=\"./{{ ${1:current route} }}/new-${2:quelquechose}\" class=\"btn btn-primary mb-3\">",
+			"<i class=\"material-icons\">add</i>",
+			"Ajouter un ${2:quelquechose}</a>",
+        ],
+    },
     "redirect to current url": {
         "scope": "php",
-        "prefix": "redirect_current_url",
+        "prefix": "cmo_redirect_current_url",
         "body": [
             "return \\$response->withRedirect(\\$request->getUri()->getPath());$0"
         ],
     },
     "return twig render": {
         "scope": "php",
-        "prefix": "return_twig_render",
+        "prefix": "cmo_return_render",
         "body": [
             "return \\$response->write(\\$this->view->render('$1'));$0"
         ],
-    }
+    },
+    "db get pdo": {
+        "scope": "php",
+        "prefix": "cmo_db_getpdo_prepare_execute",
+        "body": [
+            "\\$db = getPDO();",
+            "\\$req = \\$db->prepare(getSqlQueryString('$1'));",
+            "\\$req->execute(['id_commercial' => \\$_SESSION['current_user']['uid']]);",
+            "\\$result = \\$req->fetch${2:All}();",
+            "$0",
+        ],
+    },
 }

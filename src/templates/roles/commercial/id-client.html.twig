@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+		{% include 'components/back-link.html.twig' %}
+
+		<h4 class="my-3">Client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
+		<a href="./{{ client.id_personne }}/new-projet" class="btn btn-primary mb-3">
+			<i class="material-icons">add</i>
+			Ajouter un projet</a>
+		{% if projets|length > 0 %}
+			<div class="card">
+				<ul class="list-group list-group-flush">
+					{% for projet in projets %}
+						<li class="list-group-item">
+							<a href="./{{ client.id_personne }}/{{ projet.id_projet }}">{{ projet.nom_produit }}</a>
+							<p>Créé
+								{{ projet.date_creation|timeago }}</p>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		{% else %}
+			<p class="text-muted fst-italic">Il n'y a aucun projets à afficher</p>
+		{% endif %}
+	</div>
+{% endblock %}

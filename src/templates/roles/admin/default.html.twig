@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Liste des utilisateurs
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+
+		<div class="row g-5">
+			<div class="col">
+				<h4 class="my-3">Liste de tous les commerciaux</h4>
+				<p>
+					<a href="/admin/new-commercial" class="btn btn-primary">
+						<i class="material-icons">add</i>
+						Créer un compte de commercial</a>
+                </p>
+                {% if commerciaux|length > 0 %}
+                <div class="card">
+					<ul class="list-group list-group-flush">
+						{% for commercial in commerciaux %}
+							<li class="list-group-item">
+								<a class="text-decoration-none" href="/admin/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}
+									(uid:{{ commercial.id_personne }})</a>
+							</li>
+						{% endfor %}
+					</ul>
+                </div>
+                {% else %}
+                    <p class="text-muted fst-italic">Il n'y a aucun commercial à afficher</p>
+                {% endif %}
+			</div>
+			<div class="col">
+				<h4 class="my-3">Liste de tous les fournisseurs</h4>
+				<p>
+					<a href="/admin/new-fournisseur" class="btn btn-primary">
+						<i class="material-icons">add</i>
+						Créer un compte de fournisseur</a>
+				</p>
+				{% if fournisseurs|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for fournisseur in fournisseurs %}
+								<li class="list-group-item">
+									<a class="text-decoration-none" href="/{{ fournisseur.id }}">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille}}
+										(uid:{{ fournisseur.id }})</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun fournisseur à afficher</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -18,9 +18,32 @@ $container['view'] = function ($container) {
     ]);
 
     $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
+    $twig->addGlobal('isAdmin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
 
     $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
     $_SESSION['session_alert'] = null;
+
+    $filter = new \Twig\TwigFilter('timeago', function ($datetime) {
+        $time = time() - strtotime($datetime);
+
+        $units = array(
+            31536000 => 'an',
+            2592000 => 'mois',
+            604800 => 'semaine',
+            86400 => 'jour',
+            3600 => 'heure',
+            60 => 'minute',
+            1 => 'seconde'
+        );
+
+        foreach ($units as $unit => $val) {
+            if ($time < $unit) continue;
+            $numberOfUnits = floor($time / $unit);
+            return ($unit <= 1) ? "à l'instant" :
+                'il y a ' . $numberOfUnits . ' ' . $val . (($numberOfUnits > 1 and $val != 'mois') ? 's' : '');
+        }
+    });
+    $twig->addFilter($filter);
 
     return $twig;
 };

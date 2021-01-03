@@ -1,13 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des commerciaux
-{% endblock %}
+{% block title %}Ajouter un client{% endblock %}
 
 {% block body %}
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
-        {% include 'components/back-link.html.twig'
-        with {href: '/clients', text: 'Revenir à la liste des clients'} %}
+        {% include 'components/back-link.html.twig' %}
 
 		<h4 class="mb-3">Ajouter un client</h4>
 		<p class="alert alert-warning">

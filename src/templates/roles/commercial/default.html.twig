@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Liste de vos clients
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+		<h4 class="my-3">Liste de vos clients</h4>
+		<p>
+			<a href="/{{isAdmin ? idCommercial : 'commercial'}}/new-client" class="btn btn-primary">
+				<i class="material-icons">add</i>
+				Ajouter un client</a>
+		</p>
+		{% if clients|length > 0 %}
+			<div class="card">
+				<ul class="list-group list-group-flush">
+					{% for client in clients %}
+						<li class="list-group-item">
+							<a class="text-decoration-none" href="/{{isAdmin ? idCommercial : 'commercial'}}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
+							<p>Nombre de projets {{ isAdmin ?? 'avec ce commercial '}}: 
+								{{ client.nb_projets }}
+							</p>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		{% else %}
+			<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
+		{% endif %}
+	</div>
+{% endblock %}

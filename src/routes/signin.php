@@ -25,7 +25,7 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
         if ($user_infos['uid'] == null || $user_infos['email'] == null || $user_infos['user_role'] == null) {
             throw new Exception("Les infos de l'utilisateur n'ont pas été correctement initialisés");
         }
-        if ($res['last_time_settings_changed'] != $payload['last_time_settings_changed']) {
+        if ($res['last_user_update'] != $payload['last_user_update']) {
             throw new Exception("Ce lien n'est plus valide (votre compte a été modifié depuis l'émission de ce lien)");
         }
 
@@ -42,11 +42,11 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
         // not logged => /login
         return $response->withRedirect(empty($_GET['redirect']) ? '/login' : $_GET['redirect']);
     } else if ($_SESSION['current_user']['user_role'] == 'admin') {
-        // logged in admin => /commerciaux
-        return $response->withRedirect(empty($_GET['redirect']) ? '/commerciaux' : $_GET['redirect']);
+        // logged in admin => /admin
+        return $response->withRedirect(empty($_GET['redirect']) ? '/admin' : $_GET['redirect']);
     } else if ($_SESSION['current_user']['user_role'] == 'commercial') {
-        // logged in commercial => /clients
-        return $response->withRedirect(empty($_GET['redirect']) ? '/clients' : $_GET['redirect']);
+        // logged in commercial => /commercial
+        return $response->withRedirect(empty($_GET['redirect']) ? '/commercial' : $_GET['redirect']);
     } else {
         console_log($_SESSION['current_user']);
     }
@@ -78,7 +78,7 @@ $app->post('/login', function (Request $request, Response $response): Response {
     // get password hash (and infos at the same time)
     $res = $req->fetch();
     $user_infos = [
-        'uid' => $res['id_user'],
+        'uid' => $res['id_utilisateur'],
         'email' => $res['primary_email'],
         'user_role' => $res['user_role'],
     ];
@@ -120,7 +120,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
     $reponse = $req->fetch();
 
     $jwt = jwt_encode([
-        "last_time_settings_changed" => $reponse['last_time_settings_changed'],
+        "last_user_update" => $reponse['last_user_update'],
         "uid" => $id_user,
     ], 20);
 
