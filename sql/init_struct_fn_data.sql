@@ -24,7 +24,7 @@ create or replace table _enum_mime_type (
 insert into _enum_mime_type(description) values ('image/png');
 insert into _enum_mime_type(description) values ('image/jpeg');
 insert into _enum_mime_type(description) values ('image/gif');
-insert into _enum_mime_type(description) values ('file/pdf');
+insert into _enum_mime_type(description) values ('application/pdf');
 
 create or replace table _enum_etat_dossier (
     description varchar(50) not null primary key

@@ -146,6 +146,10 @@ function routesCommercial()
                     if ($req->rowCount() == 0) {
                         throw new \Exception("Ce type de fichier n'est pas accepté");
                     }
+                    // if PDF creates a preview
+                    if ($mime_type == 'application/pdf') {
+                        console_log('koala');
+                    }
 
                     // register file in the DB
                     $req = $db->prepare(getSqlQueryString('new_fichier_dossier'));

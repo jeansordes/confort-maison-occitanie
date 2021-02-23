@@ -20,13 +20,14 @@
 		{% if fichiers|length > 0 %}
 			<div class="files-thumbnails">
 				{% for fichier in fichiers %}
-					{% if fichier.mime_type starts with "image" %}
-						<a href="/uploads/{{ fichier.file_name }}">
-							<img src="/uploads/{{ fichier.file_name }}" class="img-fluid img-thumbnail">
-						</a>
-					{% else %}
-						<span class="text-muted fst-italic">Aperçu non disponible</span>
-					{% endif %}
+					<a href="/uploads/{{ fichier.file_name }}" class="text-muted img-thumbnail text-decoration-none">
+                        <span class="mb-3 text-decoration-underline">{{ fichier.file_name }}</span>
+						{% if fichier.mime_type starts with "image" %}
+							<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">
+						{% else %}
+							<span class="fst-italic"><i class="material-icons">picture_as_pdf</i> Aperçu non disponible</span>
+						{% endif %}
+					</a>
 				{% endfor %}
 			</div>
 		{% else %}
