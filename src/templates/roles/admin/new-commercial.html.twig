@@ -7,7 +7,7 @@
 {% block body %}
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		{% include 'components/back-link.html.twig' %}
+		<p>{% include 'components/back-link.html.twig' with {'href': '.'} %}</p>
 
 		<h4 class="mb-3">Créer un compte de commercial</h4>
 		<p>

@@ -14,12 +14,12 @@ function sendEmail($to, $subject, $body)
     //Server settings
     $mail->SMTPDebug = SMTP::DEBUG_SERVER;
     $mail->isSMTP();
-    $mail->Host       = 'mail.gandi.net';
+    $mail->Host       = $_ENV['email_smtp_host'];
     $mail->SMTPAuth   = true;
     $mail->Username   = $_ENV['email_username'];
     $mail->Password   = $_ENV['email_password'];
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
+    $mail->Port       = $_ENV['email_smtp_port'];
 
     // NO OUTPUT
     $mail->SMTPDebug = false;
@@ -98,7 +98,7 @@ function loggedInSlimMiddleware(array $allowed_roles)
     return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) {
         global $_allowed_roles;
         global $_internal_exception;
-        if (in_array($_SESSION["current_user"]["user_role"], $_allowed_roles)) {
+        if (!empty($_SESSION["current_user"]) && in_array($_SESSION["current_user"]["user_role"], $_allowed_roles)) {
             return $next($request, $response);
         } else {
             $origin = debug_backtrace(1)[0];

@@ -1,4 +1,4 @@
-use confort_maison_occitanie;
+use cwapgwkr_confort_maison_occitanie;
 
 -- admin account (admin_cmo@yopmail.com:admin)
 select new_user('admin', 'admin_cmo@yopmail.com', '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', null, null);
@@ -30,6 +30,6 @@ set @prod1 = last_insert_id();
 insert into produits(nom_produit, id_fournisseur) values ('Crepis sur la facade', @fournisseur);
 set @prod2 = last_insert_id();
 
-insert into projets(id_client, id_produit) values (@cli1,@prod1);
-insert into projets(id_client, id_produit) values (@cli1, @prod2);
-insert into projets(id_client, id_produit) values (@cli3, @prod2);
+insert into dossiers(id_client, id_produit) values (@cli1,@prod1);
+insert into dossiers(id_client, id_produit) values (@cli1, @prod2);
+insert into dossiers(id_client, id_produit) values (@cli3, @prod2);

@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter un projet
+{% block title %}Ajouter un dossier
 {% endblock %}
 
 {% block body %}
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		{% include 'components/back-link.html.twig' %}
+		<p>{% include 'components/back-link.html.twig' with {'href': '.'} %}</p>
 
-		<h4 class="mb-3">Ajouter un projet</h4>
+		<h4 class="mb-3">Ajouter un dossier</h4>
 		{% if produits|length > 0 %}
 			<div class="card">
 				<ul class="list-group list-group-flush">
@@ -16,10 +16,10 @@
 						<li class="list-group-item">
 							<h5>{{ produit.nom_produit }}</h5>
 							<span class="text-muted fst-italic">{{ produit.description_produit ?? "Ce produit n'a pas de description" }}</span>
-                            <form method="POST">
-                                <input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
-                                <button class="btn btn-primary mt-3">Ajouter ce produit</button>
-                            </form>
+							<form method="POST">
+								<input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
+								<button class="btn btn-primary mt-3">Ajouter ce produit</button>
+							</form>
 						</li>
 					{% endfor %}
 				</ul>

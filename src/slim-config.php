@@ -17,6 +17,7 @@ $container['view'] = function ($container) {
         // 'cache' => __DIR__ . '/templates/cache',
     ]);
 
+    $twig->addGlobal('currentUrl', parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)); // https://stackoverflow.com/a/25944383/5736301
     $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
     $twig->addGlobal('isAdmin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
 
@@ -47,6 +48,8 @@ $container['view'] = function ($container) {
 
     return $twig;
 };
+
+$container['upload_directory'] = realpath(__DIR__ . '/../uploads');
 
 //Override the default Not Found Handler
 $container['notFoundHandler'] = function ($c) {

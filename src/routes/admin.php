@@ -4,16 +4,23 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+require_once 'commercial.php';
+
 $app->group('/admin', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
         $db = getPDO();
         $commerciaux = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
-        return $response->write($this->view->render('roles/admin/default.html.twig', ['commerciaux' => $commerciaux]));
+        $fournisseurs = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
+        return $response->write($this->view->render('roles/admin/default.html.twig', ['commerciaux' => $commerciaux, 'fournisseurs' => $fournisseurs]));
+    });
+    $app->get('/composer_init', function (Request $request, Response $response, array $args): Response {
+        require_once __DIR__ . '/../../init.php';
+        return $response;
     });
     $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {
         return $response->write($this->view->render('roles/admin/new-commercial.html.twig', $_GET));
     });
-    $app->post('', function (Request $request, Response $response, array $args) {
+    $app->post('/new-commercial', function (Request $request, Response $response, array $args) {
         $missing_fields_message = get_form_missing_fields_message(['email', 'prenom', 'nom_famille'], $_POST);
         if ($missing_fields_message) {
             alert($missing_fields_message, 3);
@@ -52,4 +59,10 @@ $app->group('/admin', function (App $app) {
             . $_POST['email'] . ") a bien été créé, et un email lui a été envoyé</b>", 1);
         return $response->withRedirect($request->getUri()->getPath());
     });
-});
+    
+    $app->group('/co/{idCommercial}', routesCommercial());
+
+    $app->get('/f/{idFournisseur}', function (Request $request, Response $response, array $args): Response {
+        return $response->write('en construction');
+    });
+})->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['admin'])($req, $res, $next));

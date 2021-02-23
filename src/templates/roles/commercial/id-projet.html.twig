@@ -1,31 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Projet
-	{{ projet.nom_produit }}
+{% block title %}dossier
+	{{ dossier.nom_produit }}
 {% endblock %}
 
 {% block body %}
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		{% include 'components/back-link.html.twig' %}
 
-		<h4 class="my-3">Projet "{{ projet.nom_produit }}"</h4>
-		<a href="./{{ projet.id_projet }}/new-fichier" class="btn btn-primary mb-3">
-			<i class="material-icons">add</i>
-			Ajouter un fichier</a>
+		<h4 class="my-3">dossier "{{ dossier.nom_produit }}"</h4>
+		<p>
+			{% include 'components/back-link.html.twig' %}
+			<form action="{{currentUrl}}/new-fichier" class="dropzone">
+				<span class="dz-message">
+					<i class="material-icons">add</i>
+					Ajouter des fichiers</span>
+			</form>
+		</p>
 		{% if fichiers|length > 0 %}
-			<div class="card">
-				<ul class="list-group list-group-flush">
-					{% for fichier in fichiers %}
-						<li class="list-group-item">
-							{% if fichier.mime_type starts with "image" %}
-								<img src="{{ fichier.file_url }}">
-							{% else %}
-								<span class="text-muted fst-italic">Aperçu non disponible</span>
-							{% endif %}
-						</li>
-					{% endfor %}
-				</ul>
+			<div class="files-thumbnails">
+				{% for fichier in fichiers %}
+					{% if fichier.mime_type starts with "image" %}
+						<a href="/uploads/{{ fichier.file_name }}">
+							<img src="/uploads/{{ fichier.file_name }}" class="img-fluid img-thumbnail">
+						</a>
+					{% else %}
+						<span class="text-muted fst-italic">Aperçu non disponible</span>
+					{% endif %}
+				{% endfor %}
 			</div>
 		{% else %}
 			<p class="text-muted fst-italic">Il n'y a aucun fichiers à afficher</p>

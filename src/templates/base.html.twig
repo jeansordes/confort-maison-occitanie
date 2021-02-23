@@ -6,9 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="/public/index.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="/public/bootstrap.min.5.0.0-beta1.css" rel="stylesheet" >
+    <link rel="stylesheet" href="/public/dropzone.css">
+    <link rel="stylesheet" href="/public/index.css">
     <script src="/public/bootstrap.bundle.min.5.0.0-beta1.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
@@ -21,6 +22,10 @@
     {% block body %}{% endblock %}
     <script src="/public/index.js"></script>
     <script>console.log('current user details :');console.log({{ current_user | json_encode | raw }})</script>
+    <script>
+	    [...document.getElementsByClassName('backlink-js')].forEach(b => {b.addEventListener('click', () => window.history.back())});
+    </script>
+    <script src="/public/dropzone.js"></script>
 </body>
 
 </html>

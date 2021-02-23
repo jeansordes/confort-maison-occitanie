@@ -22,3 +22,25 @@
     text-rendering: optimizeLegibility;
     -moz-osx-font-smoothing: grayscale;
 }
+
+.dropzone {
+    display: inline-block;
+    color: #0087F7;
+    padding: 3rem;
+    border: 2px dashed currentColor;
+    border-radius: 5px;
+    min-height: fit-content;
+}
+
+.files-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -1rem;
+}
+
+.files-thumbnails > * {
+    max-width: calc(100% - 2rem);
+    width: 20rem;
+    height: fit-content;
+    margin: 1rem;
+}

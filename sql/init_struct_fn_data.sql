@@ -1,6 +1,6 @@
-drop database if exists confort_maison_occitanie;
-create database confort_maison_occitanie default character set utf8mb4 collate utf8mb4_general_ci;
-use confort_maison_occitanie;
+drop database if exists cwapgwkr_confort_maison_occitanie;
+create database cwapgwkr_confort_maison_occitanie default character set utf8mb4 collate utf8mb4_general_ci;
+use cwapgwkr_confort_maison_occitanie;
 
 create or replace table _enum_user_role (
     description varchar(50) not null primary key
@@ -21,15 +21,19 @@ insert into _enum_statut_societe(description) values ('vendeur à domicile');
 create or replace table _enum_mime_type (
     description varchar(50) not null primary key
 );
+insert into _enum_mime_type(description) values ('image/png');
+insert into _enum_mime_type(description) values ('image/jpeg');
+insert into _enum_mime_type(description) values ('image/gif');
+insert into _enum_mime_type(description) values ('file/pdf');
 
-create or replace table _enum_etat_projet (
+create or replace table _enum_etat_dossier (
     description varchar(50) not null primary key
 );
-insert into _enum_etat_projet(description) values ('proposition commerciale');
-insert into _enum_etat_projet(description) values ('commande validée par le client');
-insert into _enum_etat_projet(description) values ('validation commande par le fournisseur');
-insert into _enum_etat_projet(description) values ('installation planifiée');
-insert into _enum_etat_projet(description) values ('instalée');
+insert into _enum_etat_dossier(description) values ('proposition commerciale');
+insert into _enum_etat_dossier(description) values ('commande validée par le client');
+insert into _enum_etat_dossier(description) values ('validation commande par le fournisseur');
+insert into _enum_etat_dossier(description) values ('installation planifiée');
+insert into _enum_etat_dossier(description) values ('instalée');
 
 create or replace table coordonnees (
     id_coordonnees int(11) not null auto_increment primary key,
@@ -54,8 +58,10 @@ create or replace table personnes (
 );
 
 create or replace table user_emails (
-    -- varchar(255) https://stackoverflow.com/a/8242609
-    email_string varchar(255) not null primary key check (email_string REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
+    -- varchar(200) https://stackoverflow.com/a/8242609
+    -- 200 instead of 255, cause it stores 4 bytes per character, so 4*255 = 1020
+    -- and on planethoster, the maximum limit is 1000 bytes for a primary key
+    email_string varchar(200) not null primary key check (email_string REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     id_user int(11) not null,
     constraint
         foreign key (id_user) references personnes(id_personne)
@@ -65,8 +71,9 @@ create or replace table utilisateurs (
     id_utilisateur int(11) primary key not null,
     last_user_update time not null default current_timestamp(),
     user_role varchar(50) not null,
-    primary_email varchar(255) not null,
+    primary_email varchar(200) not null,
     password_hash text not null,
+    commentaire_admin text default null,
     constraint
         foreign key (user_role) references _enum_user_role(description),
         foreign key (id_utilisateur) references personnes(id_personne),
@@ -113,10 +120,11 @@ create or replace table produits (
         foreign key (id_fournisseur) references societes(id_societe)
 );
 
-create or replace table projets (
-    id_projet int(11) not null auto_increment primary key,
+create or replace table dossiers (
+    id_dossier int(11) not null auto_increment primary key,
     id_client int(11) not null,
     id_produit int(11) not null,
+    commentaire text default null,
     date_creation timestamp not null default current_timestamp(),
     constraint
         foreign key (id_client) references clients_des_commerciaux (id_client),
@@ -125,7 +133,7 @@ create or replace table projets (
 
 create or replace table fichiers (
     id_fichier int(11) not null auto_increment primary key,
-    file_url text not null,
+    file_name text not null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
     constraint
@@ -141,28 +149,29 @@ create or replace table fichiers_produit (
         foreign key (id_fichier) references fichiers(id_fichier)
 );
 
-create or replace table fichiers_projet (
-    id_projet int(11) not null,
+create or replace table fichiers_dossier (
+    id_dossier int(11) not null,
     id_fichier int(11) not null,
     constraint
-        primary key (id_projet, id_fichier),
-        foreign key (id_projet) references projets(id_projet),
+        primary key (id_dossier, id_fichier),
+        foreign key (id_dossier) references dossiers(id_dossier),
         foreign key (id_fichier) references fichiers(id_fichier)
 );
 
-create or replace table avancement_projet (
+create or replace table avancement_dossier (
     id_avancement int(11) not null auto_increment primary key,
-    id_projet int(11) not null,
+    id_dossier int(11) not null,
     date_heure timestamp not null default current_timestamp(),
-    etat_projet varchar(50) not null,
+    etat_dossier varchar(50) not null,
     commentaire_avancement text default null,
     id_auteur int(11) not null,
     constraint
-        foreign key (id_projet) references projets(id_projet),
-        foreign key (etat_projet) references _enum_etat_projet(description),
+        foreign key (id_dossier) references dossiers(id_dossier),
+        foreign key (etat_dossier) references _enum_etat_dossier(description),
         foreign key (id_auteur) references personnes(id_personne)
 );
 
+DELIMITER //
 create or replace function new_user (
     p_role varchar(50),
     p_email text,
@@ -175,8 +184,10 @@ create or replace function new_user (
     insert into user_emails(email_string, id_user) values (p_email, @v_uid);
     insert into utilisateurs(id_utilisateur, user_role, primary_email, password_hash) values (@v_uid, p_role, p_email, p_password_hash);
     return @v_uid;
-end;
+end
+// DELIMITER ;
 
+DELIMITER //
 create or replace function new_client(
     p_prenom text,
     p_nom_famille text,
@@ -194,7 +205,36 @@ create or replace function new_client(
     insert into personnes(prenom, nom_famille, civilite, id_coordonnees)
         values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees);
     return last_insert_id();
-end;
+end
+// DELIMITER ;
+
+DELIMITER //
+create or replace function new_fichier_dossier(
+    p_filename text,
+    p_file_mime_type text,
+    p_project_id int(11)
+) returns int(11) begin
+    insert into fichiers(file_name, mime_type) values (p_filename, p_file_mime_type);
+    set @id_fichier = last_insert_id();
+    insert into fichiers_dossier(id_dossier, id_fichier)
+        values (p_project_id, @id_fichier);
+    return @id_fichier;
+end
+// DELIMITER ;
+
+DELIMITER //
+create or replace function new_fichier_produit(
+    p_filename text,
+    p_file_mime_type text,
+    p_produit_id int(11)
+) returns int(11) begin
+    insert into fichiers(file_name, mime_type) values (p_filename, p_file_mime_type);
+    set @id_fichier = last_insert_id();
+    insert into fichiers_produit(id_produit, id_fichier)
+        values (p_produit_id, @id_fichier);
+    return @id_fichier;
+end
+// DELIMITER ;
 
 create or replace view clients as
 select a.id_commercial, u.*
@@ -203,8 +243,8 @@ select a.id_commercial, u.*
         except select id_utilisateur from utilisateurs
     ) t where u.id_personne = t.id_personne and a.id_client = u.id_personne;
 
-create or replace view clients_w_nb_projets as
-    select count(p.id_projet) nb_projets, c.* from clients c left join projets p on c.id_personne = p.id_client group by p.id_client;
+create or replace view clients_w_nb_dossiers as
+    select count(p.id_dossier) nb_dossiers, c.* from clients c left join dossiers p on c.id_personne = p.id_client group by p.id_client;
 
 create or replace view commerciaux as
     select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'commercial';
@@ -212,7 +252,12 @@ create or replace view commerciaux as
 create or replace view fournisseurs as
     select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'fournisseur';
 
-create or replace view projets_enriched as
+create or replace view dossiers_enriched as
     select a.id_commercial, c.nom_produit, b.*
-    from clients_des_commerciaux a, projets b, produits c
+    from clients_des_commerciaux a, dossiers b, produits c
     where a.id_client = b.id_client and b.id_produit = c.id_produit;
+
+create or replace view fichiers_enriched as
+    select a.*, b.id_dossier
+    from fichiers a, fichiers_dossier b, fichiers_produit c
+    where a.id_fichier = b.id_fichier or a.id_fichier = c.id_fichier;

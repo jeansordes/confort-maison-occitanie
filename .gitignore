@@ -5,3 +5,4 @@ src/templates/cache/*
 composer.lock
 composer.phar
 .env
+uploads/*

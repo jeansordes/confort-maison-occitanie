@@ -11,10 +11,11 @@ session_start();
 
 require_once 'src/utilities.php';
 require_once 'src/sql-utilities.php';
-require_once 'src/twig-config.php';
+require_once 'src/slim-config.php';
 
 // routes
 foreach (glob("src/routes/*.php") as $filename) include_once $filename;
+foreach (glob("src/routes/**/*.php") as $filename) include_once $filename;
 
 $app->get('{url:.*}/', function (Request $request, Response $response, array $args) {
     return $response->withRedirect($args["url"], 301);
