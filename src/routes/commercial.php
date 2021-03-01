@@ -111,7 +111,7 @@ function routesCommercial()
                 $req = $db->prepare(getSqlQueryString('new_dossier'));
                 $req->execute(['id_client' => $args['idClient'], 'id_produit' => $_POST['id_produit']]);
                 alert("Le dossier a bien été créé", 1);
-                return $response->withRedirect($request->getUri()->getPath());
+                return $response->withRedirect($request->getUri()->getPath() . '/..');
             });
             # /{iddossier}
             $app->group('/{iddossier}', function (App $app) {
