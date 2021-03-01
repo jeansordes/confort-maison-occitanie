@@ -15,19 +15,17 @@
 				<i class="material-icons">add</i>
 				Ajouter un dossier</a>
 		</p>
-		<p>
-			<form method="post" action="{{ currentUrl }}/comment">
-				<div class="col">
-					<label class="form-label">Commentaire sur ce client</label>
-					<textarea name="comment" type="text" class="form-control">{{ comment }}</textarea>
-					<p>
-						<small class="text-muted">Cet espace n'est accessible que par vous
-							{{ isAdmin ? 'et le commercial à qui appartient ce client' : 'et les administrateurs' }}</small>
-					</p>
-				</div>
-                <button class="btn btn-primary">Enregistrer le commentaire</button>
+		<div class="card mb-3">
+            <div class="card-header">Commentaire sur ce client</div>
+			<form method="post" action="{{ currentUrl }}/comment" class="card-body">
+				<textarea name="comment" type="text" class="form-control">{{ comment }}</textarea>
+				<p>
+                </p>
+				<button class="btn btn-primary">Enregistrer le commentaire</button>
 			</form>
-		</p>
+            <small class="card-footer text-muted">Cet espace n'est accessible que par vous
+                {{ isAdmin ? 'et le commercial à qui appartient ce client' : 'et les administrateurs' }}</small>
+		</div>
 		{% if dossiers|length > 0 %}
 			<div class="card">
 				<ul class="list-group list-group-flush">
