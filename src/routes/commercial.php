@@ -74,10 +74,22 @@ function routesCommercial()
                 $req = $db->prepare(getSqlQueryString('dossiers_client'));
                 $req->execute(['id_client' => $args['idClient'], 'id_commercial' => $idCommercial]);
                 $dossiers = $req->fetchAll();
+                // récupérer le commentaire du client
+                $req = $db->prepare(getSqlQueryString('get_comment_client'));
+                $req->execute(['id_client' => $args['idClient']]);
+                $comment = $req->fetch()['commentaire_commercial'];
                 return $response->write($this->view->render(
                     'roles/commercial/id-client.html.twig',
-                    ['client' => $client, 'dossiers' => $dossiers]
+                    ['client' => $client, 'dossiers' => $dossiers, 'comment' => $comment]
                 ));
+            });
+            # /comment
+            $app->post('/comment', function (Request $request, Response $response, array $args): Response {
+                $db = getPDO();
+                $req = $db->prepare(getSqlQueryString('new_comment_client'));
+                $req->execute(['id_client' => $args['idClient'], 'comment' => $_POST['comment']]);
+                alert("Le commentaire a bien été enregistré", 1);
+                return $response->withRedirect($request->getUri()->getPath() . '/..');
             });
             # /edit
             $app->get('/edit', function (Request $request, Response $response, array $args): Response {

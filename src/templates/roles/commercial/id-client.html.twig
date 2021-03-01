@@ -7,14 +7,27 @@
 {% block body %}
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
-        
+
 		<h4 class="my-3">Client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
-        <p>
-            {% include 'components/back-link.html.twig' %}
-            <a href="{{ currentUrl }}/new-dossier" class="btn btn-primary">
-                <i class="material-icons">add</i>
-                Ajouter un dossier</a>
-        </p>
+		<p>
+			{% include 'components/back-link.html.twig' with {'href': currentUrl ~ '/..'} %}
+			<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary">
+				<i class="material-icons">add</i>
+				Ajouter un dossier</a>
+		</p>
+		<p>
+			<form method="post" action="{{ currentUrl }}/comment">
+				<div class="col">
+					<label class="form-label">Commentaire sur ce client</label>
+					<textarea name="comment" type="text" class="form-control">{{ comment }}</textarea>
+					<p>
+						<small class="text-muted">Cet espace n'est accessible que par vous
+							{{ isAdmin ? 'et le commercial à qui appartient ce client' : 'et les administrateurs' }}</small>
+					</p>
+				</div>
+                <button class="btn btn-primary">Enregistrer le commentaire</button>
+			</form>
+		</p>
 		{% if dossiers|length > 0 %}
 			<div class="card">
 				<ul class="list-group list-group-flush">

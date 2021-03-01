@@ -27,6 +27,8 @@ function getSqlQueryString($key)
         'new_fichier_produit' => 'select new_fichier_produit(:file_name, :mime_type, :id_produit)',
         'check_mime_type' => 'select description from _enum_mime_type where description = :mime_type',
         'get_file' => 'select * from fichiers where file_name = :file_name',
+        'new_comment_client' => 'update clients_des_commerciaux set commentaire_commercial = :comment where id_client = :id_client',
+        'get_comment_client' => 'select commentaire_commercial from clients_des_commerciaux where id_client = :id_client',
         '' => '',
     ][$key];
 }
