@@ -61,6 +61,7 @@ $container['notFoundHandler'] = function ($c) {
 };
 $container['errorHandler'] = function ($c) {
     return function ($request, $response, $exception) use ($c) {
+        console_log($exception);
         return $c['response']
             ->withStatus(500)
             ->write($c->view->render('error.html.twig', [
