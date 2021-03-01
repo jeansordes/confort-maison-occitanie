@@ -10,7 +10,7 @@
 
 		<h4 class="my-3">dossier "{{ dossier.nom_produit }}"</h4>
 		<p>
-			{% include 'components/back-link.html.twig' %}
+			{% include 'components/back-link.html.twig' with {'href': '.'} %}
 			<form action="{{currentUrl}}/new-fichier" class="dropzone">
 				<span class="dz-message">
 					<i class="material-icons">add</i>
