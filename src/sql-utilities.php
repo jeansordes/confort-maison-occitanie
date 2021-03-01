@@ -17,7 +17,7 @@ function getSqlQueryString($key)
         'new_email' => 'insert into user_emails(email_string, id_user) values (:email, :uid)',
         'tous_clients' => "select * from clients_w_nb_dossiers",
         'infos_client' => 'select id_personne, prenom, nom_famille from clients where id_personne = :id_client and id_commercial = :id_commercial',
-        'dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client and id_commercial = :id_commercial',
+        'dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client and id_commercial = :id_commercial order by date_creation desc',
         'new_dossier' => 'insert into dossiers (id_client, id_produit) values (:id_client, :id_produit)',
         'tous_produits' => 'select * from produits',
         'infos_dossier' => 'select * from dossiers_enriched where id_dossier = :id_dossier',
