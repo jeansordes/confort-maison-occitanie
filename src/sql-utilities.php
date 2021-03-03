@@ -37,7 +37,7 @@ function getPDO()
 {
     try {
         $db = new \PDO(
-            'mysql:host=127.0.0.1;dbname=' . $_ENV['db_name'] . ';charset=utf8mb4',
+            'mysql:host=localhost;dbname=' . $_ENV['db_name'] . ';charset=utf8mb4',
             $_ENV['db_username'],
             $_ENV['db_password'],
         );

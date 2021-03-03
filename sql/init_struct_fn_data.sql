@@ -16,7 +16,7 @@ insert into _enum_statut_societe(description) values ('autoentrepreneur');
 insert into _enum_statut_societe(description) values ('entreprise');
 insert into _enum_statut_societe(description) values ('vendeur à domicile');
 
--- https://developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+-- https:$$developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 -- application/pdf ou image/png
 create or replace table _enum_mime_type (
     description varchar(50) not null primary key
@@ -58,7 +58,7 @@ create or replace table personnes (
 );
 
 create or replace table user_emails (
-    -- varchar(200) https://stackoverflow.com/a/8242609
+    -- varchar(200) https:$$stackoverflow.com/a/8242609
     -- 200 instead of 255, cause it stores 4 bytes per character, so 4*255 = 1020
     -- and on planethoster, the maximum limit is 1000 bytes for a primary key
     email_string varchar(200) not null primary key check (email_string REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
@@ -171,7 +171,7 @@ create or replace table avancement_dossier (
         foreign key (id_auteur) references personnes(id_personne)
 );
 
-DELIMITER //
+DELIMITER $$
 create or replace function new_user (
     p_role varchar(50),
     p_email text,
@@ -185,9 +185,9 @@ create or replace function new_user (
     insert into utilisateurs(id_utilisateur, user_role, primary_email, password_hash) values (@v_uid, p_role, p_email, p_password_hash);
     return @v_uid;
 end
-// DELIMITER ;
+$$
 
-DELIMITER //
+$$
 create or replace function new_client(
     p_prenom text,
     p_nom_famille text,
@@ -206,9 +206,9 @@ create or replace function new_client(
         values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees);
     return last_insert_id();
 end
-// DELIMITER ;
+$$
 
-DELIMITER //
+$$
 create or replace function new_fichier_dossier(
     p_filename text,
     p_file_mime_type text,
@@ -220,9 +220,9 @@ create or replace function new_fichier_dossier(
         values (p_project_id, @id_fichier);
     return @id_fichier;
 end
-// DELIMITER ;
+$$
 
-DELIMITER //
+$$
 create or replace function new_fichier_produit(
     p_filename text,
     p_file_mime_type text,
@@ -234,7 +234,7 @@ create or replace function new_fichier_produit(
         values (p_produit_id, @id_fichier);
     return @id_fichier;
 end
-// DELIMITER ;
+$$
 
 create or replace view clients as
 select a.id_commercial, u.*
