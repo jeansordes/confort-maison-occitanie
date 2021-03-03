@@ -17,6 +17,10 @@ $app->group('/admin', function (App $app) {
         require_once __DIR__ . '/../../init.php';
         return $response;
     });
+    $app->get('/reset_db', function (Request $request, Response $response, array $args): Response {
+        require_once __DIR__ . '/../../reset_db.php';
+        return $response;
+    });
     $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {
         return $response->write($this->view->render('roles/admin/new-commercial.html.twig', $_GET));
     });
