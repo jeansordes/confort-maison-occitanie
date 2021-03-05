@@ -8,38 +8,35 @@
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<h4 class="my-3">Client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
-		<p>
+		<div class="mb-3">
 			{% include 'components/back-link.html.twig' with {'href': currentUrl ~ '/..'} %}
 			<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary">
 				<i class="material-icons">add</i>
 				Ajouter un dossier</a>
-		</p>
-		<div class="card mb-3">
-            <div class="card-header">Commentaire sur ce client</div>
-			<form method="post" action="{{ currentUrl }}/comment" class="card-body">
-				<textarea name="comment" type="text" class="form-control">{{ comment }}</textarea>
-				<p>
-                </p>
-				<button class="btn btn-primary">Enregistrer le commentaire</button>
-			</form>
-            <small class="card-footer text-muted">Cet espace n'est accessible que par vous
-                {{ isAdmin ? 'et le commercial à qui appartient ce client' : 'et les administrateurs' }}</small>
 		</div>
-		{% if dossiers|length > 0 %}
-			<div class="card">
-				<ul class="list-group list-group-flush">
-					{% for dossier in dossiers %}
-						<li class="list-group-item">
-							<a href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
-							<p>Créé
-								{{ dossier.date_creation|timeago }}</p>
-						</li>
-					{% endfor %}
-				</ul>
+		<div class="row">
+			<div class="col-12 col-md-4">
+				{% include "components/vos-commentaires.html.twig" with {'about': 'à propos de ce client'} %}
 			</div>
-		{% else %}
-			<p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
-		{% endif %}
+			<div class="col-12 col-md-8">
+				<h4 class="my-3">Dossiers du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
+
+				{% if dossiers|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for dossier in dossiers %}
+								<li class="list-group-item">
+									<a href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
+									<p>Créé
+										{{ dossier.date_creation|timeago }}</p>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
+				{% endif %}
+			</div>
+		</div>
 	</div>
 {% endblock %}

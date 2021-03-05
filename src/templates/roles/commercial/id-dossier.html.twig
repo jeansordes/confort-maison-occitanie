@@ -8,30 +8,42 @@
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<h4 class="my-3">dossier "{{ dossier.nom_produit }}"</h4>
-		<p>
+		<div class="mb-3">
 			{% include 'components/back-link.html.twig' with {'href': '.'} %}
-			<form action="{{currentUrl}}/new-fichier" class="dropzone">
-				<span class="dz-message">
-					<i class="material-icons">add</i>
-					Ajouter des fichiers</span>
-			</form>
-		</p>
-		{% if fichiers|length > 0 %}
-			<div class="files-thumbnails">
-				{% for fichier in fichiers %}
-					<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
-                        <span class="mb-3 text-decoration-underline">{{ fichier.file_name }}</span>
-						{% if fichier.mime_type starts with "image" %}
-							<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">
-						{% else %}
-							<span class="fst-italic"><i class="material-icons">picture_as_pdf</i> Aperçu non disponible</span>
-						{% endif %}
-					</a>
-				{% endfor %}
+		</div>
+
+		<div class="row">
+			<div class="col-12 col-md-4">
+				{% include "components/vos-commentaires.html.twig" with {'about': 'à propos de ce dossier'} %}
 			</div>
-		{% else %}
-			<p class="text-muted fst-italic">Il n'y a aucun fichiers à afficher</p>
-		{% endif %}
+			<div class="col-12 col-md-8">
+				<h4 class="my-3">Fichiers du dossier "{{ dossier.nom_produit }}"</h4>
+
+                <form action="{{currentUrl}}/new-fichier" class="dropzone mb-3">
+                    <span class="dz-message">
+                        <i class="material-icons">add</i>
+                        Ajouter des fichiers</span>
+                </form>
+
+				{% if fichiers|length > 0 %}
+					<div class="files-thumbnails">
+						{% for fichier in fichiers %}
+							<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
+								<span class="mb-3 text-decoration-underline">{{ fichier.file_name }}</span>
+								{% if fichier.mime_type starts with "image" %}
+									<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">
+								{% else %}
+									<span class="fst-italic">
+										<i class="material-icons">picture_as_pdf</i>
+										Aperçu non disponible</span>
+								{% endif %}
+							</a>
+						{% endfor %}
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun fichiers à afficher</p>
+				{% endif %}
+			</div>
+		</div>
 	</div>
 {% endblock %}

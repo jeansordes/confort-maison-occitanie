@@ -21,8 +21,7 @@
 					<ul class="list-group list-group-flush">
 						{% for commercial in commerciaux %}
 							<li class="list-group-item">
-								<a class="text-decoration-none" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}
-									(uid:{{ commercial.id_personne }})</a>
+								<a class="text-decoration-none" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
 							</li>
 						{% endfor %}
 					</ul>
@@ -43,8 +42,7 @@
 						<ul class="list-group list-group-flush">
 							{% for fournisseur in fournisseurs %}
 								<li class="list-group-item">
-									<a class="text-decoration-none" href="/admin/f/{{ fournisseur.id_personne }}">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille}}
-										(uid:{{ fournisseur.id_personne }})</a>
+									<a class="text-decoration-none" href="/admin/f/{{ fournisseur.id_personne }}">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille}}</a>
 								</li>
 							{% endfor %}
 						</ul>

@@ -29,6 +29,10 @@ function getSqlQueryString($key)
         'get_file' => 'select * from fichiers where file_name = :file_name',
         'new_comment_client' => 'update clients_des_commerciaux set commentaire_commercial = :comment where id_client = :id_client',
         'get_comment_client' => 'select commentaire_commercial from clients_des_commerciaux where id_client = :id_client',
+        'new_comment_commercial' => 'update utilisateurs set commentaire_admin = :comment where id_utilisateur = :id_commercial',
+        'get_comment_commercial' => 'select commentaire_admin from utilisateurs where id_utilisateur = :id_commercial',
+        'new_comment_dossier' => 'update dossiers set commentaire = :comment where id_dossier = :id_dossier',
+        'get_comment_dossier' => 'select commentaire from dossiers where id_dossier = :id_dossier',
         '' => '',
     ][$key];
 }
