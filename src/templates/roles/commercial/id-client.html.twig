@@ -10,9 +10,6 @@
 
 		<div class="mb-3">
 			{% include 'components/back-link.html.twig' with {'href': currentUrl ~ '/..'} %}
-			<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary">
-				<i class="material-icons">add</i>
-				Ajouter un dossier</a>
 		</div>
 		<div class="row">
 			<div class="col-12 col-md-4">
@@ -20,15 +17,16 @@
 			</div>
 			<div class="col-12 col-md-8">
 				<h4 class="my-3">Dossiers du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
-
+				<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
+					<i class="material-icons">add</i>
+					Créer un nouveau dossier</a>
 				{% if dossiers|length > 0 %}
 					<div class="card">
 						<ul class="list-group list-group-flush">
 							{% for dossier in dossiers %}
 								<li class="list-group-item">
-									<a href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
-									<p>Créé
-										{{ dossier.date_creation|timeago }}</p>
+									<a class="d-block" href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
+									<small class="text-muted">Créé {{ dossier.date_creation|timeago }}</small>
 								</li>
 							{% endfor %}
 						</ul>

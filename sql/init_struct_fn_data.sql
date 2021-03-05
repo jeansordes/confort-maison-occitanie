@@ -51,7 +51,6 @@ create or replace table personnes (
     nom_famille text default null,
     civilite enum('mr', 'mme') default null,
     -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
-    commentaire_admin text default null,
     id_coordonnees int(11) default null,
     constraint
         foreign key (id_coordonnees) references coordonnees(id_coordonnees)
@@ -237,17 +236,26 @@ end
 $$
 
 create or replace view clients as
-select a.id_commercial, u.*
-    from personnes u, clients_des_commerciaux a, (
-        select id_personne from personnes, utilisateurs
-        except select id_utilisateur from utilisateurs
-    ) t where u.id_personne = t.id_personne and a.id_client = u.id_personne;
-
-create or replace view clients_w_nb_dossiers as
-    select count(p.id_dossier) nb_dossiers, c.* from clients c left join dossiers p on c.id_personne = p.id_client group by p.id_client;
+    select
+        a.id_commercial,
+        u.*,
+        coalesce((select count(p.id_dossier) nb_dossiers
+            from dossiers p where u.id_personne = p.id_client group by p.id_client),0) nb_dossiers
+        from personnes u, clients_des_commerciaux a, (
+            select id_personne from personnes, utilisateurs
+            except select id_utilisateur from utilisateurs
+        ) t where u.id_personne = t.id_personne and a.id_client = u.id_personne;
 
 create or replace view commerciaux as
-    select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'commercial';
+    select
+        a.commentaire_admin,
+        (select count(*) from clients_des_commerciaux where id_commercial = u.id_personne) nb_clients,
+        (select count(*) from dossiers d, clients_des_commerciaux cc
+            where d.id_client = cc.id_client and cc.id_commercial = u.id_personne) nb_dossiers,
+        u.*
+    from personnes u, utilisateurs a
+    where u.id_personne = a.id_utilisateur
+        and a.user_role = 'commercial';
 
 create or replace view fournisseurs as
     select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'fournisseur';
@@ -261,3 +269,5 @@ create or replace view fichiers_enriched as
     select a.*, b.id_dossier
     from fichiers a, fichiers_dossier b, fichiers_produit c
     where a.id_fichier = b.id_fichier or a.id_fichier = c.id_fichier;
+
+select '';

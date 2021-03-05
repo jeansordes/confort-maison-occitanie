@@ -5,7 +5,7 @@ function getSqlQueryString($key)
 {
     return [
         'infos_commercial' => 'select id_personne, prenom, nom_famille from commerciaux where id_personne = :uid',
-        'clients_commercial' => 'select * from clients_w_nb_dossiers where id_commercial = :id_commercial',
+        'clients_commercial' => 'select * from clients where id_commercial = :id_commercial',
         'tous_commerciaux' => 'select * from commerciaux',
         'new_commercial' => "select new_user('commercial', :email, '', :prenom, :nom_famille) new_uid",
         'last_settings_update' => 'select last_user_update from utilisateurs where id_utilisateur = :uid',
@@ -15,7 +15,7 @@ function getSqlQueryString($key)
         'uid_from_primary_email' => 'select id_utilisateur from utilisateurs where primary_email = :email',
         'new_client' => 'select new_client(:prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2)',
         'new_email' => 'insert into user_emails(email_string, id_user) values (:email, :uid)',
-        'tous_clients' => 'select * from clients_w_nb_dossiers',
+        'tous_clients' => 'select * from clients',
         'infos_client' => 'select id_personne, prenom, nom_famille from clients where id_personne = :id_client and id_commercial = :id_commercial',
         'dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client and id_commercial = :id_commercial order by date_creation desc',
         'new_dossier' => 'insert into dossiers (id_client, id_produit) values (:id_client, :id_produit)',

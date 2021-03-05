@@ -21,7 +21,8 @@
 					<ul class="list-group list-group-flush">
 						{% for commercial in commerciaux %}
 							<li class="list-group-item">
-								<a class="text-decoration-none" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
+								<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
+                                <small class="text-muted">{{ commercial.nb_dossiers }} dossiers, {{ commercial.nb_clients }} clients</small>
 							</li>
 						{% endfor %}
 					</ul>

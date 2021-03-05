@@ -33,3 +33,5 @@ set @prod2 = last_insert_id();
 insert into dossiers(id_client, id_produit) values (@cli1,@prod1);
 insert into dossiers(id_client, id_produit) values (@cli1, @prod2);
 insert into dossiers(id_client, id_produit) values (@cli3, @prod2);
+
+select '';
