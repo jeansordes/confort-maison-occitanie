@@ -1,4 +1,4 @@
-use cwapgwkr_confort_maison_occitanie;
+use cmo_db_name;
 
 -- admin account (admin_cmo@yopmail.com:admin)
 select new_user('admin', 'admin_cmo@yopmail.com', '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', null, null);
@@ -33,5 +33,3 @@ set @prod2 = last_insert_id();
 insert into dossiers(id_client, id_produit) values (@cli1,@prod1);
 insert into dossiers(id_client, id_produit) values (@cli1, @prod2);
 insert into dossiers(id_client, id_produit) values (@cli3, @prod2);
-
-select '';

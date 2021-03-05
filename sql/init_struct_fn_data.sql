@@ -1,6 +1,6 @@
-drop database if exists cwapgwkr_confort_maison_occitanie;
-create database cwapgwkr_confort_maison_occitanie default character set utf8mb4 collate utf8mb4_general_ci;
-use cwapgwkr_confort_maison_occitanie;
+drop database if exists cmo_db_name;
+create database cmo_db_name default character set utf8mb4 collate utf8mb4_general_ci;
+use cmo_db_name;
 
 create or replace table _enum_user_role (
     description varchar(50) not null primary key
@@ -269,5 +269,3 @@ create or replace view fichiers_enriched as
     select a.*, b.id_dossier
     from fichiers a, fichiers_dossier b, fichiers_produit c
     where a.id_fichier = b.id_fichier or a.id_fichier = c.id_fichier;
-
-select '';
