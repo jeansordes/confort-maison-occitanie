@@ -1,7 +1,7 @@
-use cmo_db_name;
+use :cmo_db_name;
 
 -- admin account (admin_cmo@yopmail.com:admin)
-select new_user('admin', 'admin_cmo@yopmail.com', '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', null, null);
+select new_user('admin', 'admin_cmo@yopmail.com', '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', 'Administrateur', null);
 
 -- https://www.sporcle.com/games/knhall27/superheroes-real-names-dc--marvel/results
 -- commercial 1
@@ -9,27 +9,23 @@ set @com1 = new_user('commercial','peter_parker@yopmail.com','$2y$12$U3EnKlIrojd
 -- commercial 2
 set @com2 = new_user('commercial', 'bruce_banner@yopmail.com', '', 'Bruce', 'Banner');
 -- client 1
-insert into personnes(prenom, nom_famille) values ('Tony', 'Stark');
-set @cli1 = last_insert_id();
-insert into clients_des_commerciaux(id_client, id_commercial) values (@cli1, @com1);
+set @cli1 = new_client(@com1, 'Tony', 'Stark', 'mr', null, null, null, null, null, null);
 -- client 2
-insert into personnes(prenom, nom_famille) values ('Bruce', 'Wayne');
-set @cli2 = last_insert_id();
-insert into clients_des_commerciaux(id_client, id_commercial) values (@cli2, @com1);
+set @cli2 = new_client(@com1, 'Bruce', 'Wayne', 'mr', null, null, null, null, null, null);
 -- client 3
-insert into personnes(prenom, nom_famille) values ('Steve', 'Rogers');
-set @cli3 = last_insert_id();
-insert into clients_des_commerciaux(id_client, id_commercial) values (@cli3, @com2);
+set @cli3 = new_client(@com2, 'Steve', 'Rogers', 'mr', null, null, null, null, null, null);
 -- fournisseur
 set @fournisseur_representant = new_user('fournisseur', 'charles_xavier@yopmail.com', '', 'Charles', 'Xavier');
 insert into societes(nom_societe, id_representant) values ('X-men construction', @fournisseur_representant);
-set @fournisseur = last_insert_id();
 
-insert into produits(nom_produit, id_fournisseur) values ('Isolation des combles',@fournisseur);
+insert into produits(nom_produit, description_produit, id_fournisseur) values ('Isolation des combles','C''est un choix de rénovation énergétique à prioriser. En effet, jusqu''à 30 % des pertes de chaleur se font par la toiture. Cette isolation est donc celle qui permet de faire le plus d''économies d''énergie pour un faible coût',@fournisseur_representant);
 set @prod1 = last_insert_id();
-insert into produits(nom_produit, id_fournisseur) values ('Crepis sur la facade', @fournisseur);
+
+insert into produits(nom_produit, description_produit, id_fournisseur) values ('Crepis sur la facade','Il apporte une deuxième jeunesse aux maisons anciennes ou revêtit avec élégance une habitation neuve, protège le batiment des intempéries et du temps, apporte la touche finale à l''esthétique de la maison : le crépi est le revêtement de façade le plus utilisé en France, loin devant la peinture et le bardage.', @fournisseur_representant);
 set @prod2 = last_insert_id();
 
-insert into dossiers(id_client, id_produit) values (@cli1,@prod1);
-insert into dossiers(id_client, id_produit) values (@cli1, @prod2);
-insert into dossiers(id_client, id_produit) values (@cli3, @prod2);
+select new_dossier(1, @cli1, @prod1);
+select new_dossier(1, @cli1, @prod2);
+select new_dossier(1, @cli3, @prod2);
+
+select 'Query done';

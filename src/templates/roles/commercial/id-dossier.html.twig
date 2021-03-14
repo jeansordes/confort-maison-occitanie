@@ -8,22 +8,57 @@
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="mb-3">
+		<div class="mb-4">
 			{% include 'components/back-link.html.twig' with {'href': '.'} %}
+			<div>
+				<h4 class="mb-0 mt-3">Dossier "{{ dossier.nom_produit }}" du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
+				<p class="text-muted">Ce produit est fourni par "{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}", ce dossier est géré par "{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}"</p>
+			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-12 col-md-4">
 				{% include "components/vos-commentaires.html.twig" with {'about': 'à propos de ce dossier'} %}
+				<div>
+					<h4>Historique du dossier</h4>
+					{% if logs|length > 0 %}
+						<div class="card">
+							<ul class="list-group list-group-flush">
+								{% for log in logs %}
+									<li class="list-group-item">
+										<div>
+											<strong>{{ log.nom_action }}</strong>
+											{{ log.date_heure|timeago }}</div>
+										<div>Par
+											{{ log.prenom_utilisateur ~ ' ' ~ log.nom_utilisateur }}</div>
+										<small class="text-muted">{{ log.desc_action }}</small>
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+					{% else %}
+						<p class="text-muted fst-italic">Il n'y a aucun historique à afficher</p>
+					{% endif %}
+				</div>
 			</div>
 			<div class="col-12 col-md-8">
-				<h4 class="my-3">Fichiers du dossier "{{ dossier.nom_produit }}"</h4>
+				{% if etats|length > 0 %}
+					<form action="{{ currentUrl }}/changer-etat" method="post">
+                        <select name="etat" class="form-select d-inline-block w-auto me-3">
+                            {% for etat in etats %}
+                                <option value="{{ etat.id_enum_etat }}" {{ etat.id_enum_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-outline-primary">Sauvegarder état du projet</button>
+					</form>
+				{% endif %}
 
-                <form action="{{currentUrl}}/new-fichier" class="dropzone mb-3">
-                    <span class="dz-message">
-                        <i class="material-icons">add</i>
-                        Ajouter des fichiers</span>
-                </form>
+				<h4 class="my-3">Fichiers</h4>
+				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
+					<span class="dz-message">
+						<i class="material-icons">add</i>
+						Ajouter des fichiers</span>
+				</form>
 
 				{% if fichiers|length > 0 %}
 					<div class="files-thumbnails">

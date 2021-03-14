@@ -10,7 +10,6 @@
     <link href="/public/bootstrap.min.5.0.0-beta1.css" rel="stylesheet" >
     <link rel="stylesheet" href="/public/dropzone.css">
     <link rel="stylesheet" href="/public/index.css">
-    <script src="/public/bootstrap.bundle.min.5.0.0-beta1.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 
@@ -20,12 +19,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>{% endif %}
     {% block body %}{% endblock %}
+    <script src="/public/bootstrap.bundle.min.5.0.0-beta1.js"></script>
+    <script src="/public/dropzone.js"></script>
     <script src="/public/index.js"></script>
     <script>console.log('current user details :');console.log({{ current_user | json_encode | raw }})</script>
-    <script>
-	    [...document.getElementsByClassName('backlink-js')].forEach(b => {b.addEventListener('click', () => window.history.back())});
-    </script>
-    <script src="/public/dropzone.js"></script>
 </body>
 
 </html>

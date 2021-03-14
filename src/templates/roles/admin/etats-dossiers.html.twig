@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Liste des états possible de dossier
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+		<div class="mb-3">{% include 'components/back-link.html.twig' with {'href': '.'} %}</div>
+
+		<div class="col-lg-6">
+			<h4 class="mb-3">Liste des états possible de dossier</h4>
+			<form action="{{currentUrl}}/new-etat" method="post" class="mb-3">
+				<div class="input-group">
+					<input type="text" name="description" class="form-control">
+					<button class="btn btn-primary">
+						<i class="material-icons">add</i>
+						Ajouter un nouvel état</button>
+				</div>
+			</form>
+			{% if etats|length > 0 %}
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						{% for etat in etats %}
+							<li class="list-group-item d-flex align-items-center">
+								<pre class="m-0">{{ etat.description }}</pre>
+								<a href="{{currentUrl}}/{{etat.description}}/supprimer" class="btn btn-outline-danger btn-sm ms-auto">
+									<i class="material-icons">delete</i>
+								</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% else %}
+				<p class="text-muted fst-italic">Il n'y a aucun états à afficher</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

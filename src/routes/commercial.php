@@ -4,12 +4,17 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+function getCommercialId($args)
+{
+    return $_SESSION['current_user']['user_role'] == 'commercial' ? $_SESSION['current_user']['uid'] : $args['idCommercial'];
+}
+
 # /commercial
 function routesCommercial()
 {
     return function (App $app) {
         $app->get('', function (Request $request, Response $response, array $args): Response {
-            $idCommercial = $_SESSION['current_user']['user_role'] == 'commercial' ? $_SESSION['current_user']['uid'] : $args['idCommercial'];
+            $idCommercial = getCommercialId($args);
             $db = getPDO();
             // vérifier que le numéro du commercial est bon + récupérer ses infos
             $req = $db->prepare(getSqlQueryString('infos_commercial'));
@@ -23,8 +28,8 @@ function routesCommercial()
             $req->execute(['id_commercial' => $idCommercial]);
             $clients = $req->fetchAll();
             // récupérer le commentaire du client
-            $req = $db->prepare(getSqlQueryString('get_comment_commercial'));
-            $req->execute(['id_commercial' => $idCommercial]);
+            $req = $db->prepare(getSqlQueryString('get_comment_utilisateur'));
+            $req->execute(['id_utilisateur' => $idCommercial]);
             $comment = $req->fetch()[0];
             return $response->write($this->view->render('roles/commercial/default.html.twig', [
                 'commercial' => $commercial,
@@ -34,10 +39,10 @@ function routesCommercial()
         });
         # /comment
         $app->post('/comment', function (Request $request, Response $response, array $args): Response {
-            $idCommercial = $_SESSION['current_user']['user_role'] == 'commercial' ? $_SESSION['current_user']['uid'] : $args['idCommercial'];
+            $idCommercial = getCommercialId($args);
             $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('new_comment_commercial'));
-            $req->execute(['id_commercial' => $idCommercial, 'comment' => $_POST['comment']]);
+            $req = $db->prepare(getSqlQueryString('new_comment_utilisateur'));
+            $req->execute(['id_utilisateur' => $idCommercial, 'comment' => $_POST['comment']]);
             alert("Le commentaire a bien été enregistré", 1);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
@@ -54,9 +59,11 @@ function routesCommercial()
             return $response->write($this->view->render('roles/commercial/new-client.html.twig', $_GET));
         });
         $app->post('/new-client', function (Request $request, Response $response, array $args): Response {
+            $idCommercial = getCommercialId($args);
             $db = getPDO();
             $req = $db->prepare(getSqlQueryString('new_client'));
             $req->execute([
+                "id_commercial" => $idCommercial,
                 "prenom" => $_POST["prenom"],
                 "nom_famille" => $_POST["nom_famille"],
                 "civilite" => $_POST["civilite"],
@@ -75,18 +82,23 @@ function routesCommercial()
                     "uid" => $client_uid,
                 ]);
             }
+            $req = $db->prepare(getSqlQueryString(''));
             alert('Client ajouté avec succès 👍', 1);
-            return $response->withRedirect($request->getUri()->getPath());
+            return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
         # /{idClient}
         $app->group('/{idClient}', function (App $app) {
             $app->get('', function (Request $request, Response $response, array $args): Response {
-                $idCommercial = $_SESSION['current_user']['user_role'] == 'commercial' ? $_SESSION['current_user']['uid'] : $args['idCommercial'];
+                $idCommercial = getCommercialId($args);
                 // récupérer les informations du client idClient
                 $db = getPDO();
                 $req = $db->prepare(getSqlQueryString('infos_client'));
-                $req->execute(['id_client' => $args['idClient'], 'id_commercial' => $idCommercial]);
+                $req->execute(['id_client' => $args['idClient']]);
                 $client = $req->fetch();
+                // récupérer les infos du commercial
+                $req = $db->prepare(getSqlQueryString('infos_commercial'));
+                $req->execute(['uid' => $idCommercial]);
+                $commercial = $req->fetch();
                 // récupérer les contrats du client idClient
                 $req = $db->prepare(getSqlQueryString('dossiers_client'));
                 $req->execute(['id_client' => $args['idClient'], 'id_commercial' => $idCommercial]);
@@ -97,7 +109,7 @@ function routesCommercial()
                 $comment = $req->fetch()[0];
                 return $response->write($this->view->render(
                     'roles/commercial/id-client.html.twig',
-                    ['client' => $client, 'dossiers' => $dossiers, 'comment' => $comment]
+                    ['client' => $client, 'dossiers' => $dossiers, 'comment' => $comment, 'commercial' => $commercial]
                 ));
             });
             # /comment
@@ -133,11 +145,24 @@ function routesCommercial()
             # /{idDossier}
             $app->group('/{idDossier}', function (App $app) {
                 $app->get('', function (Request $request, Response $response, array $args): Response {
+                    $idCommercial = getCommercialId($args);
                     // récupérer infos sur dossier
                     $db = getPDO();
                     $req = $db->prepare(getSqlQueryString('infos_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
                     $dossier = $req->fetch();
+                    // récupérer infos sur commercial
+                    $req = $db->prepare(getSqlQueryString('infos_commercial'));
+                    $req->execute(['uid' => $idCommercial]);
+                    $commercial = $req->fetch();
+                    // récupérer infos sur fournisseur
+                    $req = $db->prepare(getSqlQueryString('infos_fournisseur'));
+                    $req->execute(['uid' => $dossier['id_fournisseur']]);
+                    $fournisseur = $req->fetch();
+                    // récupérer infos sur client
+                    $req = $db->prepare(getSqlQueryString('infos_client'));
+                    $req->execute(['id_client' => $dossier['id_client']]);
+                    $client = $req->fetch();
                     // récupérer liste des fichiers
                     $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
@@ -146,9 +171,25 @@ function routesCommercial()
                     $req = $db->prepare(getSqlQueryString('get_comment_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
                     $comment = $req->fetch()[0];
+                    // récupérer les états possibles d'un dossier
+                    $etats = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
+                    // récupérer liste des logs
+                    $req = $db->prepare(getSqlQueryString('get_logs_dossiers'));
+                    $req->execute(['id_dossier' => $args['idDossier']]);
+                    $logs = $req->fetchAll();
+
                     return $response->write($this->view->render(
                         'roles/commercial/id-dossier.html.twig',
-                        ['dossier' => $dossier, 'fichiers' => $fichiers, 'comment' => $comment]
+                        [
+                            'dossier' => $dossier,
+                            'fichiers' => $fichiers,
+                            'comment' => $comment,
+                            'commercial' => $commercial,
+                            'fournisseur' => $fournisseur,
+                            'client' => $client,
+                            'etats' => $etats,
+                            'logs' => $logs,
+                        ]
                     ));
                 });
                 # /comment
@@ -165,6 +206,31 @@ function routesCommercial()
                 });
                 $app->post('/edit', function (Request $request, Response $response, array $args): Response {
                     return $response->withRedirect($request->getUri()->getPath());
+                });
+                # /changer-etat
+                $app->post('/changer-etat', function (Request $request, Response $response, array $args): Response {
+                    $missing_fields_message = get_form_missing_fields_message(['etat'], $_POST);
+                    if ($missing_fields_message) {
+                        alert($missing_fields_message, 3);
+                        return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
+                    }
+                    $db = getPDO();
+                    $req = $db->prepare(getSqlQueryString('edit_etat'));
+                    $req->execute(['new_value' => $_POST['etat'], 'id_dossier' => $args['idDossier']]);
+                    $req = $db->prepare(getSqlQueryString('get_etats_dossier'));
+                    $req->execute(['id_enum_etat' => $_POST['etat']]);
+                    $newEtatText = $req->fetch()['description'];
+                    // ajouter dans les logs
+                    $req = $db->prepare(getSqlQueryString('new_dossier_log'));
+                    $req->execute([
+                        'id_dossier' => $args['idDossier'],
+                        'id_author' => $_SESSION['current_user']['uid'],
+                        'nom_action' => 'Changement état du dossier',
+                        'desc_action' => "« " . $newEtatText . " »",
+                    ]);
+
+                    alert("L'état du dossier a bien été mis à jour", 1);
+                    return $response->withRedirect($request->getUri()->getPath() . '/..');
                 });
                 # /new-fichier
                 $app->get('/new-fichier', function (Request $request, Response $response, array $args): Response {
@@ -197,7 +263,7 @@ function routesCommercial()
                     $req->execute([
                         "file_name" => $filename,
                         "mime_type" => $mime_type,
-                        "id_dossier" => $args['iddossier'],
+                        "id_dossier" => $args['idDossier'],
                     ]);
                     return $response->write('uploaded ' . $filename . '<br/>');
                 });

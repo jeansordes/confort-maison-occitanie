@@ -1,6 +1,6 @@
-drop database if exists cmo_db_name;
-create database cmo_db_name default character set utf8mb4 collate utf8mb4_general_ci;
-use cmo_db_name;
+drop database if exists :cmo_db_name;
+create database :cmo_db_name default character set utf8mb4 collate utf8mb4_general_ci;
+use :cmo_db_name;
 
 create or replace table _enum_user_role (
     description varchar(50) not null primary key
@@ -26,14 +26,20 @@ insert into _enum_mime_type(description) values ('image/jpeg');
 insert into _enum_mime_type(description) values ('image/gif');
 insert into _enum_mime_type(description) values ('application/pdf');
 
-create or replace table _enum_etat_dossier (
-    description varchar(50) not null primary key
+create or replace table _enum_etats_dossier (
+    id_enum_etat int(11) not null auto_increment primary key,
+    description varchar(50) not null unique
 );
-insert into _enum_etat_dossier(description) values ('proposition commerciale');
-insert into _enum_etat_dossier(description) values ('commande validée par le client');
-insert into _enum_etat_dossier(description) values ('validation commande par le fournisseur');
-insert into _enum_etat_dossier(description) values ('installation planifiée');
-insert into _enum_etat_dossier(description) values ('instalée');
+
+insert into _enum_etats_dossier(description) values ('projet créé');
+insert into _enum_etats_dossier(description) values ('en attente de validation du fournisseur');
+insert into _enum_etats_dossier(description) values ('validé par le fournisseur');
+insert into _enum_etats_dossier(description) values ('dossier à compléter');
+insert into _enum_etats_dossier(description) values ('date installation planifiée');
+insert into _enum_etats_dossier(description) values ('facturable');
+insert into _enum_etats_dossier(description) values ('payé par fournisseur');
+insert into _enum_etats_dossier(description) values ('payé au conseiller');
+insert into _enum_etats_dossier(description) values ('cloturé');
 
 create or replace table coordonnees (
     id_coordonnees int(11) not null auto_increment primary key,
@@ -49,7 +55,7 @@ create or replace table personnes (
     id_personne int(11) not null auto_increment primary key,
     prenom text default null,
     nom_famille text default null,
-    civilite enum('mr', 'mme') default null,
+    civilite enum('mr', 'mme', '') default null,
     -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
     id_coordonnees int(11) default null,
     constraint
@@ -116,7 +122,7 @@ create or replace table produits (
     id_fournisseur int(11) not null,
     description_produit text default null,
     constraint
-        foreign key (id_fournisseur) references societes(id_societe)
+        foreign key (id_fournisseur) references utilisateurs(id_utilisateur)
 );
 
 create or replace table dossiers (
@@ -124,10 +130,11 @@ create or replace table dossiers (
     id_client int(11) not null,
     id_produit int(11) not null,
     commentaire text default null,
-    date_creation timestamp not null default current_timestamp(),
+    etat_dossier int(11) not null,
     constraint
         foreign key (id_client) references clients_des_commerciaux (id_client),
-        foreign key (id_produit) references produits(id_produit)
+        foreign key (id_produit) references produits(id_produit),
+        foreign key (etat_dossier) references _enum_etats_dossier(id_enum_etat)
 );
 
 create or replace table fichiers (
@@ -157,17 +164,17 @@ create or replace table fichiers_dossier (
         foreign key (id_fichier) references fichiers(id_fichier)
 );
 
-create or replace table avancement_dossier (
-    id_avancement int(11) not null auto_increment primary key,
-    id_dossier int(11) not null,
+create or replace table logs_dossiers
+(
+    id_log         int(11)     not null auto_increment primary key,
+    id_dossier     int(11)     not null,
+    id_utilisateur int(11)     not null,
+    nom_action     varchar(50) not null,
+    desc_action    text default null,
     date_heure timestamp not null default current_timestamp(),
-    etat_dossier varchar(50) not null,
-    commentaire_avancement text default null,
-    id_auteur int(11) not null,
     constraint
-        foreign key (id_dossier) references dossiers(id_dossier),
-        foreign key (etat_dossier) references _enum_etat_dossier(description),
-        foreign key (id_auteur) references personnes(id_personne)
+        foreign key (id_dossier) references dossiers (id_dossier),
+        foreign key (id_utilisateur) references utilisateurs (id_utilisateur)
 );
 
 DELIMITER $$
@@ -188,6 +195,7 @@ $$
 
 $$
 create or replace function new_client(
+    p_id_commercial int(11),
     p_prenom text,
     p_nom_famille text,
     p_civilite text,
@@ -203,7 +211,9 @@ create or replace function new_client(
     set @id_coordonnees = last_insert_id();
     insert into personnes(prenom, nom_famille, civilite, id_coordonnees)
         values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees);
-    return last_insert_id();
+    set @id_client = last_insert_id();
+    insert into clients_des_commerciaux(id_client, id_commercial) values (@id_client, p_id_commercial);
+    return @id_client;
 end
 $$
 
@@ -235,6 +245,20 @@ create or replace function new_fichier_produit(
 end
 $$
 
+$$
+create or replace function new_dossier(
+    p_id_author int(11),
+    p_id_client int(11),
+    p_id_produit int(11)
+) returns int(11) begin
+    insert into dossiers(id_client, id_produit, etat_dossier) values (p_id_client, p_id_produit, 1);
+    set @id_dossier = last_insert_id();
+    select description into @initial_dossier_etat from _enum_etats_dossier where id_enum_etat = 1;
+    insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (@id_dossier, p_id_author, 'Initialisation état du dossier', concat('« ',@initial_dossier_etat,' »'));
+    return @id_dossier;
+end
+$$
+
 create or replace view clients as
     select
         a.id_commercial,
@@ -261,7 +285,9 @@ create or replace view fournisseurs as
     select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'fournisseur';
 
 create or replace view dossiers_enriched as
-    select a.id_commercial, c.nom_produit, b.*
+    select a.id_commercial, c.nom_produit, b.*,
+           (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure limit 1) date_creation,
+           c.id_fournisseur
     from clients_des_commerciaux a, dossiers b, produits c
     where a.id_client = b.id_client and b.id_produit = c.id_produit;
 
@@ -269,3 +295,10 @@ create or replace view fichiers_enriched as
     select a.*, b.id_dossier
     from fichiers a, fichiers_dossier b, fichiers_produit c
     where a.id_fichier = b.id_fichier or a.id_fichier = c.id_fichier;
+
+create or replace view logs_enriched as
+    select l.*, p.prenom prenom_utilisateur, p.nom_famille nom_utilisateur
+    from logs_dossiers l, personnes p where p.id_personne = l.id_utilisateur
+    order by date_heure;
+
+select 'Query done';

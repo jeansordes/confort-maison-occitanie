@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Liste des produits
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+
+		<div class="mb-3">
+			{% if isAdmin %}
+				{% include 'components/back-link.html.twig' with {href: '..'} %}
+			{% endif %}
+		</div>
+
+		<div class="row">
+			<div class="col-12 col-md-4">
+				{% include "components/vos-commentaires.html.twig" with {about: 'pour ' ~ (isAdmin ? 'ce fournisseur' : 'les admins') } %}
+			</div>
+			<div class="col-12 col-md-8">
+				<h4 class="my-3">Liste
+					{{ isAdmin ? 'des produits de ' ~ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille : 'de vos produits' }}</h4>
+				<a href="{{ currentUrl }}/new-produit" class="btn btn-primary mb-3">
+					<i class="material-icons">add</i>
+					Ajouter un produit</a>
+				{% if produits|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for produit in produits %}
+								<li class="list-group-item">
+									<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ produit.id_produit }}">{{ produit.nom_produit}}</a>
+									<small class="text-muted">{{ produit.description_produit }}</small>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

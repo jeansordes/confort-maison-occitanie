@@ -4,13 +4,14 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 global $connexion_string;
 $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . " " . $_ENV['db_name'];
+echo $connexion_string . "\n";
 
 function runFile($filename)
 {
     global $connexion_string;
     echo "--- $filename ---\n";
     $tmpString = file_get_contents(__DIR__ . '/sql/' . $filename);
-    $tmpString = str_replace('cmo_db_name', $_ENV['db_name'], $tmpString);
+    $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
 
     $temp = tmpfile();
     fwrite($temp, $tmpString);
@@ -23,3 +24,10 @@ function runFile($filename)
 
 runFile('init_struct_fn_data.sql');
 runFile('dummy_data.sql');
+
+// empty the "uploads" folder
+foreach (glob(__DIR__ . "/uploads/*") as $file) {
+    if (strpos($file, '.gitkeep') == false) {
+        unlink($file);
+    }
+}

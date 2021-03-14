@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un produit
+{% endblock %}
+
+{% block body %}
+	<div class="container my-5 pt-5">
+		{% include 'components/connected-as.html.twig' %}
+		<p>{% include 'components/back-link.html.twig' with {'href': '.'} %}</p>
+
+		<h4 class="mb-3">Ajouter un produit</h4>
+		<form method="POST" class="col-4">
+			<div class="mb-3">
+				<label class="form-label">Nom du produit</label>
+				<input name="nom_produit" value="{{ nom_produit }}" type="text" class="form-control"/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Description du produit</label>
+				<textarea name="description_produit" type="text" class="form-control">{{ description_produit }}</textarea>
+			</div>
+
+			<button class="btn btn-primary mt-3">Créer le produit</button>
+		</form>
+	</p>
+</div>{% endblock %}
