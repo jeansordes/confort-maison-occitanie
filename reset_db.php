@@ -31,5 +31,3 @@ foreach (glob(__DIR__ . "/uploads/*") as $file) {
         unlink($file);
     }
 }
-
-// pitié, ne pas supprimer ce commentaire : https://stackoverflow.com/a/55953794/5736301
