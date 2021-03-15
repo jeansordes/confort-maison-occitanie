@@ -3,7 +3,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/.env');
 
 global $connexion_string;
-$connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . " " . $_ENV['db_name'];
+$connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . " " . $_ENV['db_name'] . '--default-character-set=utf8';
 echo $connexion_string . "\n";
 
 function runFile($filename)
