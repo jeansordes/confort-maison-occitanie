@@ -10,8 +10,11 @@ require_once 'fournisseur.php';
 $app->group('/admin', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
         $db = getPDO();
+        // récupérer tous les commerciaux
         $commerciaux = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+        // récupérer tous les fournisseurs
         $fournisseurs = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
+        // récupérer tous les dossiers
         return $response->write($this->view->render('roles/admin/default.html.twig', ['commerciaux' => $commerciaux, 'fournisseurs' => $fournisseurs]));
     });
     $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {

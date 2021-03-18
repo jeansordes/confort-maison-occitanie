@@ -17,7 +17,29 @@
 						Créer un compte de commercial</a>
 				</p>
 				{% if commerciaux|length > 0 %}
-					<div class="card">
+					<table class="table sortable-table">
+						<thead>
+							<tr>
+								<th scope="col">UID</th>
+								<th scope="col">Prénom</th>
+								<th scope="col">Nom</th>
+								<th scope="col">Nb dossiers</th>
+								<th scope="col">Nb clients</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for commercial in commerciaux %}
+								<tr>
+									<th scope="row">{{ commercial.id_personne }}</th>
+									<td>{{ commercial.prenom }}</td>
+									<td>{{ commercial.nom_famille }}</td>
+									<td>{{ commercial.nb_dossiers }}</td>
+									<td>{{ commercial.nb_clients }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<!-- <div class="card">
 						<ul class="list-group list-group-flush">
 							{% for commercial in commerciaux %}
 								<li class="list-group-item">
@@ -29,7 +51,7 @@
 								</li>
 							{% endfor %}
 						</ul>
-					</div>
+					</div> -->
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun commercial à afficher</p>
 				{% endif %}
@@ -58,10 +80,10 @@
 			</div>
 		</div>
 
-        <div class="row mt-3">
-            <span>
-                <a href="{{currentUrl}}/etats-dossiers">Liste des états possibles de dossier</a>
-            </span>
-        </div>
+		<div class="row mt-3">
+			<span>
+				<a href="{{currentUrl}}/etats-dossiers">Liste des états possibles de dossier</a>
+			</span>
+		</div>
 	</div>
 {% endblock %}
