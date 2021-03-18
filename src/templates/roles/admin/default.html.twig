@@ -30,7 +30,9 @@
 						<tbody>
 							{% for commercial in commerciaux %}
 								<tr>
-									<th scope="row">{{ commercial.id_personne }}</th>
+									<th scope="row">
+										<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.id_personne }}</a>
+									</th>
 									<td>{{ commercial.prenom }}</td>
 									<td>{{ commercial.nom_famille }}</td>
 									<td>{{ commercial.nb_dossiers }}</td>
@@ -40,18 +42,18 @@
 						</tbody>
 					</table>
 					<!-- <div class="card">
-						<ul class="list-group list-group-flush">
-							{% for commercial in commerciaux %}
-								<li class="list-group-item">
-									<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
-									<small class="text-muted">{{ commercial.nb_dossiers }}
-										dossiers,
-										{{ commercial.nb_clients }}
-										clients</small>
-								</li>
-							{% endfor %}
-						</ul>
-					</div> -->
+											<ul class="list-group list-group-flush">
+												{% for commercial in commerciaux %}
+													<li class="list-group-item">
+														<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
+														<small class="text-muted">{{ commercial.nb_dossiers }}
+															dossiers,
+															{{ commercial.nb_clients }}
+															clients</small>
+													</li>
+												{% endfor %}
+											</ul>
+										</div> -->
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun commercial à afficher</p>
 				{% endif %}

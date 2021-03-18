@@ -192,6 +192,50 @@ function routesCommercial()
                         ]
                     ));
                 });
+                # /zip
+                $app->get('/zip', function (Request $request, Response $response, array $args): Response {
+                    $uploadFolder = realpath(__DIR__ . '/../../uploads');
+
+                    $db = getPDO();
+                    $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
+                    $req->execute(['id_dossier' => $args['idDossier']]);
+                    $fichiers = $req->fetchAll();
+                    
+                    // création du fichier zip
+                    // https://www.virendrachandak.com/techtalk/how-to-create-a-zip-file-using-php/
+                    $zip = new ZipArchive;
+                    $zipFilename = bin2hex(random_bytes(5)) . '.zip';
+                    if ($zip->open($uploadFolder . '/' . $zipFilename, ZipArchive::CREATE) === TRUE) {
+                        
+                        if (count($fichiers) < 1) {
+                            $zip->addFromString('readme.txt', 'Ce dossier ne contient aucun fichier');
+                        } else {
+                            foreach ($fichiers as $fichier) {
+                                $zip->addFile($uploadFolder . '/' . $fichier['file_name'], $fichier['file_name']);
+                            }
+                        }
+
+                        // All files are added, so close the zip file.
+                        $zip->close();
+                    }
+
+                    // download du fichier zip
+                    // https://stackoverflow.com/questions/35994416/slim-3-framework-how-to-download-file
+                    $file = $uploadFolder . '/' . $zipFilename;
+                    $res = $response->withHeader('Content-Description', 'File Transfer')
+                        ->withHeader('Content-Type', 'application/zip')
+                        ->withHeader('Content-Disposition', 'attachment;filename="' . basename($file) . '"')
+                        ->withHeader('Expires', '0')
+                        ->withHeader('Cache-Control', 'must-revalidate')
+                        ->withHeader('Pragma', 'public')
+                        ->withHeader('Content-Length', filesize($file));
+                    readfile($file);
+
+                    // suppression du fichier zip
+                    unlink($file);
+
+                    return $res;
+                });
                 # /comment
                 $app->post('/comment', function (Request $request, Response $response, array $args): Response {
                     $db = getPDO();

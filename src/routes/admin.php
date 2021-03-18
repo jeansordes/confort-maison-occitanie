@@ -15,7 +15,12 @@ $app->group('/admin', function (App $app) {
         // récupérer tous les fournisseurs
         $fournisseurs = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
         // récupérer tous les dossiers
-        return $response->write($this->view->render('roles/admin/default.html.twig', ['commerciaux' => $commerciaux, 'fournisseurs' => $fournisseurs]));
+        $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
+        return $response->write($this->view->render('roles/admin/default.html.twig', [
+            'commerciaux' => $commerciaux,
+            'fournisseurs' => $fournisseurs,
+            'dossiers' => $dossiers,
+        ]));
     });
     $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {
         return $response->write($this->view->render('roles/admin/new-commercial.html.twig', $_GET));
