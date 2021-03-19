@@ -18,7 +18,7 @@
 					{% for etape in etapes %}
 						<li class="list-group-item">
 							<a class="d-block" href="{{ currentUrl }}/{{ etape.id_etape }}">{{ etape.nom_produit }}</a>
-							<small class="text-muted">Créé
+							<small class="text-muted" title="{{ etape.date_creation }}">Créé
 								{{ etape.date_creation|timeago }}</small>
 						</li>
 					{% endfor %}

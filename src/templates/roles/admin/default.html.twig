@@ -8,84 +8,61 @@
 	<div class="container my-5 pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="row g-5">
-			<div class="col">
-				<h4 class="my-3">Liste de tous les commerciaux</h4>
-				<p>
-					<a href="/admin/new-commercial" class="btn btn-primary">
-						<i class="material-icons">add</i>
-						Créer un compte de commercial</a>
-				</p>
-				{% if commerciaux|length > 0 %}
-					<table class="table sortable-table">
-						<thead>
-							<tr>
-								<th scope="col">UID</th>
-								<th scope="col">Prénom</th>
-								<th scope="col">Nom</th>
-								<th scope="col">Nb dossiers</th>
-								<th scope="col">Nb clients</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for commercial in commerciaux %}
-								<tr>
-									<th scope="row">
-										<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.id_personne }}</a>
-									</th>
-									<td>{{ commercial.prenom }}</td>
-									<td>{{ commercial.nom_famille }}</td>
-									<td>{{ commercial.nb_dossiers }}</td>
-									<td>{{ commercial.nb_clients }}</td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-					<!-- <div class="card">
-											<ul class="list-group list-group-flush">
-												{% for commercial in commerciaux %}
-													<li class="list-group-item">
-														<a class="text-decoration-none d-block" href="/admin/co/{{ commercial.id_personne }}">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}</a>
-														<small class="text-muted">{{ commercial.nb_dossiers }}
-															dossiers,
-															{{ commercial.nb_clients }}
-															clients</small>
-													</li>
-												{% endfor %}
-											</ul>
-										</div> -->
-				{% else %}
-					<p class="text-muted fst-italic">Il n'y a aucun commercial à afficher</p>
-				{% endif %}
-			</div>
-			<div class="col">
-				<h4 class="my-3">Liste de tous les fournisseurs</h4>
-				<p>
-					<a href="/admin/new-fournisseur" class="btn btn-primary">
-						<i class="material-icons">add</i>
-						Créer un compte de fournisseur</a>
-				</p>
-
-				{% if fournisseurs|length > 0 %}
-					<div class="card">
-						<ul class="list-group list-group-flush">
-							{% for fournisseur in fournisseurs %}
-								<li class="list-group-item">
-									<a class="text-decoration-none" href="/admin/f/{{ fournisseur.id_personne }}">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille}}</a>
-								</li>
-							{% endfor %}
-						</ul>
-					</div>
-				{% else %}
-					<p class="text-muted fst-italic">Il n'y a aucun fournisseur à afficher</p>
-				{% endif %}
-			</div>
-		</div>
-
-		<div class="row mt-3">
-			<span>
-				<a href="{{currentUrl}}/etats-dossiers">Liste des états possibles de dossier</a>
+        <div class="row g-1 mb-3">
+			<span class="col-auto">
+				<a href="/admin/new-commercial" class="btn btn-primary">
+					<i class="material-icons">person_add</i>
+					Créer un compte de commercial</a>
+			</span>
+			<span class="col-auto">
+				<a href="/admin/new-fournisseur" class="btn btn-primary">
+					<i class="material-icons">person_add</i>
+					Créer un compte de fournisseur</a>
+			</span>
+			<span class="col-auto">
+				<a href="{{currentUrl}}/etats-dossiers" class="btn btn-primary">
+                    <i class="material-icons">label</i>
+                    Liste des états possibles de dossier</a>
 			</span>
 		</div>
+
+		{% if dossiers|length > 0 %}
+			<table class="table sortable-table">
+				<thead>
+					<tr>
+						<th scope="col">N° dossier</th>
+						<th scope="col">Etat du dossier</th>
+						<th scope="col">Nom produit</th>
+						<th scope="col">Commercial</th>
+						<th scope="col">Client</th>
+						<th scope="col">Fournisseur</th>
+						<th scope="col">Date de création</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for dossier in dossiers %}
+						<tr>
+							<th scope="row">#{{ dossier.id_dossier }}</th>
+							<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
+							<td>
+								<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
+							</td>
+							<td>
+								<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}">{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}</a>
+							</td>
+							<td>
+								<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
+							</td>
+							<td>
+								<a href="{{currentUrl}}/f/{{ dossier.id_fournisseur }}">{{ fournisseurs[dossier.id_fournisseur].nom_famille|upper ~ ' ' ~ fournisseurs[dossier.id_fournisseur].prenom }}</a>
+							</td>
+							<td title="{{ dossier.date_creation }}">{{ dossier.date_creation|timeago }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
+		{% endif %}
 	</div>
 {% endblock %}

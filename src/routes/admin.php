@@ -11,15 +11,37 @@ $app->group('/admin', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
         $db = getPDO();
         // récupérer tous les commerciaux
-        $commerciaux = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+        $commerciaux_from_db = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+        $commerciaux = [];
+        foreach ($commerciaux_from_db as $commercial) {
+            $commerciaux[$commercial['id_personne']] = $commercial;
+        }
         // récupérer tous les fournisseurs
-        $fournisseurs = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
+        $fournisseurs_from_db = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
+        $fournisseurs = [];
+        foreach ($fournisseurs_from_db as $fournisseur) {
+            $fournisseurs[$fournisseur['id_personne']] = $fournisseur;
+        }
+        // récupérer tous les clients
+        $clients_from_db = $db->query(getSqlQueryString('tous_clients'))->fetchAll();
+        $clients = [];
+        foreach ($clients_from_db as $client) {
+            $clients[$client['id_personne']] = $client;
+        }
+        // récupérer tous les etats_dossier
+        $etats_from_db = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
+        $etats_dossier = [];
+        foreach ($etats_from_db as $etat) {
+            $etats_dossier[$etat['id_enum_etat']] = $etat['description'];
+        }
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
         return $response->write($this->view->render('roles/admin/default.html.twig', [
             'commerciaux' => $commerciaux,
             'fournisseurs' => $fournisseurs,
             'dossiers' => $dossiers,
+            'clients' => $clients,
+            'etats_dossier' => $etats_dossier,
         ]));
     });
     $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {
