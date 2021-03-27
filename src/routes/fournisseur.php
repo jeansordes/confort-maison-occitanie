@@ -33,11 +33,6 @@ function routesFournisseur()
             ]));
         });
         $app->post('', function (Request $request, Response $response, array $args): Response {
-            $missing_fields_message = get_form_missing_fields_message(['id_produit', 'nom_produit', 'desc_produit'], $_POST);
-            if ($missing_fields_message) {
-                alert($missing_fields_message, 3);
-                return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
-            }
             $db = getPDO();
             $req = $db->prepare(getSqlQueryString('update_produit'));
             $req->execute($_POST);
@@ -52,12 +47,13 @@ function routesFournisseur()
             return $response->write($this->view->render('roles/fournisseur/new-produit.html.twig', $_GET));
         });
         $app->post('/new-produit', function (Request $request, Response $response, array $args): Response {
+            $idFournisseur = getFournisseurId($args);
             $db = getPDO();
             $req = $db->prepare(getSqlQueryString('new_produit'));
             $req->execute([
                 "nom_produit" => $_POST["nom_produit"],
                 "description_produit" => $_POST["description_produit"],
-                "id_fournisseur" => $args
+                "id_fournisseur" => $idFournisseur,
             ]);
             if (!empty($_POST["email"])) {
                 $produit_uid = $db->lastInsertId();

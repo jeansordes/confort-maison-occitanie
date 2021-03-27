@@ -22,6 +22,7 @@ function getSqlQueryString($key)
         'new_dossier' => 'select new_dossier(:id_commercial, :id_client, :id_produit)',
         'new_fichier_dossier' => 'select new_fichier_dossier(:file_name, :mime_type, :id_dossier)',
         'new_fichier_produit' => 'select new_fichier_produit(:file_name, :mime_type, :id_produit)',
+        'new_produit' => 'insert into produits(id_fournisseur, description_produit, nom_produit) values (:id_fournisseur, :description_produit, :nom_produit)',
         'new_etat_dossier' => 'insert into _enum_etats_dossier(description) values (:description)',
         'new_dossier_log' => 'insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (:id_dossier, :id_author, :nom_action, :desc_action)',
         // get

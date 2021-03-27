@@ -54,7 +54,7 @@ $app->group('/admin', function (App $app) {
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
 
-        // créer le compte (1 : user, 2 : email, 3 : account)
+        // créer le compte (1 : user, 2 : account)
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('new_user'));
         $req->execute([
