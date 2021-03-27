@@ -72,9 +72,9 @@ document.querySelectorAll('table.sortable-table').forEach(tDOM => {
     });
     const sortBtns = tDOM.querySelectorAll('thead th .btn');
     tDOM.querySelectorAll('thead th').forEach((header, i) => {
-        header.querySelector('.btn').addEventListener('click', evt => {
+        header.addEventListener('click', evt => {
             sortBtns.forEach(b => b.classList.remove('active'));
-            evt.target.classList.toggle('active');
+            evt.target.parentNode.querySelector('.btn').classList.toggle('active');
             sortTable(i, tDOM);
         });
     });

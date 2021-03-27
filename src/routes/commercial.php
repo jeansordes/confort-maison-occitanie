@@ -138,13 +138,6 @@ function routesCommercial()
                 alert('Client modifié avec succès 👍', 1);
                 return $response->withRedirect($request->getUri()->getPath());
             });
-            # /edit
-            $app->get('/edit', function (Request $request, Response $response, array $args): Response {
-                return $response->write('en construction');
-            });
-            $app->post('/edit', function (Request $request, Response $response, array $args): Response {
-                return $response->withRedirect($request->getUri()->getPath());
-            });
             # /new-dossier
             $app->get('/new-dossier', function (Request $request, Response $response, array $args): Response {
                 return $response->write($this->view->render('roles/commercial/dossier/new-dossier.html.twig', ['produits' => getPDO()->query(getSqlQueryString("tous_produits"))->fetchAll()]));
@@ -159,7 +152,8 @@ function routesCommercial()
                 $req = $db->prepare(getSqlQueryString('new_dossier'));
                 $req->execute(['id_client' => $args['idClient'], 'id_produit' => $_POST['id_produit'], 'id_commercial' => $idCommercial]);
                 alert("Le dossier a bien été créé", 1);
-                return $response->withRedirect($request->getUri()->getPath() . '/..');
+                $idDossier = $req->fetchColumn();
+                return $response->withRedirect($request->getUri()->getPath() . '/../' . $idDossier);
             });
             # /{idDossier}
             $app->group('/{idDossier}', function (App $app) {
@@ -250,13 +244,6 @@ function routesCommercial()
 
                     return $res;
                 });
-                # /edit
-                $app->get('/edit', function (Request $request, Response $response, array $args): Response {
-                    return $response->write('en construction');
-                });
-                $app->post('/edit', function (Request $request, Response $response, array $args): Response {
-                    return $response->withRedirect($request->getUri()->getPath());
-                });
                 # /changer-etat
                 $app->post('/changer-etat', function (Request $request, Response $response, array $args): Response {
                     $missing_fields_message = get_form_missing_fields_message(['etat'], $_POST);
@@ -316,22 +303,6 @@ function routesCommercial()
                         "id_dossier" => $args['idDossier'],
                     ]);
                     return $response->write('uploaded ' . $filename . '<br/>');
-                });
-                # /{idFichier}
-                $app->group('/{idFichier}', function (App $app) {
-                    $app->get('', function (Request $request, Response $response, array $args): Response {
-                        return $response->write('en construction');
-                    });
-                    $app->post('', function (Request $request, Response $response, array $args): Response {
-                        return $response->withRedirect($request->getUri()->getPath());
-                    });
-                    # /update
-                    $app->get('/update', function (Request $request, Response $response, array $args): Response {
-                        return $response->write('en construction');
-                    });
-                    $app->post('/update', function (Request $request, Response $response, array $args): Response {
-                        return $response->withRedirect($request->getUri()->getPath());
-                    });
                 });
             });
         });

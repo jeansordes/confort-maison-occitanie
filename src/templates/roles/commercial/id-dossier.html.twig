@@ -19,7 +19,7 @@
         
 		<div class="mb-4">
 			<div>
-				<h4 class="mb-0 mt-3">Dossier "{{ dossier.nom_produit }}" du client "<a href="{{ currentUrl }}/..">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>"</h4>
+				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, "{{ dossier.nom_produit }}" du client "<a href="{{ currentUrl }}/..">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>"</h4>
 				<p class="text-muted">Ce produit est fourni par "{% if isAdmin %}<a href="{{ currentUrl }}/../../../../f/{{ fournisseur.id_personne }}">{% endif %}{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}{% if isAdmin %}</a>{% endif %}", ce dossier est géré par "{% if isAdmin %}<a href="{{ currentUrl }}/../..">{% endif %}{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}{% if isAdmin %}</a>{% endif %}"</p>
 			</div>
 		</div>

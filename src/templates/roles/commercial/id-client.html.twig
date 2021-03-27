@@ -33,7 +33,7 @@
 						<ul class="list-group list-group-flush">
 							{% for dossier in dossiers %}
 								<li class="list-group-item">
-									<a class="d-block" href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
+									<a class="d-block" href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }} (Dossier #{{ dossier.id_dossier }})</a>
 									<small class="text-muted" title="{{ dossier.date_creation }}">Créé
 										{{ dossier.date_creation|timeago }}</small>
 								</li>
