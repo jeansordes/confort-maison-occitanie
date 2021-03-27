@@ -47,9 +47,13 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
     } else if ($_SESSION['current_user']['user_role'] == 'commercial') {
         // logged in commercial => /commercial
         return $response->withRedirect(empty($_GET['redirect']) ? '/commercial' : $_GET['redirect']);
+    } else if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
+        // logged in fournisseur => /fournisseur
+        return $response->withRedirect(empty($_GET['redirect']) ? '/fournisseur' : $_GET['redirect']);
     } else {
         console_log($_SESSION['current_user']);
     }
+    // return $response;
 });
 
 $app->get('/login', function (Request $request, Response $response, array $args): Response {

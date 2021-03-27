@@ -72,3 +72,21 @@ function getPDO()
 
     return $db;
 }
+
+function runFile($filename)
+{
+    $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . " " . $_ENV['db_name'] . ' --default-character-set=utf8';
+    // echo $connexion_string . "\n";
+    
+    echo "--- $filename ---\n";
+    $tmpString = file_get_contents(__DIR__ . '/../sql/' . $filename);
+    $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
+
+    $temp = tmpfile();
+    fwrite($temp, $tmpString);
+    $res = exec($connexion_string . ' -e "source ' . stream_get_meta_data($temp)['uri'] . '"');
+    echo $res;
+    fclose($temp);
+
+    echo "\n";
+}
