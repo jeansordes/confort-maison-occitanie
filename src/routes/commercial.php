@@ -137,9 +137,10 @@ function routesCommercial()
                     alert("Vous devez selectionner un produit", 3);
                     return $response->withRedirect($request->getUri()->getPath());
                 }
+                $idCommercial = getCommercialId($args);
                 $db = getPDO();
                 $req = $db->prepare(getSqlQueryString('new_dossier'));
-                $req->execute(['id_client' => $args['idClient'], 'id_produit' => $_POST['id_produit']]);
+                $req->execute(['id_client' => $args['idClient'], 'id_produit' => $_POST['id_produit'], 'id_commercial' => $idCommercial]);
                 alert("Le dossier a bien été créé", 1);
                 return $response->withRedirect($request->getUri()->getPath() . '/..');
             });

@@ -118,7 +118,7 @@ create or replace table dossiers (
     id_client int(11) not null,
     id_produit int(11) not null,
     commentaire text default null,
-    etat_dossier int(11) not null,
+    etat_dossier int(11) not null default 1,
     constraint
         foreign key (id_client) references clients_des_commerciaux (id_client),
         foreign key (id_produit) references produits(id_produit),

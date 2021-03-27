@@ -96,7 +96,7 @@
                         <ul class="list-group list-group-flush">
                             {% for fournisseur in fournisseurs %}
                                 <li class="list-group-item">
-                                    <a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom }}</a>
+                                    <a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom ~ ' (' ~ fournisseur.email ~ ')' }}</a>
                                 </li>
                             {% endfor %}
                         </ul>

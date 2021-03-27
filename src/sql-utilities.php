@@ -19,7 +19,7 @@ function getSqlQueryString($key)
         // new
         'new_user' => "select new_user(:user_type, :email, '', :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
         'new_client' => 'select new_client(:id_commercial, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
-        'new_dossier' => 'insert into dossiers (id_client, id_produit) values (:id_client, :id_produit)',
+        'new_dossier' => 'select new_dossier(:id_commercial, :id_client, :id_produit)',
         'new_fichier_dossier' => 'select new_fichier_dossier(:file_name, :mime_type, :id_dossier)',
         'new_fichier_produit' => 'select new_fichier_produit(:file_name, :mime_type, :id_produit)',
         'new_etat_dossier' => 'insert into _enum_etats_dossier(description) values (:description)',
