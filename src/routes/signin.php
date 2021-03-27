@@ -23,6 +23,8 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
             'user_role' => $res['user_role'],
         ];
         if ($user_infos['uid'] == null || $user_infos['email'] == null || $user_infos['user_role'] == null) {
+            console_log($payload);
+            console_log($user_infos);
             throw new Exception("Les infos de l'utilisateur n'ont pas été correctement initialisés");
         }
         if ($res['last_user_update'] != $payload['last_user_update']) {
@@ -107,11 +109,16 @@ $app->post('/password-reset', function (Request $request, Response $response): R
         alert("Cet email nous est inconnu : $_POST[email])", 3);
         return $response->withRedirect($request->getUri()->getPath());
     }
-
-    $id_user = $req->fetch()['id_user'];
+    
+    $id_user = $req->fetch()['id_personne'];
     // générer un token pour que l'utilisateur puisse réinitialiser son mot de passe
     $req = $db->prepare(getSqlQueryString('last_settings_update'));
     $req->execute(['uid' => $id_user]);
+    if ($req->rowCount() == 0) {
+        console_log($id_user);
+        alert("Impossible de récupérer la date de dernière modification de ce compte", 3);
+        return $response->withRedirect($request->getUri()->getPath());
+    }
     $reponse = $req->fetch();
 
     $jwt = jwt_encode([

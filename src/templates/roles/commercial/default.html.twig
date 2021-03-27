@@ -19,25 +19,33 @@
 			</nav>
 		{% endif %}
 
-		<h4 class="my-3">Liste
-			{{ isAdmin ? 'des clients de ' ~ commercial.prenom ~ ' ' ~ commercial.nom_famille : 'de vos clients' }}</h4>
-		<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
-			<i class="material-icons">add</i>
-			Ajouter un client</a>
-		{% if clients|length > 0 %}
-			<div class="card">
-				<ul class="list-group list-group-flush">
-					{% for client in clients %}
-						<li class="list-group-item">
-							<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
-							<small class="text-muted">{{ client.nb_dossiers }}
-								dossiers</small>
-						</li>
-					{% endfor %}
-				</ul>
+		<div class="row g-5">
+			<div class="col-12 col-lg-6">
+				<h4>{% if isAdmin %}Détails du commercial{% else %}Vos informations{% endif %}</h4>
+				{% include 'components/personne-details-form.html.twig' with {btnText: 'Valider les modifications', user: commercial} %}
 			</div>
-		{% else %}
-			<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
-		{% endif %}
+			<div class="col-12 col-lg-6">
+				<h4 class="my-3">Liste
+					{{ isAdmin ? 'des clients de ' ~ commercial.prenom ~ ' ' ~ commercial.nom_famille : 'de vos clients' }}</h4>
+				<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
+					<i class="material-icons">add</i>
+					Ajouter un client</a>
+				{% if clients|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for client in clients %}
+								<li class="list-group-item">
+									<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
+									<small class="text-muted">{{ client.nb_dossiers }}
+										dossiers</small>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
+				{% endif %}
+			</div>
+		</div>
 	</div>
 {% endblock %}

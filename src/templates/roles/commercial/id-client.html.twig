@@ -11,7 +11,7 @@
         <nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a href="/">Home</a></li>
-				{% if isAdmin %}<li class="breadcrumb-item"><a href="..">Commercial #{{ commercial.id_personne }}</a></li>{% endif %}
+				{% if isAdmin %}<li class="breadcrumb-item"><a href=".">Commercial #{{ commercial.id_personne }}</a></li>{% endif %}
 				<li class="breadcrumb-item active">Client #{{ client.id_personne }}</li>
 			</ol>
 		</nav>
@@ -19,7 +19,7 @@
 		<div class="row g-5">
 			<div class="col-12 col-lg-6">
 				<h4>Détails du client</h4>
-				{% include 'components/client-details-form.html.twig' with {action: 'edit'} %}
+				{% include 'components/personne-details-form.html.twig' with {btnText: 'Modifier ce client', user: client} %}
 			</div>
 			<div class="col-12 col-lg-6">
 				<h4 class="my-3">Dossiers du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>

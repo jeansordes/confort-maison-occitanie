@@ -5,6 +5,11 @@
     src: local('Material Icons'), local('MaterialIcons-Regular'), url(/public/material-icons.woff2) format('woff2');
 }
 
+:root {
+    --cmo-color: rgb(16, 179, 16);
+    --cmo-color-dark: rgb(3, 167, 3);
+}
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -26,7 +31,7 @@
 
 .dropzone {
     display: inline-block;
-    color: #0087F7;
+    color: var(--cmo-color-dark);
     padding: 3rem;
     border: 2px dashed currentColor;
     border-radius: 5px;
@@ -60,7 +65,31 @@
     opacity: 0;
 }
 
-/* .btn-primary {
-    background-color: red;
-    border-color: green;
-} */
+/* COLORING */
+.btn-primary {
+    background-color: var(--cmo-color);
+    border-color: var(--cmo-color-dark);
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--cmo-color-dark);
+    border-color: var(--cmo-color-dark);
+}
+.btn-outline-primary {
+    color: var(--cmo-color-dark);
+    border-color: currentColor;
+}
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    color: white;
+    background-color: var(--cmo-color-dark);
+    border-color: currentColor;
+}
+.btn-primary:focus, .btn-outline-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgb(16 179 16 / 50%);
+}
+
+a {
+    color: var(--cmo-color);
+}
+a:hover {
+    color: var(--cmo-color-dark);
+}

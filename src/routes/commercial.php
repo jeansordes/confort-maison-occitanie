@@ -17,12 +17,13 @@ function routesCommercial()
             $idCommercial = getCommercialId($args);
             $db = getPDO();
             // vérifier que le numéro du commercial est bon + récupérer ses infos
-            $req = $db->prepare(getSqlQueryString('infos_commercial'));
+            $req = $db->prepare(getSqlQueryString('get_commercial'));
             $req->execute(['uid' => $idCommercial]);
             if ($req->rowCount() != 1) {
                 throw new Exception("Numéro de commercial inconnu");
             }
             $commercial = $req->fetch();
+            $commercial['emailReadOnly'] = true;
             // affiche tous les clients du commercial en question
             $req = $db->prepare(getSqlQueryString('clients_commercial'));
             $req->execute(['id_commercial' => $idCommercial]);
@@ -32,12 +33,28 @@ function routesCommercial()
                 'clients' => $clients,
             ]));
         });
-        # /settings
-        $app->get('/settings', function (Request $request, Response $response, array $args): Response {
-            return $response->write('en construction');
-        });
-        $app->post('/settings', function (Request $request, Response $response, array $args): Response {
-            return $response->write('en construction');
+        $app->post('', function (Request $request, Response $response, array $args): Response {
+            $idCommercial = getCommercialId($args);
+            $db = getPDO();
+            $req = $db->prepare(getSqlQueryString('update_personne_noemail'));
+            $req->execute([
+                "prenom" => $_POST["prenom"],
+                "nom_famille" => $_POST["nom_famille"],
+                "civilite" => $_POST["civilite"],
+                "id_personne" => $idCommercial,
+            ]);
+            $req = $db->prepare(getSqlQueryString('update_coordonnees'));
+            $req->execute([
+                "adresse" => $_POST["adresse"],
+                "code_postal" => $_POST["code_postal"],
+                "ville" => $_POST["ville"],
+                "pays" => $_POST["pays"],
+                "tel1" => $_POST["tel1"],
+                "tel2" => $_POST["tel2"],
+                "id_personne" => $idCommercial,
+            ]);
+            alert('Informations modifiés avec succès 👍', 1);
+            return $response->withRedirect($request->getUri()->getPath());
         });
         # /new-client
         $app->get('/new-client', function (Request $request, Response $response, array $args): Response {
@@ -78,11 +95,11 @@ function routesCommercial()
                 $idCommercial = getCommercialId($args);
                 // récupérer les informations du client idClient
                 $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('infos_client'));
+                $req = $db->prepare(getSqlQueryString('get_client'));
                 $req->execute(['id_client' => $args['idClient']]);
                 $client = $req->fetch();
                 // récupérer les infos du commercial
-                $req = $db->prepare(getSqlQueryString('infos_commercial'));
+                $req = $db->prepare(getSqlQueryString('get_commercial'));
                 $req->execute(['uid' => $idCommercial]);
                 $commercial = $req->fetch();
                 // récupérer les contrats du client idClient
@@ -150,19 +167,19 @@ function routesCommercial()
                     $idCommercial = getCommercialId($args);
                     // récupérer infos sur dossier
                     $db = getPDO();
-                    $req = $db->prepare(getSqlQueryString('infos_dossier'));
+                    $req = $db->prepare(getSqlQueryString('get_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
                     $dossier = $req->fetch();
                     // récupérer infos sur commercial
-                    $req = $db->prepare(getSqlQueryString('infos_commercial'));
+                    $req = $db->prepare(getSqlQueryString('get_commercial'));
                     $req->execute(['uid' => $idCommercial]);
                     $commercial = $req->fetch();
                     // récupérer infos sur fournisseur
-                    $req = $db->prepare(getSqlQueryString('infos_fournisseur'));
+                    $req = $db->prepare(getSqlQueryString('get_fournisseur'));
                     $req->execute(['uid' => $dossier['id_fournisseur']]);
                     $fournisseur = $req->fetch();
                     // récupérer infos sur client
-                    $req = $db->prepare(getSqlQueryString('infos_client'));
+                    $req = $db->prepare(getSqlQueryString('get_client'));
                     $req->execute(['id_client' => $dossier['id_client']]);
                     $client = $req->fetch();
                     // récupérer liste des fichiers

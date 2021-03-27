@@ -21,32 +21,81 @@
 			</nav>
 		{% endif %}
 
-		<div>
-			<h4 class="my-3">Liste
-				{{ isAdmin ? 'des produits de ' ~ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille : 'de vos produits' }}</h4>
-			<a href="{{ currentUrl }}/new-produit" class="btn btn-primary mb-3">
-				<i class="material-icons">add</i>
-				Ajouter un produit</a>
-		</div>
-		{% if produits|length > 0 %}
-			{% for produit in produits %}
-				<div class="card d-inline-block me-3 mb-3 p-3">
-					<form method="POST">
-						<div class="mb-2">
-							<label class="form-label text-muted">Nom du produit</label>
-							<input type="text" name="nom_produit" class="form-control" value="{{ produit.nom_produit}}">
-						</div>
-						<div class="mb-2">
-							<label class="form-label text-muted">Description du produit</label>
-							<textarea name="desc_produit" cols="30" rows="5" class="form-control">{{ produit.description_produit }}</textarea>
-						</div>
-						<input type="hidden" name="id_produit" value="{{produit.id_produit}}">
-						<button class="btn btn-outline-primary">Enregistrer</button>
-					</form>
+		<div class="row g-lg-5">
+			<div class="col-12 col-lg-6">
+				<h4>
+					{% if isAdmin %}Détails du fournisseur{% else %}Vos informations
+					{% endif %}
+				</h4>
+				{% include 'components/personne-details-form.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
+			</div>
+			<div class="col-12 col-lg-6">
+				<h4 class="my-3">Liste
+					{{ isAdmin ? 'des produits de ' ~ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille : 'de vos produits' }}</h4>
+				<div>
+					<a href="{{ currentUrl }}/new-produit" class="btn btn-primary mb-3">
+						<i class="material-icons">add</i>
+						Ajouter un produit</a>
 				</div>
-			{% endfor %}
-		{% else %}
-			<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
-		{% endif %}
+				{% if produits|length > 0 %}
+					{% for produit in produits %}
+						<div class="card d-inline-block me-3 mb-3 p-3">
+							<form method="POST" action="{{ currentUrl }}/{{ produit.id_produit }}">
+								<div class="mb-2">
+									<label class="form-label text-muted">Nom du produit</label>
+									<input type="text" name="nom_produit" class="form-control" value="{{ produit.nom_produit}}">
+								</div>
+								<div class="mb-2">
+									<label class="form-label text-muted">Description du produit</label>
+									<textarea name="desc_produit" cols="30" rows="5" class="form-control">{{ produit.description_produit }}</textarea>
+								</div>
+								<input type="hidden" name="id_produit" value="{{produit.id_produit}}">
+								<button class="btn btn-outline-primary">Enregistrer</button>
+							</form>
+						</div>
+					{% endfor %}
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="row mt-5">
+			{% if dossiers|length > 0 %}
+				<table class="table sortable-table">
+					<thead>
+						<tr>
+							<th scope="col">N° dossier</th>
+							<th scope="col">Etat du dossier</th>
+							<th scope="col">Nom produit</th>
+							<th scope="col">Commercial</th>
+							<th scope="col">Client</th>
+							<th scope="col">Date de création</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for dossier in dossiers %}
+							<tr>
+								<th scope="row">
+									Dossier #{{ dossier.id_dossier }}
+								</th>
+								<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
+								<td>
+									{{ dossier.nom_produit }}
+								</td>
+								<td>
+									{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}
+								</td>
+								<td>
+									{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}
+								</td>
+								<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
+			{% endif %}
+		</div>
 	</div>
 {% endblock %}
