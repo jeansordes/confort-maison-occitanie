@@ -19,7 +19,7 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
         $res = $req->fetch();
         $user_infos = [
             'uid' => $payload['uid'],
-            'email' => $res['primary_email'],
+            'email' => $res['email'],
             'user_role' => $res['user_role'],
         ];
         if ($user_infos['uid'] == null || $user_infos['email'] == null || $user_infos['user_role'] == null) {
@@ -79,7 +79,7 @@ $app->post('/login', function (Request $request, Response $response): Response {
     $res = $req->fetch();
     $user_infos = [
         'uid' => $res['id_utilisateur'],
-        'email' => $res['primary_email'],
+        'email' => $res['email'],
         'user_role' => $res['user_role'],
     ];
 

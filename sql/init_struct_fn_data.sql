@@ -58,31 +58,19 @@ create or replace table personnes (
     civilite enum('mr', 'mme', '') default null,
     -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
     id_coordonnees int(11) default null,
+    email varchar(200) default null check (email REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     constraint
         foreign key (id_coordonnees) references coordonnees(id_coordonnees)
-);
-
-create or replace table user_emails (
-    -- varchar(200) https:$$stackoverflow.com/a/8242609
-    -- 200 instead of 255, cause it stores 4 bytes per character, so 4*255 = 1020
-    -- and on planethoster, the maximum limit is 1000 bytes for a primary key
-    email_string varchar(200) not null primary key check (email_string REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
-    id_user int(11) not null,
-    constraint
-        foreign key (id_user) references personnes(id_personne)
 );
 
 create or replace table utilisateurs (
     id_utilisateur int(11) primary key not null,
     last_user_update time not null default current_timestamp(),
     user_role varchar(50) not null,
-    primary_email varchar(200) not null,
     password_hash text not null,
-    commentaire_admin text default null,
     constraint
         foreign key (user_role) references _enum_user_role(description),
-        foreign key (id_utilisateur) references personnes(id_personne),
-        foreign key (primary_email) references user_emails(email_string)
+        foreign key (id_utilisateur) references personnes(id_personne)
 );
 
 create or replace table clients_des_commerciaux (
@@ -183,12 +171,22 @@ create or replace function new_user (
     p_email text,
     p_password_hash text,
     p_prenom text,
-    p_nom_famille text
+    p_nom_famille text,
+    p_civilite text,
+    p_adresse text,
+    p_code_postal text,
+    p_ville text,
+    p_pays text,
+    p_tel1 text,
+    p_tel2 text
 ) returns int(11) begin
-    insert into personnes(prenom, nom_famille) values (p_prenom, p_nom_famille);
+    insert into coordonnees(adresse, code_postal, ville, pays, tel1, tel2)
+        values (p_adresse, p_code_postal, p_ville, p_pays, p_tel1, p_tel2);
+    set @id_coordonnees = last_insert_id();
+    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email)
+        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, p_email);
     set @v_uid = last_insert_id();
-    insert into user_emails(email_string, id_user) values (p_email, @v_uid);
-    insert into utilisateurs(id_utilisateur, user_role, primary_email, password_hash) values (@v_uid, p_role, p_email, p_password_hash);
+    insert into utilisateurs(id_utilisateur, user_role, password_hash) values (@v_uid, p_role, p_password_hash);
     return @v_uid;
 end
 $$
@@ -204,13 +202,14 @@ create or replace function new_client(
     p_ville text,
     p_pays text,
     p_tel1 text,
-    p_tel2 text
+    p_tel2 text,
+    p_email varchar(200)
 ) returns int(11) begin
     insert into coordonnees(adresse, code_postal, ville, pays, tel1, tel2)
         values (p_adresse, p_code_postal, p_ville, p_pays, p_tel1, p_tel2);
     set @id_coordonnees = last_insert_id();
-    insert into personnes(prenom, nom_famille, civilite, id_coordonnees)
-        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees);
+    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email)
+        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, nullif(p_email, ''));
     set @id_client = last_insert_id();
     insert into clients_des_commerciaux(id_client, id_commercial) values (@id_client, p_id_commercial);
     return @id_client;
@@ -272,7 +271,6 @@ create or replace view clients as
 
 create or replace view commerciaux as
     select
-        a.commentaire_admin,
         (select count(*) from clients_des_commerciaux where id_commercial = u.id_personne) nb_clients,
         (select count(*) from dossiers d, clients_des_commerciaux cc
             where d.id_client = cc.id_client and cc.id_commercial = u.id_personne) nb_dossiers,

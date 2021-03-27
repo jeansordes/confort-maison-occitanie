@@ -27,24 +27,10 @@ function routesCommercial()
             $req = $db->prepare(getSqlQueryString('clients_commercial'));
             $req->execute(['id_commercial' => $idCommercial]);
             $clients = $req->fetchAll();
-            // récupérer le commentaire du client
-            $req = $db->prepare(getSqlQueryString('get_comment_utilisateur'));
-            $req->execute(['id_utilisateur' => $idCommercial]);
-            $comment = $req->fetch()[0];
             return $response->write($this->view->render('roles/commercial/default.html.twig', [
                 'commercial' => $commercial,
                 'clients' => $clients,
-                'comment' => $comment,
             ]));
-        });
-        # /comment
-        $app->post('/comment', function (Request $request, Response $response, array $args): Response {
-            $idCommercial = getCommercialId($args);
-            $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('new_comment_utilisateur'));
-            $req->execute(['id_utilisateur' => $idCommercial, 'comment' => $_POST['comment']]);
-            alert("Le commentaire a bien été enregistré", 1);
-            return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
         # /settings
         $app->get('/settings', function (Request $request, Response $response, array $args): Response {
@@ -56,10 +42,18 @@ function routesCommercial()
         # /new-client
         $app->get('/new-client', function (Request $request, Response $response, array $args): Response {
             console_log($request->getUri()->getPath());
-            return $response->write($this->view->render('roles/commercial/new-client.html.twig', $_GET));
+            return $response->write($this->view->render('roles/commercial/new-client.html.twig', ['client' => $_GET]));
         });
         $app->post('/new-client', function (Request $request, Response $response, array $args): Response {
             $idCommercial = getCommercialId($args);
+            $db = getPDO();
+            $req = $db->prepare(getSqlQueryString('get_email'));
+            $req->execute(["email" => $_POST["email"]]);
+            if ($req->rowCount() > 0) {
+                alert("Cet email est déjà pris", 3);
+                return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
+            }
+
             $db = getPDO();
             $req = $db->prepare(getSqlQueryString('new_client'));
             $req->execute([
@@ -73,16 +67,8 @@ function routesCommercial()
                 "pays" => $_POST["pays"],
                 "tel1" => $_POST["tel1"],
                 "tel2" => $_POST["tel2"],
+                "email" => $_POST["email"],
             ]);
-            if (!empty($_POST["email"])) {
-                $client_uid = $db->lastInsertId();
-                $req = $db->prepare(getSqlQueryString('new_email'));
-                $req->execute([
-                    "email" => $_POST["email"],
-                    "uid" => $client_uid,
-                ]);
-            }
-            $req = $db->prepare(getSqlQueryString(''));
             alert('Client ajouté avec succès 👍', 1);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
@@ -103,22 +89,37 @@ function routesCommercial()
                 $req = $db->prepare(getSqlQueryString('dossiers_client'));
                 $req->execute(['id_client' => $args['idClient'], 'id_commercial' => $idCommercial]);
                 $dossiers = $req->fetchAll();
-                // récupérer le commentaire du client
-                $req = $db->prepare(getSqlQueryString('get_comment_client'));
-                $req->execute(['id_client' => $args['idClient']]);
-                $comment = $req->fetch()[0];
                 return $response->write($this->view->render(
                     'roles/commercial/id-client.html.twig',
-                    ['client' => $client, 'dossiers' => $dossiers, 'comment' => $comment, 'commercial' => $commercial]
+                    [
+                        'client' => array_merge($client, $_GET),
+                        'dossiers' => $dossiers,
+                        'commercial' => $commercial,
+                    ]
                 ));
             });
-            # /comment
-            $app->post('/comment', function (Request $request, Response $response, array $args): Response {
+            $app->post('', function (Request $request, Response $response, array $args): Response {
                 $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('new_comment_client'));
-                $req->execute(['id_client' => $args['idClient'], 'comment' => $_POST['comment']]);
-                alert("Le commentaire a bien été enregistré", 1);
-                return $response->withRedirect($request->getUri()->getPath() . '/..');
+                $req = $db->prepare(getSqlQueryString('update_personne'));
+                $req->execute([
+                    "prenom" => $_POST["prenom"],
+                    "nom_famille" => $_POST["nom_famille"],
+                    "civilite" => $_POST["civilite"],
+                    "email" => $_POST["email"],
+                    "id_personne" => $args['idClient'],
+                ]);
+                $req = $db->prepare(getSqlQueryString('update_coordonnees'));
+                $req->execute([
+                    "adresse" => $_POST["adresse"],
+                    "code_postal" => $_POST["code_postal"],
+                    "ville" => $_POST["ville"],
+                    "pays" => $_POST["pays"],
+                    "tel1" => $_POST["tel1"],
+                    "tel2" => $_POST["tel2"],
+                    "id_personne" => $args['idClient'],
+                ]);
+                alert('Client modifié avec succès 👍', 1);
+                return $response->withRedirect($request->getUri()->getPath());
             });
             # /edit
             $app->get('/edit', function (Request $request, Response $response, array $args): Response {
@@ -167,10 +168,6 @@ function routesCommercial()
                     $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
                     $fichiers = $req->fetchAll();
-                    // récupérer le commentaire sur le dossier
-                    $req = $db->prepare(getSqlQueryString('get_comment_dossier'));
-                    $req->execute(['id_dossier' => $args['idDossier']]);
-                    $comment = $req->fetch()[0];
                     // récupérer les états possibles d'un dossier
                     $etats = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
                     // récupérer liste des logs
@@ -183,7 +180,6 @@ function routesCommercial()
                         [
                             'dossier' => $dossier,
                             'fichiers' => $fichiers,
-                            'comment' => $comment,
                             'commercial' => $commercial,
                             'fournisseur' => $fournisseur,
                             'client' => $client,
@@ -200,13 +196,13 @@ function routesCommercial()
                     $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
                     $req->execute(['id_dossier' => $args['idDossier']]);
                     $fichiers = $req->fetchAll();
-                    
+
                     // création du fichier zip
                     // https://www.virendrachandak.com/techtalk/how-to-create-a-zip-file-using-php/
                     $zip = new ZipArchive;
                     $zipFilename = bin2hex(random_bytes(5)) . '.zip';
                     if ($zip->open($uploadFolder . '/' . $zipFilename, ZipArchive::CREATE) === TRUE) {
-                        
+
                         if (count($fichiers) < 1) {
                             $zip->addFromString('readme.txt', 'Ce dossier ne contient aucun fichier');
                         } else {
@@ -235,14 +231,6 @@ function routesCommercial()
                     unlink($file);
 
                     return $res;
-                });
-                # /comment
-                $app->post('/comment', function (Request $request, Response $response, array $args): Response {
-                    $db = getPDO();
-                    $req = $db->prepare(getSqlQueryString('new_comment_dossier'));
-                    $req->execute(['id_dossier' => $args['idDossier'], 'comment' => $_POST['comment']]);
-                    alert("Le commentaire a bien été enregistré", 1);
-                    return $response->withRedirect($request->getUri()->getPath() . '/..');
                 });
                 # /edit
                 $app->get('/edit', function (Request $request, Response $response, array $args): Response {

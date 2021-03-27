@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Ajouter un commercial
+{% endblock %}
+
+{% block body %}
+	<div class="container pt-5">
+		{% include 'components/connected-as.html.twig' %}
+		<div class="mb-3">{% include 'components/back-link.html.twig' with {'href': '.'} %}</div>
+
+		<h4>Créer un nouvel utilisateur</h4>
+		<form method="POST">
+			<div class="card d-inline-block border-danger p-3 mb-3">
+                <h5 class="text-danger col-12">Champs obligatoires</h5>
+				<div class="row gx-5 gy-3">
+					<!-- Type d'utilisateur -->
+					<div class="col-auto">
+						<span>Cet utilisateur sera un :
+						</span>
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="radio" name="user_type" class="form-check-input" value="commercial" checked>
+								Commercial
+							</label>
+						</div>
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="radio" name="user_type" class="form-check-input" value="fournisseur">
+								Fournisseur
+							</label>
+						</div>
+					</div>
+
+					<!-- Email -->
+					<div class="col-auto">
+						<label class="form-label">Adresse mail</label>
+						<input name="email" value="{{ email }}" type="email" class="form-control" width="10rem"/>
+					</div>
+				</div>
+			</div>
+
+			<!-- Identité -->
+			<div class="row">
+				<div class="col mb-3">
+					<label class="form-label">Prénom</label>
+					<input name="prenom" value="{{ prenom }}" type="text" class="form-control"/>
+				</div>
+				<div class="col">
+					<label class="form-label">Nom de famille</label>
+					<input name="nom_famille" value="{{ nom_famille }}" type="text" class="form-control"/>
+				</div>
+			</div>
+
+			<!-- Adresse -->
+			<div class="mb-2">
+				<label class="form-label">Adresse</label>
+				<input name="adresse" value="{{ adresse }}" type="text" class="form-control"/>
+			</div>
+
+			<div class="row mb-2">
+				<div class="col">
+					<label class="form-label">Ville</label>
+					<input name="ville" value="{{ ville }}" type="text" class="form-control"/>
+				</div>
+
+				<div class="col">
+					<label class="form-label">Code postal</label>
+					<input name="code_postal" value="{{ code_postal }}" type="text" class="form-control"/>
+				</div>
+
+				<div class="col">
+					<label class="form-label">Pays</label>
+					<input name="pays" value="{{ pays }}" type="text" class="form-control" value="France"/>
+				</div>
+			</div>
+
+			<!-- Téléphones -->
+			<div class="row mb-2">
+				<div class="col">
+					<label class="form-label">Téléphone 1</label>
+					<input name="tel1" value="{{ tel1 }}" type="tel" class="form-control"/>
+				</div>
+
+				<div class="col">
+					<label class="form-label">Téléphone 2</label>
+					<input name="tel2" value="{{ tel2 }}" type="tel" class="form-control"/>
+				</div>
+			</div>
+
+			<button class="btn btn-primary mt-2">Créer le compte</button>
+		</form>
+	</div>
+{% endblock %}

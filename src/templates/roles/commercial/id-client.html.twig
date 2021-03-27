@@ -5,19 +5,21 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container my-5 pt-5">
+	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
 		<div class="mb-3">
-			{% include 'components/back-link.html.twig' with {'href': '.'} %}
+			{% include 'components/back-link.html.twig' with {href: '.', text: 'Voir les autres clients'} %}
 		</div>
-		<div class="row">
-			<div class="col-12 col-md-4">
-				{% include "components/vos-commentaires.html.twig" with {'about': 'à propos de ce client'} %}
+		<div class="row g-5">
+			<div class="col-12 col-lg-6">
+				<h4>Détails du client</h4>
+				{% include 'components/client-details-form.html.twig' with {action: 'edit'} %}
 			</div>
-			<div class="col-12 col-md-8">
+			<div class="col-12 col-lg-6">
 				<h4 class="my-3">Dossiers du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
-                <p class="text-muted">Client appartenant au commercial "{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}"  </p>
+				<p class="text-muted">Client appartenant au commercial "{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}"
+				</p>
 				<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
 					<i class="material-icons">add</i>
 					Créer un nouveau dossier</a>
@@ -27,7 +29,8 @@
 							{% for dossier in dossiers %}
 								<li class="list-group-item">
 									<a class="d-block" href="{{ currentUrl }}/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}</a>
-									<small class="text-muted" title="{{ dossier.date_creation }}">Créé {{ dossier.date_creation|timeago }}</small>
+									<small class="text-muted" title="{{ dossier.date_creation }}">Créé
+										{{ dossier.date_creation|timeago }}</small>
 								</li>
 							{% endfor %}
 						</ul>

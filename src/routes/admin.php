@@ -44,11 +44,11 @@ $app->group('/admin', function (App $app) {
             'etats_dossier' => $etats_dossier,
         ]));
     });
-    $app->get('/new-commercial', function (Request $request, Response $response, array $args): Response {
-        return $response->write($this->view->render('roles/admin/new-commercial.html.twig', $_GET));
+    $app->get('/new-user', function (Request $request, Response $response, array $args): Response {
+        return $response->write($this->view->render('roles/admin/new-user.html.twig', $_GET));
     });
-    $app->post('/new-commercial', function (Request $request, Response $response, array $args) {
-        $missing_fields_message = get_form_missing_fields_message(['email', 'prenom', 'nom_famille'], $_POST);
+    $app->post('/new-user', function (Request $request, Response $response, array $args) {
+        $missing_fields_message = get_form_missing_fields_message(['email', 'user_type'], $_POST);
         if ($missing_fields_message) {
             alert($missing_fields_message, 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
@@ -56,11 +56,19 @@ $app->group('/admin', function (App $app) {
 
         // créer le compte (1 : user, 2 : email, 3 : account)
         $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('new_commercial'));
+        $req = $db->prepare(getSqlQueryString('new_user'));
         $req->execute([
+            'user_type' => $_POST['user_type'],
+            'email' => $_POST['email'],
             'prenom' => $_POST['prenom'],
             'nom_famille' => $_POST['nom_famille'],
-            'email' => $_POST['email'],
+            "civilite" => $_POST["civilite"],
+            "adresse" => $_POST["adresse"],
+            "code_postal" => $_POST["code_postal"],
+            "ville" => $_POST["ville"],
+            "pays" => $_POST["pays"],
+            "tel1" => $_POST["tel1"],
+            "tel2" => $_POST["tel2"],
         ]);
         $new_uid = $req->fetch()['new_uid'];
 
@@ -77,14 +85,14 @@ $app->group('/admin', function (App $app) {
             $_POST['email'],
             "Confort maison occitanie : Votre compte vient d'être créé",
             $this->view->render(
-                'emails/email-new-commercial.html.twig',
+                'emails/email-new-user.html.twig',
                 ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/?action=init_password&token=' . $jwt]
             )
         );
 
         alert("Le compte du commercial <b>" . $_POST['prenom'] . " " . $_POST['nom_famille'] . " ("
             . $_POST['email'] . ") a bien été créé, et un email lui a été envoyé</b>", 1);
-        return $response->withRedirect($request->getUri()->getPath());
+        return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
 
     $app->group('/etats-dossiers', function (App $app) {

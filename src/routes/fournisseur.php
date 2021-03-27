@@ -4,7 +4,8 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-function getFournisseurId($args) {
+function getFournisseurId($args)
+{
     return $_SESSION['current_user']['user_role'] == 'fournisseur' ? $_SESSION['current_user']['uid'] : $args['idFournisseur'];
 }
 
@@ -26,25 +27,23 @@ function routesFournisseur()
             $req = $db->prepare(getSqlQueryString('produits_fournisseur'));
             $req->execute(['id_fournisseur' => $idFournisseur]);
             $produits = $req->fetchAll();
-            // récupérer le commentaire sur ce fournisseur
-            $req = $db->prepare(getSqlQueryString('get_comment_utilisateur'));
-            $req->execute(['id_utilisateur' => $idFournisseur]);
-            $comment = $req->fetch()[0];
             return $response->write($this->view->render('roles/fournisseur/default.html.twig', [
                 'fournisseur' => $fournisseur,
                 'produits' => $produits,
-                'comment' => $comment,
             ]));
         });
-
-        # /comment
-        $app->post('/comment', function (Request $request, Response $response, array $args): Response {
-            $idFournisseur = getFournisseurId($args);
+        $app->post('', function (Request $request, Response $response, array $args): Response {
+            $missing_fields_message = get_form_missing_fields_message(['id_produit', 'nom_produit', 'desc_produit'], $_POST);
+            if ($missing_fields_message) {
+                alert($missing_fields_message, 3);
+                return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
+            }
             $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('new_comment_utilisateur'));
-            $req->execute(['id_utilisateur' => $idFournisseur, 'comment' => $_POST['comment']]);
-            alert("Le commentaire a bien été enregistré", 1);
-            return $response->withRedirect($request->getUri()->getPath() . '/..');
+            $req = $db->prepare(getSqlQueryString('update_produit'));
+            $req->execute($_POST);
+            alert('Le produit #' . $_POST['id_produit'] . ' a bien été mis à jour', 1);
+
+            return $response->withRedirect($request->getUri()->getPath());
         });
 
         # /new-produit
@@ -70,29 +69,6 @@ function routesFournisseur()
             }
             alert('Produit ajouté avec succès 👍', 1);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
-        });
-
-        # /{idProduit}
-        $app->group('/{idProduit}', function (App $app) {
-            $app->get('', function (Request $request, Response $response, array $args): Response {
-                // get produit
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('get_produit'));
-                $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
-                $produit = $req->fetch();
-                // get étapes existantes
-                $req = $db->prepare(getSqlQueryString('etapes_produit'));
-                $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
-                $etapes = $req->fetchAll();
-                return $response->write($this->view->render('roles/fournisseur/id-produit.html.twig', [
-                    'produit' => $produit,
-                    'etapes' => $etapes,
-                ]));
-            });
-            $app->post('', function (Request $request, Response $response, array $args): Response {
-                // 
-                return $response->withRedirect($request->getUri()->getPath());
-            });
         });
     };
 };

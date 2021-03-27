@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container my-5 pt-5">
+	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
 		<div class="mb-4">
-			{% include 'components/back-link.html.twig' with {'href': '.'} %}
+			{% include 'components/back-link.html.twig' with {href: '.', text: 'Voir les autres dossiers de ce client'} %}
 			<div>
-				<h4 class="mb-0 mt-3">Dossier "{{ dossier.nom_produit }}" du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
-				<p class="text-muted">Ce produit est fourni par "{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}", ce dossier est géré par "{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}"</p>
+				<h4 class="mb-0 mt-3">Dossier "{{ dossier.nom_produit }}" du client "<a href="{{ currentUrl }}/..">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>"</h4>
+				<p class="text-muted">Ce produit est fourni par "{% if isAdmin %}<a href="{{ currentUrl }}/../../../../f/{{ fournisseur.id_personne }}">{% endif %}{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}{% if isAdmin %}</a>{% endif %}", ce dossier est géré par "<a href="{{ currentUrl }}/../..">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}</a>"</p>
 			</div>
 		</div>
 

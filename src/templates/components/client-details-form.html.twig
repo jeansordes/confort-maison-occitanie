@@ -1,0 +1,66 @@
+<form method="POST">
+	<div
+		class="row mb-2 align-items-end">
+		<!-- Identité -->
+		<div class="col">
+			<label class="form-label">Civilité</label>
+			<select name="civilite" class="form-control form-select">
+				<option value="" {{ client.civilite=='' ? 'selected' : '' }}></option>
+				<option value="mr" {{ client.civilite=='mr' ? 'selected' : '' }}>Mr</option>
+				<option value="mme" {{ client.civilite=='mme' ? 'selected' : '' }}>Mme</option>
+			</select>
+		</div>
+		<div class="col">
+			<label class="form-label">Prénom</label>
+			<input name="prenom" value="{{ client.prenom }}" type="text" class="form-control"/>
+		</div>
+		<div class="col">
+			<label class="form-label">Nom de famille</label>
+			<input name="nom_famille" value="{{ client.nom_famille }}" type="text" class="form-control"/>
+		</div>
+	</div>
+
+	<!-- Adresse -->
+	<div class="mb-2">
+		<label class="form-label">Adresse</label>
+		<input name="adresse" value="{{ client.adresse }}" type="text" class="form-control"/>
+	</div>
+
+	<div class="row mb-2 align-items-end">
+		<div class="col">
+			<label class="form-label">Ville</label>
+			<input name="ville" value="{{ client.ville }}" type="text" class="form-control"/>
+		</div>
+
+		<div class="col">
+			<label class="form-label">Code postal</label>
+			<input name="code_postal" value="{{ client.code_postal }}" type="text" class="form-control"/>
+		</div>
+
+		<div class="col">
+			<label class="form-label">Pays</label>
+			<input name="pays" value="{{ client.pays }}" type="text" class="form-control" value="France"/>
+		</div>
+	</div>
+
+	<!-- Téléphones -->
+	<div class="row mb-2">
+		<div class="col">
+			<label class="form-label">Téléphone 1</label>
+			<input name="tel1" value="{{ client.tel1 }}" type="tel" class="form-control"/>
+		</div>
+
+		<div class="col">
+			<label class="form-label">Téléphone 2</label>
+			<input name="tel2" value="{{ client.tel2 }}" type="tel" class="form-control"/>
+		</div>
+	</div>
+
+	<!-- email de contact -->
+	<div class="mb-2">
+		<label class="form-label">Adresse mail</label>
+		<input name="email" value="{{ client.email }}" type="email" class="form-control"/>
+	</div>
+
+	<button class="btn btn-primary mt-3">{{action == 'edit' ? 'Modifier' : 'Créer'}} le client</button>
+</form>

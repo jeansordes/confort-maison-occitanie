@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container my-5 pt-5">
+	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
 		<div class="mb-3">
 			{% if isAdmin %}
-				{% include 'components/back-link.html.twig' with {href: '..'} %}
+				{% include 'components/back-link.html.twig' with {href: '..', text: 'Revenir au panneau administrateur'} %}
 			{% endif %}
 		</div>
 
