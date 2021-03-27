@@ -20,6 +20,7 @@ $container['view'] = function ($container) {
     $twig->addGlobal('currentUrl', parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)); // https://stackoverflow.com/a/25944383/5736301
     $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
     $twig->addGlobal('isAdmin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
+    $twig->addGlobal('isLocalhost', in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1','::1']));
 
     $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
     $_SESSION['session_alert'] = null;
