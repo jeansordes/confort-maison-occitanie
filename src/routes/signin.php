@@ -41,17 +41,8 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
     } else if (empty($_SESSION['current_user'])) {
         // not logged => /login
         return $response->withRedirect(empty($_GET['redirect']) ? '/login' : $_GET['redirect']);
-    } else if ($_SESSION['current_user']['user_role'] == 'admin') {
-        // logged in admin => /admin
-        return $response->withRedirect(empty($_GET['redirect']) ? '/admin' : $_GET['redirect']);
-    } else if ($_SESSION['current_user']['user_role'] == 'commercial') {
-        // logged in commercial => /commercial
-        return $response->withRedirect(empty($_GET['redirect']) ? '/commercial' : $_GET['redirect']);
-    } else if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
-        // logged in fournisseur => /fournisseur
-        return $response->withRedirect(empty($_GET['redirect']) ? '/fournisseur' : $_GET['redirect']);
     } else {
-        console_log($_SESSION['current_user']);
+        return $response->withRedirect(empty($_GET['redirect']) ? '/' . $_SESSION['current_user']['user_role'] : $_GET['redirect']);
     }
     // return $response;
 });
