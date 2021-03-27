@@ -14,31 +14,25 @@
 			{% endif %}
 		</div>
 
-		<div class="row">
-			<div class="col-12 col-md-4">
-				{% include "components/vos-commentaires.html.twig" with {about: 'pour ' ~ (isAdmin ? 'ce commercial' : 'les admins') } %}
+		<h4 class="my-3">Liste
+			{{ isAdmin ? 'des clients de ' ~ commercial.prenom ~ ' ' ~ commercial.nom_famille : 'de vos clients' }}</h4>
+		<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
+			<i class="material-icons">add</i>
+			Ajouter un client</a>
+		{% if clients|length > 0 %}
+			<div class="card">
+				<ul class="list-group list-group-flush">
+					{% for client in clients %}
+						<li class="list-group-item">
+							<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
+							<small class="text-muted">{{ client.nb_dossiers }}
+								dossiers</small>
+						</li>
+					{% endfor %}
+				</ul>
 			</div>
-			<div class="col-12 col-md-8">
-				<h4 class="my-3">Liste
-					{{ isAdmin ? 'des clients de ' ~ commercial.prenom ~ ' ' ~ commercial.nom_famille : 'de vos clients' }}</h4>
-				<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
-					<i class="material-icons">add</i>
-					Ajouter un client</a>
-				{% if clients|length > 0 %}
-					<div class="card">
-						<ul class="list-group list-group-flush">
-							{% for client in clients %}
-								<li class="list-group-item">
-									<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
-									<small class="text-muted">{{ client.nb_dossiers }} dossiers</small>
-								</li>
-							{% endfor %}
-						</ul>
-					</div>
-				{% else %}
-					<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
-				{% endif %}
-			</div>
-		</div>
+		{% else %}
+			<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
+		{% endif %}
 	</div>
 {% endblock %}
