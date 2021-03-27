@@ -6,7 +6,15 @@
 {% block body %}
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		<p>{% include 'components/back-link.html.twig' with {'href': '.'} %}</p>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				{% if isAdmin %}<li class="breadcrumb-item"><a href="../..">Commercial</a></li>{% endif %}
+				<li class="breadcrumb-item"><a href="..">Client</a></li>
+				<li class="breadcrumb-item"><a href=".">Dossier</a></li>
+				<li class="breadcrumb-item active">Ajouter un fichier</li>
+			</ol>
+		</nav>
 
 		<h4 class="mb-3">Ajouter un fichier</h4>
 		<form action="{{currentUrl}}" method="POST" enctype="multipart/form-data">

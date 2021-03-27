@@ -8,11 +8,18 @@
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="mb-3">
-			{% if isAdmin %}
-				{% include 'components/back-link.html.twig' with {href: '..'} %}
-			{% endif %}
-		</div>
+		{% if isAdmin %}
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="/">Home</a>
+					</li>
+					<li class="breadcrumb-item active">
+						Fournisseur #{{ fournisseur.id_personne }}
+					</li>
+				</ol>
+			</nav>
+		{% endif %}
 
 		<div>
 			<h4 class="my-3">Liste

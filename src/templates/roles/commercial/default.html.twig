@@ -8,11 +8,16 @@
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="mb-3">
-			{% if isAdmin %}
-				{% include 'components/back-link.html.twig' with {href: '..', text: 'Revenir au panneau administrateur'} %}
-			{% endif %}
-		</div>
+		{% if isAdmin %}
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="/">Home</a>
+					</li>
+					<li class="breadcrumb-item active">Commercial #{{ commercial.id_personne }}</li>
+				</ol>
+			</nav>
+		{% endif %}
 
 		<h4 class="my-3">Liste
 			{{ isAdmin ? 'des clients de ' ~ commercial.prenom ~ ' ' ~ commercial.nom_famille : 'de vos clients' }}</h4>

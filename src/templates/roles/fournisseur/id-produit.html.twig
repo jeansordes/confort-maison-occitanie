@@ -8,9 +8,14 @@
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="mb-3">
-			{% include 'components/back-link.html.twig' with {href: '.'} %}
-		</div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				{% if isAdmin %}<li class="breadcrumb-item"><a href=".">Fournisseur</a></li>{% endif %}
+				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }}</li>
+			</ol>
+		</nav>
+
 		<h4 class="my-3">Étapes du produit "{{ produit.nom_produit }}"</h4>
 		{% if etapes|length > 0 %}
 			<div class="card">

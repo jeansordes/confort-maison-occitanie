@@ -29,8 +29,8 @@
 				<button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Utilisateurs</button>
 			</li>
 			{# <li class="nav-item" role="presentation">
-				<button class="nav-link" id="produits-tab" data-bs-toggle="tab" data-bs-target="#produits" type="button" role="tab" aria-controls="produits" aria-selected="false">Produits</button>
-			</li> #}
+							<button class="nav-link" id="produits-tab" data-bs-toggle="tab" data-bs-target="#produits" type="button" role="tab" aria-controls="produits" aria-selected="false">Produits</button>
+						</li> #}
 		</ul>
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
@@ -50,7 +50,9 @@
 						<tbody>
 							{% for dossier in dossiers %}
 								<tr>
-									<th scope="row"><a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a></th>
+									<th scope="row">
+										<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
+									</th>
 									<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
 									<td>
 										{{ dossier.nom_produit }}
@@ -76,7 +78,7 @@
 			<div
 				class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
 				<!-- Utilisateurs -->
-                <h5>Liste des commerciaux</h5>
+				<h5>Liste des commerciaux</h5>
 				{% if commerciaux|length > 0 %}
 					<div class="card mb-3">
 						<ul class="list-group list-group-flush">
@@ -90,24 +92,24 @@
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun commerciaux à afficher</p>
 				{% endif %}
-                <h5>Liste des fournisseurs</h5>
-                {% if fournisseurs|length > 0 %}
-                    <div class="card">
-                        <ul class="list-group list-group-flush">
-                            {% for fournisseur in fournisseurs %}
-                                <li class="list-group-item">
-                                    <a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom ~ ' (' ~ fournisseur.email ~ ')' }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% else %}
-                    <p class="text-muted fst-italic">Il n'y a aucun fournisseurs à afficher</p>
-                {% endif %}
+				<h5>Liste des fournisseurs</h5>
+				{% if fournisseurs|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for fournisseur in fournisseurs %}
+								<li class="list-group-item">
+									<a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom ~ ' (' ~ fournisseur.email ~ ')' }}</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun fournisseurs à afficher</p>
+				{% endif %}
 			</div>
 			{# <div class="tab-pane fade" id="produits" role="tabpanel" aria-labelledby="produits-tab">
-                tab 3
-            </div> #}
+			                tab 3
+			            </div> #}
 		</div>
 	</div>
 {% endblock %}

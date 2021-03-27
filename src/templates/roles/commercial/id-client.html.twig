@@ -8,9 +8,14 @@
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
 
-		<div class="mb-3">
-			{% include 'components/back-link.html.twig' with {href: '.', text: 'Voir les autres clients'} %}
-		</div>
+        <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				{% if isAdmin %}<li class="breadcrumb-item"><a href="..">Commercial #{{ commercial.id_personne }}</a></li>{% endif %}
+				<li class="breadcrumb-item active">Client #{{ client.id_personne }}</li>
+			</ol>
+		</nav>
+
 		<div class="row g-5">
 			<div class="col-12 col-lg-6">
 				<h4>Détails du client</h4>

@@ -31,6 +31,7 @@ function getSqlQueryString($key)
         'get_etats_dossier' => 'select description from _enum_etats_dossier where id_enum_etat = :id_enum_etat',
         'get_logs_dossiers' => 'select * from logs_enriched where id_dossier = :id_dossier order by date_heure desc',
         'get_email' => 'select email from personnes where email = :email',
+        'get_email_from_users' => 'select p.email from personnes p, utilisateurs u where p.id_personne = u.id_utilisateur and p.email = :email',
         // update
         'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :desc_produit where id_produit = :id_produit',
         'update_pwd' => 'update utilisateurs set password_hash = :new_password_hash where id_utilisateur = :uid',

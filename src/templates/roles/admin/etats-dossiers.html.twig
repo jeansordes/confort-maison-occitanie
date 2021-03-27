@@ -7,7 +7,12 @@
 {% block body %}
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		<div class="mb-3">{% include 'components/back-link.html.twig' with {'href': '.'} %}</div>
+        <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				<li class="breadcrumb-item active">États de dossier</li>
+			</ol>
+		</nav>
 
 		<div class="col-lg-6">
 			<h4 class="mb-3">Liste des états possible de dossier</h4>

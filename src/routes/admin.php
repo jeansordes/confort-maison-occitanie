@@ -53,9 +53,17 @@ $app->group('/admin', function (App $app) {
             alert($missing_fields_message, 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
+        
+        // vérifier que l'email n'est pas déjà utilisé par un autre compte commercial/fournisseur
+        $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('get_email_from_users'));
+        $req->execute(['email' => $_POST['email']]);
+        if ($req->rowCount() > 0) {
+            alert('Cette adresse email est déjà utilisée',3);
+            return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
+        }
 
         // créer le compte (1 : user, 2 : account)
-        $db = getPDO();
         $req = $db->prepare(getSqlQueryString('new_user'));
         $req->execute([
             'user_type' => $_POST['user_type'],

@@ -7,7 +7,12 @@
 {% block body %}
 	<div class="container pt-5">
 		{% include 'components/connected-as.html.twig' %}
-		<div class="mb-3">{% include 'components/back-link.html.twig' with {'href': '.'} %}</div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				<li class="breadcrumb-item active">Créer un nouvel utilisateur</li>
+			</ol>
+		</nav>
 
 		<h4>Créer un nouvel utilisateur</h4>
 		<form method="POST">
