@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container pt-5">
+	<div class="container">
 		{% include 'components/connected-as.html.twig' %}
 
         <nav aria-label="breadcrumb">
@@ -26,8 +26,8 @@
 
 		<div class="row">
 			<div class="col-12 col-md-4">
-				{# {% include "components/vos-commentaires.html.twig" with {'about': 'à propos de ce dossier'} %} #}
 				<div>
+                    <!-- Historique -->
 					<h4>Historique du dossier</h4>
 					{% if logs|length > 0 %}
 						<div class="card">
@@ -50,6 +50,7 @@
 				</div>
 			</div>
 			<div class="col-12 col-md-8">
+                <!-- Etats dossier -->
 				{% if etats|length > 0 %}
 					<form action="{{ currentUrl }}/changer-etat" method="post">
 						<select name="etat" class="form-select d-inline-block w-auto me-3">
@@ -62,12 +63,15 @@
 				{% endif %}
 
 				<h4 class="my-3">Fichiers</h4>
+                <!-- Upload -->
 				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
 					<span class="dz-message">
 						<i class="material-icons">add</i>
 						Ajouter des fichiers</span>
 				</form>
+                <a href="{{currentUrl}}/new-fichier" class="d-block mb-3"><i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i></a>
 
+                <!-- Fichiers -->
 				{% if fichiers|length > 0 %}
 					<div class="mb-3">
 						<a href="{{ currentUrl }}/zip" class="btn btn-primary">
@@ -77,7 +81,9 @@
 					<div class="files-thumbnails">
 						{% for fichier in fichiers %}
 							<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
-								<span class="mb-3 text-decoration-underline">{{ fichier.file_name }}</span>
+								<span class="text-decoration-underline">{{ fichier.file_name }}</span>
+								<span>Déposé il y a {{ fichier.updated_at|timeago }}</span>
+								<span class="mb-2">({{ fichier.updated_at }})</span>
 								{% if fichier.mime_type starts with "image" %}
 									<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">
 								{% else %}

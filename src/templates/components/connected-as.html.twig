@@ -1,6 +1,6 @@
-<header class="mb-5 d-flex justify-content-between align-items-center">
-    {% include 'components/logo.html.twig' %}
-    <span class="text-muted">Connecté en tant que {{ current_user.email }} (<a
+<header class="mb-2 mb-md-5 row d-flex justify-content-between align-items-center">
+    <span class="col-12 col-md-6 mb-3 mb-sm-0 text-center text-md-start">{% include 'components/logo.html.twig' %}</span>
+    <span class="col-12 col-md-6 text-muted">Connecté en tant que {{ current_user.email }} (<a
             href="/logout" class="text-muted">Se deconnecter</a>)
     </span>
 </header>
