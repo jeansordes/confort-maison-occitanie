@@ -12,16 +12,21 @@
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item">
-						<a href="/">Home</a>
+						<a href="/">Accueil</a>
 					</li>
-					<li class="breadcrumb-item active">Commercial #{{ commercial.id_personne }}</li>
+					<li title="Commercial #{{ commercial.id_personne }}" class="breadcrumb-item active">
+						{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}
+					</li>
 				</ol>
 			</nav>
 		{% endif %}
 
 		<div class="row g-5">
 			<div class="col-12 col-lg-6">
-				<h4>{% if isAdmin %}Détails du commercial{% else %}Vos informations{% endif %}</h4>
+				<h4>
+					{% if isAdmin %}Détails du commercial{% else %}Vos informations
+					{% endif %}
+				</h4>
 				{% include 'components/personne-details-form.html.twig' with {btnText: 'Valider les modifications', user: commercial} %}
 			</div>
 			<div class="col-12 col-lg-6">
@@ -30,12 +35,13 @@
 				<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
 					<i class="material-icons">add</i>
 					Ajouter un client</a>
+				<!-- Clients -->
 				{% if clients|length > 0 %}
 					<div class="card">
 						<ul class="list-group list-group-flush">
 							{% for client in clients %}
 								<li class="list-group-item">
-									<a class="text-decoration-none d-block" href="{{ currentUrl }}/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
+									<a class="text-decoration-none d-block" href="/cl/{{ client.id_personne }}">{{ client.civilite|capitalize ~ ' ' ~ client.prenom ~ ' ' ~ client.nom_famille}}</a>
 									<small class="text-muted">{{ client.nb_dossiers }}
 										dossiers</small>
 								</li>

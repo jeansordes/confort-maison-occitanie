@@ -51,20 +51,20 @@
 							{% for dossier in dossiers %}
 								<tr>
 									<th scope="row">
-										<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
+										<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
 									</th>
 									<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
 									<td>
 										{{ dossier.nom_produit }}
 									</td>
 									<td>
-										<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}">{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}</a>
+										<a href="/admin/co/{{ dossier.id_commercial }}">{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}</a>
 									</td>
 									<td>
-										<a href="{{currentUrl}}/co/{{ dossier.id_commercial }}/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
+										<a href="/cl/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
 									</td>
 									<td>
-										<a href="{{currentUrl}}/f/{{ dossier.id_fournisseur }}">{{ fournisseurs[dossier.id_fournisseur].nom_famille|upper ~ ' ' ~ fournisseurs[dossier.id_fournisseur].prenom }}</a>
+										<a href="/admin/f/{{ dossier.id_fournisseur }}">{{ fournisseurs[dossier.id_fournisseur].nom_famille|upper ~ ' ' ~ fournisseurs[dossier.id_fournisseur].prenom }}</a>
 									</td>
 									<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
 								</tr>

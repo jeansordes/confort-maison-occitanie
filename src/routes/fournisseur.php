@@ -50,7 +50,7 @@ function routesFournisseur()
             foreach ($etats_from_db as $etat) {
                 $etats_dossier[$etat['id_enum_etat']] = $etat['description'];
             }
-            return $response->write($this->view->render('roles/fournisseur/default.html.twig', [
+            return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', [
                 'fournisseur' => $fournisseur,
                 'commerciaux' => $commerciaux,
                 'produits' => $produits,
@@ -85,8 +85,15 @@ function routesFournisseur()
 
         # /new-produit
         $app->get('/new-produit', function (Request $request, Response $response, array $args): Response {
-            console_log($request->getUri()->getPath());
-            return $response->write($this->view->render('roles/fournisseur/new-produit.html.twig', $_GET));
+            $idFournisseur = getFournisseurId($args);
+            $db = getPDO();
+            $req = $db->prepare(getSqlQueryString('get_fournisseur'));
+            $req->execute(['uid' => $idFournisseur]);
+            $fournisseur = $req->fetch();
+            return $response->write($this->view->render(
+                'fournisseur/new-produit.html.twig',
+                array_merge($_GET, ['fournisseur' => $fournisseur])
+            ));
         });
         $app->post('/new-produit', function (Request $request, Response $response, array $args): Response {
             $idFournisseur = getFournisseurId($args);

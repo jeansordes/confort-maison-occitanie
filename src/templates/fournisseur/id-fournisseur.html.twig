@@ -12,10 +12,10 @@
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item">
-						<a href="/">Home</a>
+						<a href="/">Accueil</a>
 					</li>
-					<li class="breadcrumb-item active">
-						Fournisseur #{{ fournisseur.id_personne }}
+					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
+						{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}
 					</li>
 				</ol>
 			</nav>
@@ -76,7 +76,7 @@
 						{% for dossier in dossiers %}
 							<tr>
 								<th scope="row">
-									Dossier #{{ dossier.id_dossier }}
+									<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
 								</th>
 								<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
 								<td>
@@ -86,7 +86,7 @@
 									{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}
 								</td>
 								<td>
-									{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}
+									<a href="/cl/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
 								</td>
 								<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
 							</tr>

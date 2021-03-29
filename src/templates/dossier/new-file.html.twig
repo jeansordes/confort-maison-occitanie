@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un fichier
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		{% include 'components/connected-as.html.twig' %}
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="/">Accueil</a>
+				</li>
+				{% if isAdmin %}
+					<li class="breadcrumb-item">
+						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}</a>
+					</li>
+				{% endif %}
+				<li class="breadcrumb-item">
+					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="/d/{{ dossier.id_dossier }}" title="Dossier #{{ dossier.id_dossier }}">« {{ dossier.nom_produit }} »</a>
+				</li>
+				<li class="breadcrumb-item active">Ajouter un fichier</li>
+			</ol>
+		</nav>
+
+		<h4 class="mb-3">Ajouter un fichier</h4>
+		<form method="POST" enctype="multipart/form-data">
+			<input type="file" name="file">
+			<button type="submit" class="btn btn-outline-primary">Envoyer</button>
+		</form>
+	</div>
+{% endblock %}

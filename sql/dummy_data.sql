@@ -24,8 +24,8 @@ set @prod1 = last_insert_id();
 insert into produits(nom_produit, description_produit, id_fournisseur) values ('Crepis sur la facade','Il apporte une deuxième jeunesse aux maisons anciennes ou revêtit avec élégance une habitation neuve, protège le batiment des intempéries et du temps, apporte la touche finale à l''esthétique de la maison : le crépi est le revêtement de façade le plus utilisé en France, loin devant la peinture et le bardage.', @fournisseur_representant);
 set @prod2 = last_insert_id();
 
-select new_dossier(1, @cli1, @prod1);
-select new_dossier(1, @cli1, @prod2);
-select new_dossier(1, @cli3, @prod2);
+select new_dossier(@cli1, @prod1);
+select new_dossier(@cli1, @prod2);
+select new_dossier(@cli3, @prod2);
 
 select 'Query done';

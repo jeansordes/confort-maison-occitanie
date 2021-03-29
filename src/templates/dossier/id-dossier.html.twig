@@ -8,26 +8,48 @@
 	<div class="container">
 		{% include 'components/connected-as.html.twig' %}
 
-        <nav aria-label="breadcrumb">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="/">Home</a></li>
-				{% if isAdmin %}<li class="breadcrumb-item"><a href="..">Commercial #{{ commercial.id_personne }}</a></li>{% endif %}
-				<li class="breadcrumb-item"><a href=".">Client #{{ client.id_personne }}</a></li>
-				<li class="breadcrumb-item active">Dossier #{{ dossier.id_dossier }}</li>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb d-flex align-items-center">
+				<li class="breadcrumb-item">
+					<a href="/">Accueil</a>
+				</li>
+				{% if isAdmin %}
+					<li class="breadcrumb-item">
+						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}</a>
+					</li>
+				{% endif %}
+				<li class="breadcrumb-item">
+					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>
+				</li>
+				<li title="Dossier #{{ dossier.id_dossier }}" class="breadcrumb-item active">« {{ dossier.nom_produit }} »</li>
 			</ol>
 		</nav>
-        
+
 		<div class="mb-4">
 			<div>
-				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, "{{ dossier.nom_produit }}" du client "<a href="{{ currentUrl }}/..">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>"</h4>
-				<p class="text-muted">Ce produit est fourni par "{% if isAdmin %}<a href="{{ currentUrl }}/../../../../f/{{ fournisseur.id_personne }}">{% endif %}{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}{% if isAdmin %}</a>{% endif %}", ce dossier est géré par "{% if isAdmin %}<a href="{{ currentUrl }}/../..">{% endif %}{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}{% if isAdmin %}</a>{% endif %}"</p>
+				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, "{{ dossier.nom_produit }}" du client "<a href="/cl/{{client.id_personne}}">{{ client.prenom ~ ' ' ~ client.nom_famille }}</a>"</h4>
+				<p class="text-muted">Ce produit est fourni par "
+					{% if isAdmin %}
+						<a href="/admin/f/{{ fournisseur.id_personne }}">
+						{% endif %}
+						{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}
+						{% if isAdmin %}
+						</a>
+					{% endif %}", ce dossier est géré par "
+					{% if isAdmin %}
+						<a href="/admin/co/{{ commercial.id_personne }}">
+						{% endif %}
+						{{ commercial.prenom ~ ' ' ~ commercial.nom_famille }}
+						{% if isAdmin %}
+						</a>
+					{% endif %}"</p>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-12 col-md-4">
 				<div>
-                    <!-- Historique -->
+					<!-- Historique -->
 					<h4>Historique du dossier</h4>
 					{% if logs|length > 0 %}
 						<div class="card">
@@ -36,7 +58,9 @@
 									<li class="list-group-item">
 										<div>
 											<strong>{{ log.nom_action }}</strong>
-											<span title="{{ log.date_heure }}"> {{ log.date_heure|timeago }}</span></div>
+											<span title="{{ log.date_heure }}">
+												{{ log.date_heure|timeago }}</span>
+										</div>
 										<div>Par
 											{{ log.prenom_utilisateur ~ ' ' ~ log.nom_utilisateur }}</div>
 										<small class="text-muted">{{ log.desc_action }}</small>
@@ -49,8 +73,9 @@
 					{% endif %}
 				</div>
 			</div>
-			<div class="col-12 col-md-8">
-                <!-- Etats dossier -->
+			<div
+				class="col-12 col-md-8">
+				<!-- Etats dossier -->
 				{% if etats|length > 0 %}
 					<form action="{{ currentUrl }}/changer-etat" method="post">
 						<select name="etat" class="form-select d-inline-block w-auto me-3">
@@ -63,15 +88,17 @@
 				{% endif %}
 
 				<h4 class="my-3">Fichiers</h4>
-                <!-- Upload -->
+				<!-- Upload -->
 				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
 					<span class="dz-message">
 						<i class="material-icons">add</i>
 						Ajouter des fichiers</span>
 				</form>
-                <a href="{{currentUrl}}/new-fichier" class="d-block mb-3"><i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i></a>
+				<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
+					<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
+				</a>
 
-                <!-- Fichiers -->
+				<!-- Fichiers -->
 				{% if fichiers|length > 0 %}
 					<div class="mb-3">
 						<a href="{{ currentUrl }}/zip" class="btn btn-primary">
@@ -82,7 +109,8 @@
 						{% for fichier in fichiers %}
 							<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
 								<span class="text-decoration-underline">{{ fichier.file_name }}</span>
-								<span>Déposé il y a {{ fichier.updated_at|timeago }}</span>
+								<span>Déposé il y a
+									{{ fichier.updated_at|timeago }}</span>
 								<span class="mb-2">({{ fichier.updated_at }})</span>
 								{% if fichier.mime_type starts with "image" %}
 									<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">

@@ -10,9 +10,15 @@
 
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="/">Home</a></li>
-				{% if isAdmin %}<li class="breadcrumb-item"><a href=".">Fournisseur</a></li>{% endif %}
-				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }}</li>
+				<li class="breadcrumb-item">
+					<a href="/">Accueil</a>
+				</li>
+				{% if isAdmin %}
+					<li class="breadcrumb-item">
+						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}</a>
+					</li>
+				{% endif %}
+				<li title="Produit #{{ produit.id_produit }}" class="breadcrumb-item active">Étapes de « {{ produit.nom_produit }} »</li>
 			</ol>
 		</nav>
 

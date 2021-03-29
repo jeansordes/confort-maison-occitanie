@@ -36,7 +36,7 @@ $app->group('/admin', function (App $app) {
         }
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
-        return $response->write($this->view->render('roles/admin/default.html.twig', [
+        return $response->write($this->view->render('admin/admin-panel.html.twig', [
             'commerciaux' => $commerciaux,
             'fournisseurs' => $fournisseurs,
             'dossiers' => $dossiers,
@@ -45,7 +45,7 @@ $app->group('/admin', function (App $app) {
         ]));
     });
     $app->get('/new-user', function (Request $request, Response $response, array $args): Response {
-        return $response->write($this->view->render('roles/admin/new-user.html.twig', $_GET));
+        return $response->write($this->view->render('admin/new-user.html.twig', $_GET));
     });
     $app->post('/new-user', function (Request $request, Response $response, array $args) {
         $missing_fields_message = get_form_missing_fields_message(['email', 'user_type'], $_POST);
@@ -111,7 +111,7 @@ $app->group('/admin', function (App $app) {
             $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
             $etats = $req->fetchAll();
 
-            return $response->write($this->view->render('roles/admin/etats-dossiers.html.twig', [
+            return $response->write($this->view->render('admin/etats-dossiers.html.twig', [
                 'etats' => $etats
             ]));
         });
