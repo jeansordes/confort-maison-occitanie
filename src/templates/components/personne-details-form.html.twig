@@ -4,7 +4,7 @@
 		<!-- Identité -->
 		<div class="col">
 			<label class="form-label">Civilité</label>
-			<select name="civilite" class="form-control form-select">
+			<select name="civilite" class="form-control form-select" {% if user.readOnly %}disabled{% endif %}>
 				<option value="" {{ user.civilite=='' ? 'selected' : '' }}></option>
 				<option value="mr" {{ user.civilite=='mr' ? 'selected' : '' }}>Mr</option>
 				<option value="mme" {{ user.civilite=='mme' ? 'selected' : '' }}>Mme</option>
@@ -12,34 +12,34 @@
 		</div>
 		<div class="col">
 			<label class="form-label">Prénom</label>
-			<input name="prenom" value="{{ user.prenom }}" type="text" class="form-control"/>
+			<input name="prenom" value="{{ user.prenom }}" type="text" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 		<div class="col">
 			<label class="form-label">Nom de famille</label>
-			<input name="nom_famille" value="{{ user.nom_famille }}" type="text" class="form-control"/>
+			<input name="nom_famille" value="{{ user.nom_famille }}" type="text" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 	</div>
 
 	<!-- Adresse -->
 	<div class="mb-2">
 		<label class="form-label">Adresse</label>
-		<input name="adresse" value="{{ user.adresse }}" type="text" class="form-control"/>
+		<input name="adresse" value="{{ user.adresse }}" type="text" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 	</div>
 
 	<div class="row mb-2 align-items-end">
 		<div class="col">
 			<label class="form-label">Ville</label>
-			<input name="ville" value="{{ user.ville }}" type="text" class="form-control"/>
+			<input name="ville" value="{{ user.ville }}" type="text" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 
 		<div class="col">
 			<label class="form-label">Code postal</label>
-			<input name="code_postal" value="{{ user.code_postal }}" type="text" class="form-control"/>
+			<input name="code_postal" value="{{ user.code_postal }}" type="text" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 
 		<div class="col">
 			<label class="form-label">Pays</label>
-			<input name="pays" value="{{ user.pays }}" type="text" class="form-control" value="France"/>
+			<input name="pays" value="{{ user.pays }}" type="text" class="form-control" value="France" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 	</div>
 
@@ -47,19 +47,19 @@
 	<div class="row mb-2">
 		<div class="col">
 			<label class="form-label">Téléphone 1</label>
-			<input name="tel1" value="{{ user.tel1 }}" type="tel" class="form-control"/>
+			<input name="tel1" value="{{ user.tel1 }}" type="tel" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 
 		<div class="col">
 			<label class="form-label">Téléphone 2</label>
-			<input name="tel2" value="{{ user.tel2 }}" type="tel" class="form-control"/>
+			<input name="tel2" value="{{ user.tel2 }}" type="tel" class="form-control" {% if user.readOnly %}disabled{% endif %}/>
 		</div>
 	</div>
 
 	<!-- email de contact -->
 	<div class="mb-2">
 		<label class="form-label">Adresse mail</label>
-		<input name="email" value="{{ user.email }}" type="email" class="form-control" {% if user.emailReadOnly %}disabled{% endif %}/>
+		<input name="email" value="{{ user.email }}" type="email" class="form-control" {% if user.emailReadOnly or user.readOnly %}disabled{% endif %}/>
 	</div>
 
 	<button class="btn btn-primary mt-3">{{ btnText }}</button>

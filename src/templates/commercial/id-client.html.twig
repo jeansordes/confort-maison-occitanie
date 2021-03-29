@@ -28,13 +28,13 @@
 				{% include 'components/personne-details-form.html.twig' with {btnText: 'Modifier ce client', user: client} %}
 			</div>
 			<div class="col-12 col-lg-6">
+                <!-- Dossiers -->
 				<h4 class="my-3">Dossiers du client "{{ client.prenom ~ ' ' ~ client.nom_famille }}"</h4>
 				<p class="text-muted">Client appartenant au commercial "{{ commercial.prenom ~ ' ' ~ commercial.nom_famille}}"
 				</p>
 				<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
 					<i class="material-icons">add</i>
 					Créer un nouveau dossier</a>
-				<!-- Dossiers -->
 				{% if dossiers|length > 0 %}
 					<div class="card">
 						<ul class="list-group list-group-flush">

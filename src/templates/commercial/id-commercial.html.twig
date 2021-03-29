@@ -24,8 +24,7 @@
 		<div class="row g-5">
 			<div class="col-12 col-lg-6">
 				<h4>
-					{% if isAdmin %}Détails du commercial{% else %}Vos informations
-					{% endif %}
+					{{ isAdmin ? 'Détails du commercial' : 'Vos informations' }}
 				</h4>
 				{% include 'components/personne-details-form.html.twig' with {btnText: 'Valider les modifications', user: commercial} %}
 			</div>

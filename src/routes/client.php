@@ -11,15 +11,39 @@ $app->group('/cl/{idClient}', function (App $app) {
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_client'));
         $req->execute(['id_client' => $args['idClient']]);
+        if ($req->rowCount() == 0) {
+            throw new Exception("Ce client n'existe pas");
+        }
         $client = $req->fetch();
+        // vérifier si le demandeur a le droit de consulter ce client
+        if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
+            //     si fournisseur, vérifier qu'il y a des dossiers à afficher
+            // récupérer les contrats du client idClient
+            $req = $db->prepare(getSqlQueryString('tous_dossiers_client_filtre_fournisseur'));
+            $req->execute(['id_client' => $args['idClient'], 'id_fournisseur' => $_SESSION['current_user']['uid']]);
+            if ($req->rowCount() == 0) {
+                throw new Exception("Vous n'avez pas la permission d'accéder à ce client");
+            }
+            $dossiers = $req->fetchAll();
+            $client['readOnly'] = true;
+        } else if (
+            ($_SESSION['current_user']['user_role'] == 'commercial'
+                && $client['id_commercial'] == $_SESSION['current_user']['uid'])
+            || $_SESSION['current_user']['user_role'] == 'admin'
+        ) {
+            //     commercial propriétaire du client OU admin
+            // récupérer les contrats du client idClient
+            $req = $db->prepare(getSqlQueryString('tous_dossiers_client'));
+            $req->execute(['id_client' => $args['idClient']]);
+            $dossiers = $req->fetchAll();
+        } else {
+            throw new Exception("Vous n'avez pas la permission d'accéder à ce client");
+        }
+
         // récupérer les infos du commercial
         $req = $db->prepare(getSqlQueryString('get_commercial'));
         $req->execute(['uid' => $client['id_commercial']]);
         $commercial = $req->fetch();
-        // récupérer les contrats du client idClient
-        $req = $db->prepare(getSqlQueryString('dossiers_client'));
-        $req->execute(['id_client' => $args['idClient'], 'id_commercial' => $client['id_commercial']]);
-        $dossiers = $req->fetchAll();
         return $response->write($this->view->render(
             'commercial/id-client.html.twig',
             [
@@ -67,7 +91,7 @@ $app->group('/cl/{idClient}', function (App $app) {
             'produits' => getPDO()->query(getSqlQueryString("tous_produits"))->fetchAll(),
             'client' => $client,
             'commercial' => $commercial,
-            ]));
+        ]));
     });
     $app->post('/new-dossier', function (Request $request, Response $response, array $args): Response {
         if (empty($_POST['id_produit'])) {

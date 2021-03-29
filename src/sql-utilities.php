@@ -13,6 +13,8 @@ function getSqlQueryString($key)
         'tous_etats_dossier' => 'select * from _enum_etats_dossier order by id_enum_etat',
         'tous_produits_fournisseur' => 'select * from produits where id_fournisseur = :id_fournisseur',
         'tous_dossiers_fournisseur' => 'select * from dossiers_enriched where id_fournisseur = :id_fournisseur',
+        'tous_dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client order by date_creation desc',
+        'tous_dossiers_client_filtre_fournisseur' => 'select * from dossiers_enriched where id_client = :id_client and id_fournisseur = :id_fournisseur order by date_creation desc',
         // new
         'new_user' => "select new_user(:user_type, :email, '', :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
         'new_client' => 'select new_client(:id_commercial, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
@@ -45,7 +47,6 @@ function getSqlQueryString($key)
         'account_infos_from_uid' => 'select u.last_user_update, u.user_role, p.email from utilisateurs u, personnes p where u.id_utilisateur = :uid and u.id_utilisateur = p.id_personne',
         'account_infos_from_email' => 'select id_utilisateur, email, user_role, password_hash from utilisateurs u, personnes p where u.id_utilisateur = p.id_personne and p.email = :email',
         'uid_from_primary_email' => 'select id_personne from personnes where email = :email',
-        'dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client and id_commercial = :id_commercial order by date_creation desc',
         'fichiers_dossier' => 'select ff.* from fichiers ff, fichiers_dossier fp where ff.id_fichier = fp.id_fichier and fp.id_dossier = :id_dossier',
         'check_mime_type' => 'select description from _enum_mime_type where description = :mime_type',
         'count_file' => 'select count(*) from fichiers where file_name = :file_name',
