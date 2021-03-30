@@ -15,7 +15,7 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}</a>
+						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}</a>
 					</li>
 				{% endif %}
 				<li title="Produit #{{ produit.id_produit }}" class="breadcrumb-item active">Étapes de « {{ produit.nom_produit }} »</li>

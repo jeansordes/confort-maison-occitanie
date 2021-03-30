@@ -15,7 +15,7 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
-						{{ fournisseur.prenom ~ ' ' ~ fournisseur.nom_famille }}
+						{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}
 					</li>
 				</ol>
 			</nav>
@@ -37,6 +37,8 @@
 					</thead>
 					<tbody>
 						{% for dossier in dossiers %}
+                        {% set commercial = commerciaux[dossier.id_commercial] %}
+                        {% set client = clients[dossier.id_client] %}
 							<tr>
 								<th scope="row">
 									<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
@@ -46,10 +48,10 @@
 									{{ dossier.nom_produit }}
 								</td>
 								<td>
-									{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}
+									{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}
 								</td>
 								<td>
-									<a href="/cl/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
+									<a href="/cl/{{ dossier.id_client }}">{{ client.est_un_particulier ?  client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a>
 								</td>
 								<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
 							</tr>

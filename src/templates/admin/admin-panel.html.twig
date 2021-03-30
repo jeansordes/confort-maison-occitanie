@@ -64,10 +64,10 @@
 										<a href="/admin/co/{{ dossier.id_commercial }}">{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}</a>
 									</td>
 									<td>
-										<a href="/cl/{{ dossier.id_client }}">{{ client.nom_famille|upper ~ ' ' ~ client.prenom }}</a>
+										<a href="/cl/{{ dossier.id_client }}">{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a>
 									</td>
 									<td>
-										<a href="/admin/f/{{ dossier.id_fournisseur }}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom }}</a>
+										<a href="/admin/f/{{ dossier.id_fournisseur }}">{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}</a>
 									</td>
 									<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
 								</tr>
@@ -87,7 +87,7 @@
 						<ul class="list-group list-group-flush">
 							{% for commercial in commerciaux %}
 								<li class="list-group-item">
-									<a href="{{currentUrl}}/co/{{commercial.id_personne}}">{{ commercial.nom_famille|upper ~ ' ' ~ commercial.prenom ~ ' (' ~ commercial.email ~ ')' }}</a>
+									<a href="{{currentUrl}}/co/{{commercial.id_personne}}">{{ (commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise) ~ ' (' ~ commercial.email ~ ')' }}</a>
 								</li>
 							{% endfor %}
 						</ul>
@@ -101,7 +101,7 @@
 						<ul class="list-group list-group-flush">
 							{% for fournisseur in fournisseurs %}
 								<li class="list-group-item">
-									<a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom ~ ' (' ~ fournisseur.email ~ ')' }}</a>
+									<a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{{ (fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise) ~ ' (' ~ fournisseur.email ~ ')' }}</a>
 								</li>
 							{% endfor %}
 						</ul>
