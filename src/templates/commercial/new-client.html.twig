@@ -26,7 +26,9 @@
 			Remarque : aucun des champs ci dessous n'est obligatoire (mais on vous conseille d'au moins mettre le nom et le prénom 😉)
 		</p>
 		<div class="mb-3">
-			{% include 'components/personne-details-form.html.twig' with {btnText: 'Créer ce client', user: client} %}
+            <form method="POST">
+                {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Créer ce client', user: client} %}
+            </form>
 		</div>
 	</div>
 {% endblock %}

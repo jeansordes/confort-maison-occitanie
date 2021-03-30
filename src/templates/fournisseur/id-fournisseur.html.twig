@@ -65,7 +65,9 @@
 			<!-- Coordonnées -->
 			<div class="col-12 col-lg-6">
 				<h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
-				{% include 'components/personne-details-form.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
+                <form method="POST">
+                    {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
+                </form>
 			</div>
 			<!-- Liste produits -->
 			<div class="col-12 col-lg-6">

@@ -25,7 +25,9 @@
 		<div class="row g-5">
 			<div class="col-12 col-lg-6">
 				<h4>Détails du client</h4>
-				{% include 'components/personne-details-form.html.twig' with {btnText: 'Modifier ce client', user: client} %}
+                <form method="POST">
+                    {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Modifier ce client', user: client} %}
+                </form>
 			</div>
 			<div class="col-12 col-lg-6">
                 <!-- Dossiers -->

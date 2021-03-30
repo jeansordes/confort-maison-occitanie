@@ -40,6 +40,10 @@ function routesCommercial()
             $db = getPDO();
             $req = $db->prepare(getSqlQueryString('update_personne_noemail'));
             $req->execute([
+                'nom_entreprise' => $_POST['nom_entreprise'],
+                'numero_entreprise' => $_POST['numero_entreprise'],
+                'est_un_particulier' => $_POST['est_un_particulier'] ? 1 : 0,
+
                 "prenom" => $_POST["prenom"],
                 "nom_famille" => $_POST["nom_famille"],
                 "civilite" => $_POST["civilite"],
@@ -81,6 +85,11 @@ function routesCommercial()
             $req = $db->prepare(getSqlQueryString('new_client'));
             $req->execute([
                 "id_commercial" => $idCommercial,
+                
+                'nom_entreprise' => $_POST['nom_entreprise'],
+                'numero_entreprise' => $_POST['numero_entreprise'],
+                'est_un_particulier' => $_POST['est_un_particulier'] ? 1 : 0,
+
                 "prenom" => $_POST["prenom"],
                 "nom_famille" => $_POST["nom_famille"],
                 "civilite" => $_POST["civilite"],

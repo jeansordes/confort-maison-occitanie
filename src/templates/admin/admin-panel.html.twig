@@ -29,8 +29,8 @@
 				<button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Utilisateurs</button>
 			</li>
 			{# <li class="nav-item" role="presentation">
-							<button class="nav-link" id="produits-tab" data-bs-toggle="tab" data-bs-target="#produits" type="button" role="tab" aria-controls="produits" aria-selected="false">Produits</button>
-						</li> #}
+										<button class="nav-link" id="produits-tab" data-bs-toggle="tab" data-bs-target="#produits" type="button" role="tab" aria-controls="produits" aria-selected="false">Produits</button>
+									</li> #}
 		</ul>
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
@@ -49,6 +49,9 @@
 						</thead>
 						<tbody>
 							{% for dossier in dossiers %}
+								{% set commercial = commerciaux[dossier.id_commercial] %}
+								{% set client = clients[dossier.id_client] %}
+								{% set fournisseur = fournisseurs[dossier.id_fournisseur] %}
 								<tr>
 									<th scope="row">
 										<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
@@ -58,13 +61,13 @@
 										{{ dossier.nom_produit }}
 									</td>
 									<td>
-										<a href="/admin/co/{{ dossier.id_commercial }}">{{ commerciaux[dossier.id_commercial].nom_famille|upper ~ ' ' ~ commerciaux[dossier.id_commercial].prenom }}</a>
+										<a href="/admin/co/{{ dossier.id_commercial }}">{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}</a>
 									</td>
 									<td>
-										<a href="/cl/{{ dossier.id_client }}">{{ clients[dossier.id_client].nom_famille|upper ~ ' ' ~ clients[dossier.id_client].prenom }}</a>
+										<a href="/cl/{{ dossier.id_client }}">{{ client.nom_famille|upper ~ ' ' ~ client.prenom }}</a>
 									</td>
 									<td>
-										<a href="/admin/f/{{ dossier.id_fournisseur }}">{{ fournisseurs[dossier.id_fournisseur].nom_famille|upper ~ ' ' ~ fournisseurs[dossier.id_fournisseur].prenom }}</a>
+										<a href="/admin/f/{{ dossier.id_fournisseur }}">{{ fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom }}</a>
 									</td>
 									<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
 								</tr>
@@ -108,8 +111,8 @@
 				{% endif %}
 			</div>
 			{# <div class="tab-pane fade" id="produits" role="tabpanel" aria-labelledby="produits-tab">
-			                tab 3
-			            </div> #}
+						                tab 3
+						            </div> #}
 		</div>
 	</div>
 {% endblock %}

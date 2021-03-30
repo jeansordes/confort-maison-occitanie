@@ -45,7 +45,7 @@ $app->group('/admin', function (App $app) {
         ]));
     });
     $app->get('/new-user', function (Request $request, Response $response, array $args): Response {
-        return $response->write($this->view->render('admin/new-user.html.twig', $_GET));
+        return $response->write($this->view->render('admin/new-user.html.twig', ['user' => $_GET]));
     });
     $app->post('/new-user', function (Request $request, Response $response, array $args) {
         $missing_fields_message = get_form_missing_fields_message(['email', 'user_type'], $_POST);
@@ -68,6 +68,11 @@ $app->group('/admin', function (App $app) {
         $req->execute([
             'user_type' => $_POST['user_type'],
             'email' => $_POST['email'],
+
+            'nom_entreprise' => $_POST['nom_entreprise'],
+            'numero_entreprise' => $_POST['numero_entreprise'],
+            'est_un_particulier' => $_POST['est_un_particulier'] ? 1 : 0,
+
             'prenom' => $_POST['prenom'],
             'nom_famille' => $_POST['nom_famille'],
             "civilite" => $_POST["civilite"],

@@ -57,6 +57,9 @@ create or replace table personnes (
     nom_famille text default null,
     civilite enum('mr', 'mme', '') default null,
     -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
+    nom_entreprise text default null,
+    numero_entreprise text default null,
+    est_un_particulier int(1) default 1,
     id_coordonnees int(11) default null,
     email varchar(200) default null check (email REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     constraint
@@ -170,6 +173,9 @@ create or replace function new_user (
     p_role varchar(50),
     p_email text,
     p_password_hash text,
+    p_nom_entreprise text,
+    p_numero_entreprise text,
+    p_est_un_particulier int(1),
     p_prenom text,
     p_nom_famille text,
     p_civilite text,
@@ -183,8 +189,8 @@ create or replace function new_user (
     insert into coordonnees(adresse, code_postal, ville, pays, tel1, tel2)
         values (p_adresse, p_code_postal, p_ville, p_pays, p_tel1, p_tel2);
     set @id_coordonnees = last_insert_id();
-    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email)
-        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, p_email);
+    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email, nom_entreprise, numero_entreprise, est_un_particulier)
+        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, p_email, p_nom_entreprise, p_numero_entreprise, p_est_un_particulier);
     set @v_uid = last_insert_id();
     insert into utilisateurs(id_utilisateur, user_role, password_hash) values (@v_uid, p_role, p_password_hash);
     return @v_uid;
@@ -194,6 +200,9 @@ $$
 $$
 create or replace function new_client(
     p_id_commercial int(11),
+    p_nom_entreprise text,
+    p_numero_entreprise text,
+    p_est_un_particulier int(1),
     p_prenom text,
     p_nom_famille text,
     p_civilite text,
@@ -208,8 +217,8 @@ create or replace function new_client(
     insert into coordonnees(adresse, code_postal, ville, pays, tel1, tel2)
         values (p_adresse, p_code_postal, p_ville, p_pays, p_tel1, p_tel2);
     set @id_coordonnees = last_insert_id();
-    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email)
-        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, nullif(p_email, ''));
+    insert into personnes(prenom, nom_famille, civilite, id_coordonnees, email, nom_entreprise, numero_entreprise, est_un_particulier)
+        values (p_prenom, p_nom_famille, p_civilite, @id_coordonnees, nullif(p_email, ''), p_nom_entreprise, p_numero_entreprise, p_est_un_particulier);
     set @id_client = last_insert_id();
     insert into clients_des_commerciaux(id_client, id_commercial) values (@id_client, p_id_commercial);
     return @id_client;

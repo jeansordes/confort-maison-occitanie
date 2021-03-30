@@ -57,6 +57,10 @@ $app->group('/cl/{idClient}', function (App $app) {
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('update_personne'));
         $req->execute([
+            'nom_entreprise' => $_POST['nom_entreprise'],
+            'numero_entreprise' => $_POST['numero_entreprise'],
+            'est_un_particulier' => $_POST['est_un_particulier'] ? 1 : 0,
+
             "prenom" => $_POST["prenom"],
             "nom_famille" => $_POST["nom_famille"],
             "civilite" => $_POST["civilite"],
@@ -75,7 +79,8 @@ $app->group('/cl/{idClient}', function (App $app) {
         ]);
         alert('Client modifié avec succès 👍', 1);
         return $response->withRedirect($request->getUri()->getPath());
-    });
+    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
+
     # /new-dossier
     $app->get('/new-dossier', function (Request $request, Response $response, array $args): Response {
         // get client
@@ -105,4 +110,4 @@ $app->group('/cl/{idClient}', function (App $app) {
         $idDossier = $req->fetchColumn();
         return $response->withRedirect('/d/' . $idDossier);
     });
-});
+})->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

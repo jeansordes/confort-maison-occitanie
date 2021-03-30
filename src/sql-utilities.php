@@ -16,8 +16,8 @@ function getSqlQueryString($key)
         'tous_dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client order by date_creation desc',
         'tous_dossiers_client_filtre_fournisseur' => 'select * from dossiers_enriched where id_client = :id_client and id_fournisseur = :id_fournisseur order by date_creation desc',
         // new
-        'new_user' => "select new_user(:user_type, :email, '', :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
-        'new_client' => 'select new_client(:id_commercial, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
+        'new_user' => "select new_user(:user_type, :email, '', :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
+        'new_client' => 'select new_client(:id_commercial, :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
         'new_dossier' => 'select new_dossier(:id_client, :id_produit)',
         'new_fichier_dossier' => 'select new_fichier_dossier(:file_name, :mime_type, :id_dossier)',
         'new_fichier_produit' => 'select new_fichier_produit(:file_name, :mime_type, :id_produit)',
@@ -38,14 +38,14 @@ function getSqlQueryString($key)
         // update
         'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :desc_produit where id_produit = :id_produit',
         'update_pwd' => 'update utilisateurs set password_hash = :new_password_hash where id_utilisateur = :uid',
-        'update_personne' => 'update personnes set prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite, email = nullif(:email, \'\') where id_personne = :id_personne',
-        'update_personne_noemail' => 'update personnes set prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite where id_personne = :id_personne',
+        'update_personne' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite, email = nullif(:email, \'\') where id_personne = :id_personne',
+        'update_personne_noemail' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite where id_personne = :id_personne',
         'update_coordonnees' => 'update coordonnees set adresse = :adresse, code_postal = :code_postal, ville = :ville, pays = :pays, tel1 = :tel1, tel2 = :tel2 where id_coordonnees = (select id_coordonnees from personnes where id_personne = :id_personne)',
         // autre
         'clients_commercial' => 'select * from clients where id_commercial = :id_commercial',
         'last_settings_update' => 'select last_user_update from utilisateurs where id_utilisateur = :uid',
         'account_infos_from_uid' => 'select u.last_user_update, u.user_role, p.email from utilisateurs u, personnes p where u.id_utilisateur = :uid and u.id_utilisateur = p.id_personne',
-        'account_infos_from_email' => 'select id_utilisateur, email, user_role, password_hash from utilisateurs u, personnes p where u.id_utilisateur = p.id_personne and p.email = :email',
+        'account_infos_from_email' => 'select * from utilisateurs u, personnes p where u.id_utilisateur = p.id_personne and p.email = :email',
         'uid_from_primary_email' => 'select id_personne from personnes where email = :email',
         'fichiers_dossier' => 'select ff.* from fichiers ff, fichiers_dossier fp where ff.id_fichier = fp.id_fichier and fp.id_dossier = :id_dossier',
         'check_mime_type' => 'select description from _enum_mime_type where description = :mime_type',
