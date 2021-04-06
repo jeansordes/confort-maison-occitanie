@@ -15,7 +15,7 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
-						{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}
+						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
 					</li>
 				</ol>
 			</nav>
@@ -32,7 +32,7 @@
 							<th scope="col">Nom produit</th>
 							<th scope="col">Commercial</th>
 							<th scope="col">Client</th>
-							<th scope="col">Date de création</th>
+							<th scope="col">Date de modification</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -48,7 +48,7 @@
 									{{ dossier.nom_produit }}
 								</td>
 								<td>
-									{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}
+									{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
 								</td>
 								<td>
 									<a href="/cl/{{ dossier.id_client }}">{{ client.est_un_particulier ?  client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a>

@@ -1,15 +1,5 @@
-<!-- Type d'entité -->
-<div class="row mb-2 align-items-end">
-	<div class="col">
-		<label class="form-label d-block p-3 border border-3 border-light rounded">
-			<input type="checkbox" name="est_un_particulier" id="type_entite_checkbox" data-when-unchecked="#entreprise" data-when-checked="#particulier" class="me-2" {{ user.est_un_particulier or not user ? 'checked' : '' }} {% if user.readOnly %} disabled {% endif %}>
-			<span>Est un particulier</span>
-		</label>
-	</div>
-</div>
-
 <!-- SI : Entreprise -->
-<div class="row mb-2 align-items-end {{ user.est_un_particulier or not user ? 'd-none' : '' }}" id="entreprise">
+<div class="row mb-2 align-items-end">
 	<div class="col">
 		<label class="form-label">Nom de l'entreprise</label>
 		<input name="nom_entreprise" value="{{ user.nom_entreprise }}" type="text" class="form-control" {% if user.readOnly %} disabled {% endif %}/>
@@ -21,7 +11,7 @@
 </div>
 
 <!-- SI : Particulier -->
-<div class="row mb-2 align-items-end {{ user.est_un_particulier or not user ? '' : 'd-none' }}" id="particulier">
+<div class="row mb-2 align-items-end">
 	<div class="col">
 		<label class="form-label">Civilité</label>
 		<select name="civilite" class="form-control form-select" {% if user.readOnly %} disabled {% endif %}>
@@ -37,6 +27,16 @@
 	<div class="col">
 		<label class="form-label">Nom de famille</label>
 		<input name="nom_famille" value="{{ user.nom_famille }}" type="text" class="form-control" {% if user.readOnly %} disabled {% endif %}/>
+	</div>
+</div>
+
+<!-- Type d'entité -->
+<div class="row mb-2 mt-3 align-items-end">
+	<div class="col">
+		<label class="form-label d-block px-2 py-1 border border-3 border-light rounded">
+			<input type="checkbox" name="est_un_particulier" class="me-2" {{ user.est_un_particulier or not user ? 'checked' : '' }} {% if user.readOnly %} disabled {% endif %}>
+			<span>Est un particulier</span>
+		</label>
 	</div>
 </div>
 

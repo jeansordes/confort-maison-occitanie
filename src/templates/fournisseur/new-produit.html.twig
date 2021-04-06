@@ -14,7 +14,7 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}</a>
+						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}</a>
 					</li>
 				{% endif %}
 				<li class="breadcrumb-item active">Ajouter un produit</li>

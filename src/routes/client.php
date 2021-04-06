@@ -53,6 +53,7 @@ $app->group('/cl/{idClient}', function (App $app) {
             ]
         ));
     });
+    
     $app->post('', function (Request $request, Response $response, array $args): Response {
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('update_personne'));
@@ -97,7 +98,8 @@ $app->group('/cl/{idClient}', function (App $app) {
             'client' => $client,
             'commercial' => $commercial,
         ]));
-    });
+    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
+
     $app->post('/new-dossier', function (Request $request, Response $response, array $args): Response {
         if (empty($_POST['id_produit'])) {
             alert("Vous devez selectionner un produit", 3);
@@ -109,5 +111,5 @@ $app->group('/cl/{idClient}', function (App $app) {
         alert("Le dossier a bien été créé", 1);
         $idDossier = $req->fetchColumn();
         return $response->withRedirect('/d/' . $idDossier);
-    });
+    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

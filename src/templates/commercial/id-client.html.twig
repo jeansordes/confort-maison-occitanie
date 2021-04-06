@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	Client "{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}"
+	Client "{% include 'components/titre-personne.html.twig' with { personne: client} %}"
 {% endblock %}
 
 {% block body %}
@@ -15,10 +15,10 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-                        <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}</a>
+                        <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a>
 					</li>
 				{% endif %}
-                <li title="Client #{{ client.id_personne }}" class="breadcrumb-item active">{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</li>
+                <li title="Client #{{ client.id_personne }}" class="breadcrumb-item active">{% include 'components/titre-personne.html.twig' with { personne: client} %}</li>
 			</ol>
 		</nav>
 
@@ -31,12 +31,14 @@
 			</div>
 			<div class="col-12 col-lg-6">
                 <!-- Dossiers -->
-				<h4 class="my-3">Dossiers du client "{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}"</h4>
-				<p class="text-muted">Client appartenant au commercial "{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}"
+				<h4 class="my-3">Dossiers du client "{% include 'components/titre-personne.html.twig' with { personne: client} %}"</h4>
+				<p class="text-muted">Client appartenant au commercial "{% include 'components/titre-personne.html.twig' with { personne: commercial} %}"
 				</p>
-				<a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
-					<i class="material-icons">add</i>
-					Créer un nouveau dossier</a>
+                {% if current_user.user_role != 'fournisseur' %}
+                    <a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
+                        <i class="material-icons">add</i>
+                        Créer un nouveau dossier</a>
+                {% endif %}
 				{% if dossiers|length > 0 %}
 					<div class="card">
 						<ul class="list-group list-group-flush">
@@ -44,7 +46,7 @@
 								<li class="list-group-item">
 									<a class="d-block" href="/d/{{ dossier.id_dossier }}">{{ dossier.nom_produit }}
 										(Dossier #{{ dossier.id_dossier }})</a>
-									<small class="text-muted" title="{{ dossier.date_creation }}">Créé
+									<small class="text-muted" title="{{ dossier.date_creation }}">Modifié
 										{{ dossier.date_creation|timeago }}</small>
 								</li>
 							{% endfor %}

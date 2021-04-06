@@ -15,11 +15,11 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}</a>
+						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a>
 					</li>
 				{% endif %}
 				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a>
+					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a>
 				</li>
 				<li title="Dossier #{{ dossier.id_dossier }}" class="breadcrumb-item active">« {{ dossier.nom_produit }} »</li>
 			</ol>
@@ -27,19 +27,19 @@
 
 		<div class="mb-4">
 			<div>
-				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, « {{ dossier.nom_produit }} » du client « <a href="/cl/{{client.id_personne}}">{{ client.est_un_particulier ? client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a> »</h4>
+				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, « {{ dossier.nom_produit }} » du client « <a href="/cl/{{client.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a> »</h4>
 				<p class="text-muted">Ce produit est fourni par « 
 					{% if isAdmin %}
 						<a href="/admin/f/{{ fournisseur.id_personne }}">
 						{% endif %}
-						{{ fournisseur.est_un_particulier ? fournisseur.nom_famille|upper ~ ' ' ~ fournisseur.prenom : fournisseur.nom_entreprise }}
+						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
 						{% if isAdmin %}
 						</a>
 					{% endif %} », ce dossier est géré par « 
 					{% if isAdmin %}
 						<a href="/admin/co/{{ commercial.id_personne }}">
 						{% endif %}
-						{{ commercial.est_un_particulier ? commercial.nom_famille|upper ~ ' ' ~ commercial.prenom : commercial.nom_entreprise }}
+						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
 						{% if isAdmin %}
 						</a>
 					{% endif %} »</p>
@@ -62,7 +62,7 @@
 												{{ log.date_heure|timeago }}</span>
 										</div>
 										<div>Par
-											{{ log.est_un_particulier ? log.nom_famille|upper ~ ' ' ~ log.prenom : log.nom_entreprise }}</div>
+											{% include 'components/titre-personne.html.twig' with { personne: log} %}</div>
 										<small class="text-muted">{{ log.desc_action }}</small>
 									</li>
 								{% endfor %}
