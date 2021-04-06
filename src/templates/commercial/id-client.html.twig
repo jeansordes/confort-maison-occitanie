@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	Client "{% include 'components/titre-personne.html.twig' with { personne: client} %}"
+	Client « {% include 'components/titre-personne.html.twig' with { personne: client} %} »
 {% endblock %}
 
 {% block body %}
@@ -31,7 +31,7 @@
 			</div>
 			<div class="col-12 col-lg-6">
                 <!-- Dossiers -->
-				<h4 class="my-3">Dossiers du client "{% include 'components/titre-personne.html.twig' with { personne: client} %}"</h4>
+				<h4 class="my-3">Dossiers du client « {% include 'components/titre-personne.html.twig' with { personne: client} %} »</h4>
 				<p class="text-muted">Client appartenant au commercial "{% include 'components/titre-personne.html.twig' with { personne: commercial} %}"
 				</p>
                 {% if current_user.user_role != 'fournisseur' %}

@@ -1,1 +1,1 @@
-{{ personne.est_un_particulier ? personne.nom_famille|upper ~ ' ' ~ personne.prenom : personne.nom_entreprise ~ ' (' ~ personne.nom_famille|upper ~ ' ' ~ personne.prenom ~ ')' }}
+{{ personne.est_un_particulier ? personne.nom_famille|upper ~ ' ' ~ personne.prenom : personne.nom_entreprise ~ (personne.nom_famille or personne.prenom ? ' (' ~ personne.nom_famille|upper ~ (personne.nom_famille and personne.prenom ? ' ' : '') ~ personne.prenom ~ ')' : '') }}
