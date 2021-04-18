@@ -35,6 +35,7 @@ $scripts = [
                     unlink($file);
                 }
             }
+            echo "The /uploads folder is now empty";
         }
     ],
 ];
