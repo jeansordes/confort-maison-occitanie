@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
+(new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
 
 // { <nom_requete> : { sql: string, args: array<string> } }
 function getSqlQueryString($key)
