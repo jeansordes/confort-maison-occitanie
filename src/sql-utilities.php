@@ -83,7 +83,7 @@ function runFile($filename)
     // echo $connexion_string . "\n";
     
     echo "--- $filename ---\n";
-    $tmpString = file_get_contents(__DIR__ . '/../sql/' . $filename);
+    $tmpString = file_get_contents(__DIR__ . '/sql/' . $filename);
     $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
 
     $temp = tmpfile();

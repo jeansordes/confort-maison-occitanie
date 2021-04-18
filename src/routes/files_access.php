@@ -4,7 +4,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\UploadedFile;
 
-require_once "./src/sql-utilities.php";
+require_once __DIR__ . "/../sql-utilities.php";
 
 /**
  * Moves the uploaded file to the upload directory and assigns it a unique name
