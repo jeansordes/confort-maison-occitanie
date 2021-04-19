@@ -109,16 +109,9 @@
 						{% for fichier in fichiers %}
 							<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
 								<span class="text-decoration-underline">{{ fichier.file_name }}</span>
-								<span>Déposé il y a
-									{{ fichier.updated_at|timeago }}</span>
+								<span>Déposé {{ fichier.updated_at|timeago }}</span>
 								<span class="mb-2">({{ fichier.updated_at }})</span>
-								{% if fichier.mime_type starts with "image" %}
-									<img src="/uploads/{{ fichier.file_name }}" class="img-fluid">
-								{% else %}
-									<span class="fst-italic">
-										<i class="material-icons">picture_as_pdf</i>
-										Aperçu non disponible</span>
-								{% endif %}
+                                <img src="/uploads/preview/{{ fichier.file_name }}.png" class="img-fluid">
 							</a>
 						{% endfor %}
 					</div>

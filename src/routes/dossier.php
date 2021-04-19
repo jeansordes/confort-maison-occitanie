@@ -218,10 +218,12 @@ $app->group('/d/{idDossier}', function (App $app) {
         if ($req->rowCount() == 0) {
             throw new \Exception("Ce type de fichier n'est pas accepté");
         }
-        // if PDF creates a preview
-        if ($mime_type == 'application/pdf') {
-            console_log('PDF preview needs to be created');
-        }
+        // Preview creation
+        $img_data = new Imagick($directory . "/" . $filename . ($mime_type == 'application/pdf' ? "[0]" : ''));
+        $img_data->setResolution("300", "300");
+        $img_data->setImageFormat("png");
+        $img_data->thumbnailImage(300, 300, true, true);
+        file_put_contents($directory . "/preview/" . $filename . ".png", $img_data, FILE_USE_INCLUDE_PATH);
 
         // register file in the DB
         $req = $db->prepare(getSqlQueryString('new_fichier_dossier'));

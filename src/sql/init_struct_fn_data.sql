@@ -131,6 +131,7 @@ create or replace table dossiers (
 create or replace table fichiers (
     id_fichier int(11) not null auto_increment primary key,
     file_name text not null,
+    file_preview text default null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
     constraint

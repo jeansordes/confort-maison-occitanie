@@ -6,4 +6,5 @@ composer.lock
 composer.phar
 .env
 uploads/*
+uploads/preview/*
 !**/.gitkeep

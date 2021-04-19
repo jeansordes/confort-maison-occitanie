@@ -1,6 +1,19 @@
 <?php
 require_once __DIR__ . '/src/sql-utilities.php';
 
+function deleteUploads()
+{
+    // empty the "uploads" folder
+    foreach (['/uploads/*.*', '/uploads/preview/*.*'] as $folder) {
+        foreach (glob(__DIR__ . $folder) as $file) {
+            if (strpos($file, '.gitkeep') == false) {
+                unlink($file);
+            }
+        }
+    }
+    echo "The /uploads folder is now empty\n";
+}
+
 $scripts = [
     [
         'drop database + rebuild it',
@@ -21,21 +34,24 @@ $scripts = [
         }
     ],
     [
-        'apply patch0001.sql only',
+        'apply patch.sql only',
         function () {
-            runFile('patch0001.sql');
+            runFile('patch.sql');
         }
     ],
     [
         'empty the "uploads" folder',
         function () {
-            // empty the "uploads" folder
-            foreach (glob(__DIR__ . "/uploads/*") as $file) {
-                if (strpos($file, '.gitkeep') == false) {
-                    unlink($file);
-                }
-            }
-            echo "The /uploads folder is now empty";
+            deleteUploads();
+        }
+    ],
+    [
+        'DANGER ZONE : delete, then rebuild everything (db + uploads)',
+        function () {
+            runFile('init_struct_fn_data.sql');
+            runFile('create_admin.sql');
+            runFile('create_dummy_data.sql');
+            deleteUploads();
         }
     ],
 ];

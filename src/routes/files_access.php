@@ -45,18 +45,3 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
 
     return $filename;
 }
-
-$app->get('/uploads/{filename}', function (Request $request, Response $response, array $args): Response {
-    // check in the db if the file exists
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('getfile'));
-
-    $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
-    $result = $req->fetchAll();
-
-    // if not, respond with 404 error
-    $image = file_get_contents("image_location");
-    return $response->withHeader("Content-Type", "image/jpeg")->write($image);
-
-    return $response->write($this->view->render('settings/password-edit.html.twig', ['email' => $_SESSION['current_user']['email']]));
-});
