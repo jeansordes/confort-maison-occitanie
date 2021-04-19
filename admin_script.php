@@ -9,13 +9,13 @@ $scripts = [
         }
     ],
     [
-        'drop database + rebuild it + add admin only',
+        'add admin account to DB',
         function () {
             runFile('create_admin.sql');
         }
     ],
     [
-        'drop database + rebuild it + add admin only + dummy data',
+        'add dummy data in the DB (admin not included)',
         function () {
             runFile('create_dummy_data.sql');
         }

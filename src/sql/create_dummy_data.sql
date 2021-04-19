@@ -1,8 +1,5 @@
 use :cmo_db_name;
 
--- admin account (admin_cmo@yopmail.com:admin)
-select new_user('admin', 'admin_cmo@yopmail.com', '$2y$12$hA2wxJZhBLdHPJPQHQA.2e.sSUOqI/HAndSH8/9LD9WHn.cZ8qfz2', 'Administrateur', null, 0, null, null, null, null, null, null, null, null, null);
-
 -- https://www.sporcle.com/games/knhall27/superheroes-real-names-dc--marvel/results
 -- commercial 1
 set @com1 = new_user('commercial','peter_parker@yopmail.com','$2y$12$U3EnKlIrojdabF8s4z70Ne2rZB9yvzqYH/IzNNUMUVTqG3sGy7dRS', 'Spiderman Co.', null, 0, 'Peter','Parker', 'mr', null, null, null, null, null, null);
