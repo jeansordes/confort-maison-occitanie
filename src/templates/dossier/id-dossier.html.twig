@@ -8,8 +8,8 @@
 	<div class="container">
 		{% include 'components/connected-as.html.twig' %}
 
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb d-flex align-items-center">
+		<nav aria-label="breadcrumb bg-white">
+			<ol class="breadcrumb bg-light p-2 px-3 rounded">
 				<li class="breadcrumb-item">
 					<a href="/">Accueil</a>
 				</li>
@@ -21,28 +21,36 @@
 				<li class="breadcrumb-item">
 					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a>
 				</li>
-				<li title="Dossier #{{ dossier.id_dossier }}" class="breadcrumb-item active">« {{ dossier.nom_produit }} »</li>
+				<li title="Dossier #{{ dossier.id_dossier }}" class="breadcrumb-item active">«
+					{{ dossier.nom_produit }}
+					»</li>
 			</ol>
 		</nav>
 
 		<div class="mb-4">
 			<div>
-				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, « {{ dossier.nom_produit }} » du client « <a href="/cl/{{client.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a> »</h4>
-				<p class="text-muted">Ce produit est fourni par « 
+				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, «
+					{{ dossier.nom_produit }}
+					» du client «
+					<a href="/cl/{{client.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a>
+					»</h4>
+				<p class="text-muted">Ce produit est fourni par «
 					{% if isAdmin %}
 						<a href="/admin/f/{{ fournisseur.id_personne }}">
 						{% endif %}
 						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
 						{% if isAdmin %}
 						</a>
-					{% endif %} », ce dossier est géré par « 
+					{% endif %}
+					», ce dossier est géré par «
 					{% if isAdmin %}
 						<a href="/admin/co/{{ commercial.id_personne }}">
 						{% endif %}
 						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
 						{% if isAdmin %}
 						</a>
-					{% endif %} »</p>
+					{% endif %}
+					»</p>
 			</div>
 		</div>
 
@@ -56,14 +64,14 @@
 							<ul class="list-group list-group-flush">
 								{% for log in logs %}
 									<li class="list-group-item">
+										<strong class="d-block">{{ log.nom_action }}</strong>
 										<div>
-											<strong>{{ log.nom_action }}</strong>
-											<span title="{{ log.date_heure }}">
-												{{ log.date_heure|timeago }}</span>
+											{{ log.date_heure|timeago }}
+											<small class="text-muted">({{ log.date_heure }})</small>
+											par
+											{% include 'components/titre-personne.html.twig' with { personne: log} %}
 										</div>
-										<div>Par
-											{% include 'components/titre-personne.html.twig' with { personne: log} %}</div>
-										<small class="text-muted">{{ log.desc_action }}</small>
+										<small class="d-block text-muted">{{ log.desc_action }}</small>
 									</li>
 								{% endfor %}
 							</ul>
@@ -99,25 +107,17 @@
 				</a>
 
 				<!-- Fichiers -->
-				{% if fichiers|length > 0 %}
-					<div class="mb-3">
-						<a href="{{ currentUrl }}/zip" class="btn btn-primary">
+				<div class="mb-3">
+					{% if fichiers|length > 0 %}
+						<a href="{{ currentUrl }}/zip" class="btn btn-primary me-2">
 							<i class="material-icons">download</i>
 							Télécharger tous les fichiers ci dessous</a>
-					</div>
-					<div class="files-thumbnails">
-						{% for fichier in fichiers %}
-							<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="text-muted img-thumbnail text-decoration-none">
-								<span class="text-decoration-underline">{{ fichier.file_name }}</span>
-								<span>Déposé {{ fichier.updated_at|timeago }}</span>
-								<span class="mb-2">({{ fichier.updated_at }})</span>
-                                <img src="/uploads/preview/{{ fichier.file_name }}.png" class="img-fluid">
-							</a>
-						{% endfor %}
-					</div>
-				{% else %}
-					<p class="text-muted fst-italic">Il n'y a aucun fichiers à afficher</p>
-				{% endif %}
+					{% endif %}
+					<a href="{{ currentUrl }}/corbeille" class="btn btn-outline-secondary">
+						<i class="material-icons">delete</i>
+						Accéder à la corbeille</a>
+				</div>
+				{% include "components/fichiers.html.twig" with { fichiers: fichiers } %}
 			</div>
 		</div>
 	</div>

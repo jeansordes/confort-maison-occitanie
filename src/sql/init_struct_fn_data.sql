@@ -59,7 +59,7 @@ create or replace table personnes (
     -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
     nom_entreprise text default null,
     numero_entreprise text default null,
-    est_un_particulier int(1) default 1,
+    est_un_particulier boolean default 1,
     id_coordonnees int(11) default null,
     email varchar(200) default null check (email REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     constraint
@@ -131,9 +131,9 @@ create or replace table dossiers (
 create or replace table fichiers (
     id_fichier int(11) not null auto_increment primary key,
     file_name text not null,
-    file_preview text default null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
+    in_trash boolean default 0,
     constraint
         foreign key (mime_type) references _enum_mime_type(description)
 );
@@ -176,7 +176,7 @@ create or replace function new_user (
     p_password_hash text,
     p_nom_entreprise text,
     p_numero_entreprise text,
-    p_est_un_particulier int(1),
+    p_est_un_particulier boolean,
     p_prenom text,
     p_nom_famille text,
     p_civilite text,
@@ -203,7 +203,7 @@ create or replace function new_client(
     p_id_commercial int(11),
     p_nom_entreprise text,
     p_numero_entreprise text,
-    p_est_un_particulier int(1),
+    p_est_un_particulier boolean,
     p_prenom text,
     p_nom_famille text,
     p_civilite text,

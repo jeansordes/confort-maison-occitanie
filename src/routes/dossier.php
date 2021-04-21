@@ -9,24 +9,36 @@ use Slim\Http\Response;
 
 require_once 'commercial.php';
 
+/**
+ * Renvoie soit le dossier soit une exception dans le cas où l'utilisateur n'a pas le droit de consulter le dossier
+ */
+function is_user_allowed($idDossier)
+{
+    // récupérer infos sur dossier
+    $db = getPDO();
+    $req = $db->prepare(getSqlQueryString('get_dossier'));
+    $req->execute(['id_dossier' => $idDossier]);
+    if ($req->rowCount() == 0) {
+        throw new \Exception("Ce dossier n'existe pas");
+    }
+    $dossier = $req->fetch();
+    // vérifier si on doit empêcher la personne d'accéder au dossier
+    $role = $_SESSION['current_user']['user_role'];
+    $uid = $_SESSION['current_user']['uid'];
+    if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
+        return new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
+    }
+    return $dossier;
+}
+
 # /{idDossier}
 $app->group('/d/{idDossier}', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
-        // récupérer infos sur dossier
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
-        if ($req->rowCount() == 0) {
-            throw new \Exception("Ce dossier n'existe pas");
-        }
-        $dossier = $req->fetch();
-        // vérifier si la personne a le droit d'accéder à ce dossier
-        $role = $_SESSION['current_user']['user_role'];
-        $uid = $_SESSION['current_user']['uid'];
-        if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
-            throw new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
-        }
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
+
         // récupérer infos sur commercial
+        $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_commercial'));
         $req->execute(['uid' => $dossier['id_commercial']]);
         $commercial = $req->fetch();
@@ -39,8 +51,8 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
         // récupérer liste des fichiers
-        $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
+        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
         // récupérer les états possibles d'un dossier
         $etats = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
@@ -64,26 +76,14 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /zip
     $app->get('/zip', function (Request $request, Response $response, array $args): Response {
-        // récupérer infos sur dossier
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
-        if ($req->rowCount() == 0) {
-            throw new \Exception("Ce dossier n'existe pas");
-        }
-        $dossier = $req->fetch();
-        // vérifier si la personne a le droit d'accéder à ce dossier
-        $role = $_SESSION['current_user']['user_role'];
-        $uid = $_SESSION['current_user']['uid'];
-        if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
-            throw new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
-        }
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
 
         $uploadFolder = realpath(__DIR__ . '/../../uploads');
 
         $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
+        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // création du fichier zip
@@ -123,26 +123,15 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /changer-etat
     $app->post('/changer-etat', function (Request $request, Response $response, array $args): Response {
-        // récupérer infos sur dossier
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
-        if ($req->rowCount() == 0) {
-            throw new \Exception("Ce dossier n'existe pas");
-        }
-        $dossier = $req->fetch();
-        // vérifier si la personne a le droit d'accéder à ce dossier
-        $role = $_SESSION['current_user']['user_role'];
-        $uid = $_SESSION['current_user']['uid'];
-        if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
-            throw new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
-        }
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
 
         $missing_fields_message = get_form_missing_fields_message(['etat'], $_POST);
         if ($missing_fields_message) {
             alert($missing_fields_message, 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
+        $db = getPDO();
         $req = $db->prepare(getSqlQueryString('edit_etat'));
         $req->execute(['new_value' => $_POST['etat'], 'id_dossier' => $args['idDossier']]);
         $req = $db->prepare(getSqlQueryString('get_etats_dossier'));
@@ -162,18 +151,10 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /new-fichier
     $app->get('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        // get dossier
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
-        $dossier = $req->fetch();
-        // vérifier si la personne a le droit d'accéder à ce dossier
-        $role = $_SESSION['current_user']['user_role'];
-        $uid = $_SESSION['current_user']['uid'];
-        if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
-            throw new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
-        }
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
         // get client
+        $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_client'));
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
@@ -188,22 +169,10 @@ $app->group('/d/{idDossier}', function (App $app) {
         ]));
     });
     $app->post('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        // récupérer infos sur dossier
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
-        if ($req->rowCount() == 0) {
-            throw new \Exception("Ce dossier n'existe pas");
-        }
-        $dossier = $req->fetch();
-        // vérifier si la personne a le droit d'accéder à ce dossier
-        $role = $_SESSION['current_user']['user_role'];
-        $uid = $_SESSION['current_user']['uid'];
-        if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
-            throw new \Exception("Vous n'avez pas la permission d'accéder à ce dossier");
-        }
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
 
-        require_once 'files_access.php';
+        require_once 'fichiers.php';
         $directory = $this->get('upload_directory');
 
         $uploadedFile = $request->getUploadedFiles()['file'];
@@ -213,6 +182,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $filename = moveUploadedFile($directory, $uploadedFile);
         $mime_type = mime_content_type($directory . DIRECTORY_SEPARATOR . $filename);
         // check mime type
+        $db = getPDO();
         $req = $db->prepare(getSqlQueryString('check_mime_type'));
         $req->execute(['mime_type' => $mime_type]);
         if ($req->rowCount() == 0) {
@@ -222,7 +192,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $img_data = new Imagick($directory . "/" . $filename . ($mime_type == 'application/pdf' ? "[0]" : ''));
         $img_data->setResolution("300", "300");
         $img_data->setImageFormat("png");
-        $img_data->thumbnailImage(300, 300, true, true);
+        $img_data->thumbnailImage(300, 300, true);
         file_put_contents($directory . "/preview/" . $filename . ".png", $img_data, FILE_USE_INCLUDE_PATH);
 
         // register file in the DB
@@ -233,5 +203,34 @@ $app->group('/d/{idDossier}', function (App $app) {
             "id_dossier" => $args['idDossier'],
         ]);
         return $response->write('uploaded ' . $filename . '<br/>');
+    });
+
+    $app->get('/corbeille', function (Request $request, Response $response, array $args): Response {
+        $dossier = is_user_allowed($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
+
+        // récupérer infos sur commercial
+        $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req->execute(['uid' => $dossier['id_commercial']]);
+        $commercial = $req->fetch();
+        // récupérer infos sur client
+        $req = $db->prepare(getSqlQueryString('get_client'));
+        $req->execute(['id_client' => $dossier['id_client']]);
+        $client = $req->fetch();
+        // récupérer liste des fichiers
+        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 1]);
+        $fichiers = $req->fetchAll();
+
+        return $response->write($this->view->render(
+            'dossier/corbeille.html.twig',
+            [
+                'dossier' => $dossier,
+                'fichiers' => $fichiers,
+                'commercial' => $commercial,
+                'client' => $client,
+            ]
+        ));
     });
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

@@ -39,22 +39,6 @@
     min-height: fit-content;
 }
 
-.files-thumbnails {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -1rem;
-}
-
-.files-thumbnails>* {
-    max-width: calc(100% - 2rem);
-    width: 20rem;
-    height: fit-content;
-    margin: 1rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-}
-
 .sortable-table thead th .material-icons {
     cursor: pointer;
     right: 0;

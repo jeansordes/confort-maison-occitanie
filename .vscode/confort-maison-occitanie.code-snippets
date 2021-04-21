@@ -98,6 +98,13 @@
 			"Ajouter un ${2:quelquechose}</a>",
         ],
     },
+    "material icons": {
+        "scope": "twig,html",
+        "prefix": "i.material-icons",
+        "body": [
+            "<i class=\"material-icons\">${1:nom de l'icone}</i>",
+        ],
+    },
     "redirect to current url": {
         "scope": "php",
         "prefix": "cmo_redirect_current_url",
