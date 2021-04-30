@@ -79,18 +79,3 @@ document.querySelectorAll('table.sortable-table').forEach(tDOM => {
         });
     });
 });
-
-const checkbox = document.querySelector('#type_entite_checkbox');
-if (checkbox) {
-    checkbox.addEventListener('change', evt => {
-        const un = document.querySelector(checkbox.getAttribute('data-when-unchecked')),
-            ch = document.querySelector(checkbox.getAttribute('data-when-checked'));
-        if (checkbox.checked) {
-            ch.classList.remove('d-none');
-            un.classList.add('d-none');
-        } else {
-            ch.classList.add('d-none');
-            un.classList.remove('d-none');
-        }
-    })
-}

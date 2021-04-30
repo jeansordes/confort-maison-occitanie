@@ -45,10 +45,10 @@ function routesFournisseur()
                 $clients[$client['id_personne']] = $client;
             }
             // récupérer tous les etats_dossier
-            $etats_from_db = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
+            $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
             $etats_dossier = [];
             foreach ($etats_from_db as $etat) {
-                $etats_dossier[$etat['id_enum_etat']] = $etat['description'];
+                $etats_dossier[$etat['id_etat']] = $etat['description'];
             }
             return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', [
                 'fournisseur' => $fournisseur,
@@ -117,16 +117,6 @@ function routesFournisseur()
                 ]);
             }
             alert('Produit ajouté avec succès 👍', 1);
-            return $response->withRedirect($request->getUri()->getPath() . '/..');
-        });
-
-        # /{idProduit}
-        $app->post('/{idProduit}', function (Request $request, Response $response, array $args): Response {
-            $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('update_produit'));
-            $req->execute($_POST);
-            alert('Le produit #' . $_POST['id_produit'] . ' a bien été mis à jour', 1);
-
             return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
     };

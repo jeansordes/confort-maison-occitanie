@@ -107,21 +107,21 @@
     },
     "redirect to current url": {
         "scope": "php",
-        "prefix": "cmo_redirect_current_url",
+        "prefix": "redirect cmo",
         "body": [
             "return \\$response->withRedirect(\\$request->getUri()->getPath());$0"
         ],
     },
     "return twig render": {
         "scope": "php",
-        "prefix": "cmo_return_render",
+        "prefix": "render cmo",
         "body": [
             "return \\$response->write(\\$this->view->render('$1'));$0"
         ],
     },
     "db get pdo": {
         "scope": "php",
-        "prefix": "cmo_db_getpdo_prepare_execute",
+        "prefix": "$db getpdo cmo",
         "body": [
             "\\$db = getPDO();",
             "\\$req = \\$db->prepare(getSqlQueryString('$1'));",

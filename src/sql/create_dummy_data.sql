@@ -17,9 +17,15 @@ insert into societes(nom_societe, id_representant) values ('X-men construction',
 
 insert into produits(nom_produit, description_produit, id_fournisseur) values ('Isolation des combles','C''est un choix de rénovation énergétique à prioriser. En effet, jusqu''à 30 % des pertes de chaleur se font par la toiture. Cette isolation est donc celle qui permet de faire le plus d''économies d''énergie pour un faible coût',@fournisseur_representant);
 set @prod1 = last_insert_id();
+insert into etats_produit(description, order_etat, id_produit) values ('P1 projet créé', 0, @prod1);
+insert into etats_produit(description, order_etat, id_produit) values ('P1 dossier à compléter', 1, @prod1);
+insert into etats_produit(description, order_etat, id_produit) values ('P1 cloturé', 2, @prod1);
 
 insert into produits(nom_produit, description_produit, id_fournisseur) values ('Crepis sur la facade','Il apporte une deuxième jeunesse aux maisons anciennes ou revêtit avec élégance une habitation neuve, protège le batiment des intempéries et du temps, apporte la touche finale à l''esthétique de la maison : le crépi est le revêtement de façade le plus utilisé en France, loin devant la peinture et le bardage.', @fournisseur_representant);
 set @prod2 = last_insert_id();
+insert into etats_produit(description, order_etat, id_produit) values ('P2 projet créé', 0, @prod2);
+insert into etats_produit(description, order_etat, id_produit) values ('P2 dossier à compléter', 1, @prod2);
+insert into etats_produit(description, order_etat, id_produit) values ('P2 cloturé', 2, @prod2);
 
 select new_dossier(@cli1, @prod1);
 select new_dossier(@cli1, @prod2);

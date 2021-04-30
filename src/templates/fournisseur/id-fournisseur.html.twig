@@ -37,8 +37,8 @@
 					</thead>
 					<tbody>
 						{% for dossier in dossiers %}
-                        {% set commercial = commerciaux[dossier.id_commercial] %}
-                        {% set client = clients[dossier.id_client] %}
+							{% set commercial = commerciaux[dossier.id_commercial] %}
+							{% set client = clients[dossier.id_client] %}
 							<tr>
 								<th scope="row">
 									<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
@@ -67,9 +67,9 @@
 			<!-- Coordonnées -->
 			<div class="col-12 col-lg-6">
 				<h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
-                <form method="POST">
-                    {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
-                </form>
+				<form method="POST">
+					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
+				</form>
 			</div>
 			<!-- Liste produits -->
 			<div class="col-12 col-lg-6">
@@ -82,18 +82,11 @@
 				{% if produits|length > 0 %}
 					{% for produit in produits %}
 						<div class="card d-inline-block me-3 mb-3 p-3">
-							<form method="POST" action="{{ currentUrl }}/{{ produit.id_produit }}">
-								<div class="mb-2">
-									<label class="form-label text-muted">Nom du produit</label>
-									<input type="text" name="nom_produit" class="form-control" value="{{ produit.nom_produit}}">
-								</div>
-								<div class="mb-2">
-									<label class="form-label text-muted">Description du produit</label>
-									<textarea name="desc_produit" cols="30" rows="5" class="form-control">{{ produit.description_produit }}</textarea>
-								</div>
-								<input type="hidden" name="id_produit" value="{{produit.id_produit}}">
-								<button class="btn btn-outline-primary">Enregistrer</button>
-							</form>
+							<div class="card-body">
+								<h5 class="card-title">{{ produit.nom_produit }}</h5>
+								<div class="card-text mb-3">{{ produit.description_produit }}</div>
+                                <a href="{{ base_url }}/p/{{ produit.id_produit }}" class="btn btn-outline-primary card-link">Détails de ce produit</a>
+							</div>
 						</div>
 					{% endfor %}
 				{% else %}

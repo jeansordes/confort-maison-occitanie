@@ -29,10 +29,10 @@ $app->group('/admin', function (App $app) {
             $clients[$client['id_personne']] = $client;
         }
         // récupérer tous les etats_dossier
-        $etats_from_db = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
+        $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
         $etats_dossier = [];
         foreach ($etats_from_db as $etat) {
-            $etats_dossier[$etat['id_enum_etat']] = $etat['description'];
+            $etats_dossier[$etat['id_etat']] = $etat['description'];
         }
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
@@ -56,7 +56,7 @@ $app->group('/admin', function (App $app) {
         
         // vérifier que l'email n'est pas déjà utilisé par un autre compte commercial/fournisseur
         $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_email_from_users'));
+        $req = $db->prepare(getSqlQueryString('get_user_from_email'));
         $req->execute(['email' => $_POST['email']]);
         if ($req->rowCount() > 0) {
             alert('Cette adresse email est déjà utilisée',3);
@@ -112,7 +112,7 @@ $app->group('/admin', function (App $app) {
         $app->get('', function (Request $request, Response $response, array $args): Response {
             // récupérer les états de dossier possible
             $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('tous_etats_dossier'));
+            $req = $db->prepare(getSqlQueryString('tous_etats_produit'));
             $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
             $etats = $req->fetchAll();
 
@@ -134,17 +134,6 @@ $app->group('/admin', function (App $app) {
 
             alert('Le nouvel état "' . $_POST['description'] . '" a bien été créé', 1);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
-        });
-
-        $app->group('/{etatDossier}', function (App $app) {
-            $app->get('/supprimer', function (Request $request, Response $response, array $args): Response {
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('supprimer_etat_dossier'));
-                $req->execute(['description' => $args['etatDossier']]);
-
-                alert('L\'état "' . $args['etatDossier'] . '" a bien été supprimé', 1);
-                return $response->withRedirect($request->getUri()->getPath() . '/../..');
-            });
         });
     });
 

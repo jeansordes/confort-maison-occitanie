@@ -27,6 +27,7 @@
 			</ol>
 		</nav>
 
+        <!-- Titre du produit -->
 		<div class="mb-4">
 			<div>
 				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, «
@@ -88,7 +89,7 @@
 					<form action="{{ currentUrl }}/changer-etat" method="post">
 						<select name="etat" class="form-select d-inline-block w-auto me-3">
 							{% for etat in etats %}
-								<option value="{{ etat.id_enum_etat }}" {{ etat.id_enum_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
+								<option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
 							{% endfor %}
 						</select>
 						<button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>

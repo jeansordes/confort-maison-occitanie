@@ -6,11 +6,11 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<link rel="shortcut icon" href="/public/favicon{{ isLocalhost ? '-localhost' : '' }}.png" type="image/x-icon">
+		<link rel="shortcut icon" href="/public/img/favicon{{ isLocalhost ? '-localhost' : '' }}.png" type="image/x-icon">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-		<link href="/public/bootstrap.min.5.0.0-beta1.css" rel="stylesheet">
-		<link rel="stylesheet" href="/public/dropzone.css">
-		<link rel="stylesheet" href="/public/index.css">
+		<link href="/public/css/bootstrap.min.5.0.0-beta1.css" rel="stylesheet">
+		<link rel="stylesheet" href="/public/css/dropzone.css">
+		<link rel="stylesheet" href="/public/css/index.css">
 		<title>
 			{% block title %}{% endblock %}
 		</title>
@@ -18,15 +18,15 @@
 
 	<body class="py-3 py-md-5">
 		{% if session_alert %}
-			<div class="alert {{ session_alert.meaning }} alert-dismissible fade show m-3" role="alert">
+			<div class="alert {{ session_alert.meaning }} alert-dismissible fade show m-3" role="alert" style="margin-top: -2rem !important">
 				{{ session_alert.message|raw }}
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 			</div>
 		{% endif %}
 		{% block body %}{% endblock %}
-		<script src="/public/bootstrap.bundle.min.5.0.0-beta1.js"></script>
-		<script src="/public/dropzone.js"></script>
-		<script src="/public/index.js"></script>
+		<script src="/public/js/bootstrap.bundle.min.5.0.0-beta1.js"></script>
+		<script src="/public/js/dropzone.js"></script>
+		<script src="/public/js/index.js"></script>
 		<script>
 			console.log('current user details :');
 console.log({{ current_user | json_encode | raw }})

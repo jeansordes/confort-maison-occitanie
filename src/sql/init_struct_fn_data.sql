@@ -26,21 +26,6 @@ insert into _enum_mime_type(description) values ('image/jpeg');
 insert into _enum_mime_type(description) values ('image/gif');
 insert into _enum_mime_type(description) values ('application/pdf');
 
-create or replace table _enum_etats_dossier (
-    id_enum_etat int(11) not null auto_increment primary key,
-    description varchar(50) not null unique
-);
-
-insert into _enum_etats_dossier(description) values ('projet créé');
-insert into _enum_etats_dossier(description) values ('en attente de validation du fournisseur');
-insert into _enum_etats_dossier(description) values ('validé par le fournisseur');
-insert into _enum_etats_dossier(description) values ('dossier à compléter');
-insert into _enum_etats_dossier(description) values ('date installation planifiée');
-insert into _enum_etats_dossier(description) values ('facturable');
-insert into _enum_etats_dossier(description) values ('payé par fournisseur');
-insert into _enum_etats_dossier(description) values ('payé au conseiller');
-insert into _enum_etats_dossier(description) values ('cloturé');
-
 create or replace table coordonnees (
     id_coordonnees int(11) not null auto_increment primary key,
     adresse text default null,
@@ -116,16 +101,25 @@ create or replace table produits (
         foreign key (id_fournisseur) references utilisateurs(id_utilisateur)
 );
 
+create or replace table etats_produit (
+    id_etat int(11) not null auto_increment primary key,
+    description varchar(50) not null,
+    order_etat int(11) not null,
+    id_produit int(11) not null,
+    constraint
+        foreign key (id_produit) references produits(id_produit)
+);
+
 create or replace table dossiers (
     id_dossier int(11) not null auto_increment primary key,
     id_client int(11) not null,
     id_produit int(11) not null,
     commentaire text default null,
-    etat_dossier int(11) not null default 1,
+    etat_dossier int(11) not null,
     constraint
         foreign key (id_client) references clients_des_commerciaux (id_client),
         foreign key (id_produit) references produits(id_produit),
-        foreign key (etat_dossier) references _enum_etats_dossier(id_enum_etat)
+        foreign key (etat_dossier) references etats_produit(id_etat)
 );
 
 create or replace table fichiers (
@@ -169,7 +163,7 @@ create or replace table logs_dossiers
         foreign key (id_utilisateur) references utilisateurs (id_utilisateur)
 );
 
-DELIMITER $$
+delimiter $$
 create or replace function new_user (
     p_role varchar(50),
     p_email text,
@@ -261,10 +255,35 @@ create or replace function new_dossier(
 ) returns int(11) begin
     insert into dossiers(id_client, id_produit, etat_dossier) values (p_id_client, p_id_produit, 1);
     set @id_dossier = last_insert_id();
-    select description into @initial_dossier_etat from _enum_etats_dossier where id_enum_etat = 1;
+    select description into @initial_dossier_etat from etats_produit where id_produit = p_id_produit order by order_etat limit 1;
     select id_commercial into @id_commercial from clients_des_commerciaux where id_client = p_id_client;
-    insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (@id_dossier, @id_commercial, 'Initialisation état du dossier', concat('« ',@initial_dossier_etat,' »'));
+    insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (@id_dossier, @id_commercial, 'Initialisation état du dossier', concat('État du dossier : ', @initial_dossier_etat));
     return @id_dossier;
+end
+$$
+
+$$
+create or replace function update_etat_dossier(
+    p_id_dossier int(11),
+    p_id_nouvel_etat int(11),
+    p_id_author int(11)
+) returns int(11) begin
+    update dossiers set etat_dossier = p_id_nouvel_etat where id_dossier = p_id_dossier;
+    select description into @nouvel_etat from etats_produit where id_etat = p_id_nouvel_etat;
+    insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action)
+        values (p_id_dossier, p_id_author, 'Changement de l''état du dossier', concat('État du dossier : ', @nouvel_etat));
+    return p_id_dossier;
+end
+$$
+
+$$
+create or replace function new_etat_produit(
+    p_id_produit int(11),
+    p_description varchar(50)
+) returns int(11) begin
+    select count(*) into @new_order_etat from etats_produit where id_produit = p_id_produit;
+    insert into etats_produit(description, id_produit, order_etat) values (p_description, p_id_produit, @new_order_etat);
+    return p_id_produit;
 end
 $$
 

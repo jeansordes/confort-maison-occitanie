@@ -1,8 +1,4 @@
 <?php
-
-use MyApp\EditableException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -12,7 +8,7 @@ require_once 'commercial.php';
 /**
  * Renvoie soit le dossier soit une exception dans le cas où l'utilisateur n'a pas le droit de consulter le dossier
  */
-function is_user_allowed($idDossier)
+function is_user_allowed__dossier($idDossier)
 {
     // récupérer infos sur dossier
     $db = getPDO();
@@ -34,7 +30,7 @@ function is_user_allowed($idDossier)
 # /{idDossier}
 $app->group('/d/{idDossier}', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         // récupérer infos sur commercial
@@ -55,7 +51,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
         // récupérer les états possibles d'un dossier
-        $etats = $db->query(getSqlQueryString('tous_etats_dossier'))->fetchAll();
+        $etats = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
         // récupérer liste des logs
         $req = $db->prepare(getSqlQueryString('get_logs_dossiers'));
         $req->execute(['id_dossier' => $args['idDossier']]);
@@ -76,7 +72,7 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /zip
     $app->get('/zip', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         $uploadFolder = realpath(__DIR__ . '/../../uploads');
@@ -123,7 +119,7 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /changer-etat
     $app->post('/changer-etat', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         $missing_fields_message = get_form_missing_fields_message(['etat'], $_POST);
@@ -132,18 +128,11 @@ $app->group('/d/{idDossier}', function (App $app) {
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
         $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('edit_etat'));
-        $req->execute(['new_value' => $_POST['etat'], 'id_dossier' => $args['idDossier']]);
-        $req = $db->prepare(getSqlQueryString('get_etats_dossier'));
-        $req->execute(['id_enum_etat' => $_POST['etat']]);
-        $newEtatText = $req->fetch()['description'];
-        // ajouter dans les logs
-        $req = $db->prepare(getSqlQueryString('new_dossier_log'));
+        $req = $db->prepare(getSqlQueryString('update_etat_dossier'));
         $req->execute([
+            'id_nouvel_etat' => $_POST['etat'],
             'id_dossier' => $args['idDossier'],
             'id_author' => $_SESSION['current_user']['uid'],
-            'nom_action' => 'Changement état du dossier',
-            'desc_action' => "« " . $newEtatText . " »",
         ]);
 
         alert("L'état du dossier a bien été mis à jour", 1);
@@ -151,7 +140,7 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /new-fichier
     $app->get('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
         // get client
         $db = getPDO();
@@ -169,7 +158,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         ]));
     });
     $app->post('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         require_once 'fichiers.php';
@@ -206,9 +195,9 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
 
     $app->get('/corbeille', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
-
+        
         // récupérer infos sur commercial
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_commercial'));
