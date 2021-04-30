@@ -51,7 +51,9 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
         // récupérer les états possibles d'un dossier
-        $etats = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+        $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
+        $req->execute(['id_produit' => $dossier['id_produit']]);
+        $etats = $req->fetchAll();
         // récupérer liste des logs
         $req = $db->prepare(getSqlQueryString('get_logs_dossiers'));
         $req->execute(['id_dossier' => $args['idDossier']]);
@@ -127,7 +129,16 @@ $app->group('/d/{idDossier}', function (App $app) {
             alert($missing_fields_message, 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
+        // vérifier que l'état correspond bien au produit
         $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('get_etat_produit'));
+        $req->execute(['id_etat' => $_POST['etat']]);
+        if ($req->rowCount() == 0) {
+            alert("État inconnu", 3);
+            return $response->withRedirect($request->getUri()->getPath() . '/..');
+        }
+
+        // update etat dossier
         $req = $db->prepare(getSqlQueryString('update_etat_dossier'));
         $req->execute([
             'id_nouvel_etat' => $_POST['etat'],

@@ -38,8 +38,9 @@ function getSqlQueryString($key)
         'get_email' => 'select email from personnes where email = :email',
         'get_user_from_email' => 'select p.email from personnes p, utilisateurs u where p.id_personne = u.id_utilisateur and p.email = :email',
         'get_etats_where_produit' => 'select * from etats_produit where id_produit = :id_produit order by order_etat',
+        'get_etat_produit' => 'select * from etats_produit where id_etat = :id_etat',
         // update
-        'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :desc_produit where id_produit = :id_produit',
+        'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :description_produit where id_produit = :id_produit',
         'update_pwd' => 'update utilisateurs set password_hash = :new_password_hash where id_utilisateur = :uid',
         'update_personne' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite, email = nullif(:email, \'\') where id_personne = :id_personne',
         'update_personne_noemail' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite where id_personne = :id_personne',

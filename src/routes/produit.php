@@ -53,6 +53,18 @@ $app->group('/p/{idProduit}', function (App $app) {
         ]));
     });
 
+    $app->post('', function (Request $request, Response $response, array $args): Response {
+        $produit = is_user_allowed__produit($args['idProduit']);
+        if ($produit instanceof \Exception) throw $produit;
+
+        $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('update_produit'));
+        $req->execute($_POST);
+        alert("Vos modifications ont bien été prises en compte", 1);
+
+        return $response->withRedirect($request->getUri()->getPath());
+    });
+
     $app->post('/new-etat', function (Request $request, Response $response, array $args): Response {
         $produit = is_user_allowed__produit($args['idProduit']);
         if ($produit instanceof \Exception) throw $produit;
