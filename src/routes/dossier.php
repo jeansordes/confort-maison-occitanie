@@ -212,6 +212,21 @@ $app->group('/d/{idDossier}', function (App $app) {
         }
         // Preview creation
         $img_data = new Imagick($directory . "/" . $filename . ($mime_type == 'application/pdf' ? "[0]" : ''));
+
+        switch ($img_data->getImageOrientation()) {
+            case imagick::ORIENTATION_BOTTOMRIGHT:
+                $img_data->rotateimage("#fff", 180); // rotate 180 degrees
+                break;
+            case imagick::ORIENTATION_RIGHTTOP:
+                $img_data->rotateimage("#fff", 90); // rotate 90 degrees CW
+                break;
+            case imagick::ORIENTATION_LEFTBOTTOM:
+                $img_data->rotateimage("#fff", -90); // rotate 90 degrees CCW
+                break;
+        }
+        // Now that it's auto-rotated, make sure the EXIF data is correct in case the EXIF gets saved with the image!
+        $img_data->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+
         $img_data->setResolution("300", "300");
         $img_data->setImageFormat("png");
         $img_data->thumbnailImage(300, 300, true, true);
@@ -225,6 +240,24 @@ $app->group('/d/{idDossier}', function (App $app) {
             "id_dossier" => $args['idDossier'],
         ]);
         return $response->write('uploaded ' . $filename . '<br/>');
+    });
+
+    $app->post('/new-comment', function (Request $request, Response $response, array $args): Response {
+        if (empty($_POST['comment'])) {
+            alert('Vous ne pouvez pas créer un commentaire vide', 2);
+            return $response->withRedirect($request->getUri()->getPath() . '/..');
+        }
+        $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('new_dossier_log'));
+        $req->execute([
+            'id_dossier' => $args['idDossier'],
+            'id_author' => $_SESSION['current_user']['uid'],
+            'nom_action' => 'Nouveau commentaire',
+            'desc_action' => $_POST['comment'],
+        ]);
+
+        alert('Votre commentaire a bien été enregistré', 1);
+        return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
 
     $app->get('/corbeille', function (Request $request, Response $response, array $args): Response {

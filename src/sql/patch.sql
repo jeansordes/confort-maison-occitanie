@@ -1,31 +1,18 @@
-alter table etats_produit add column
-    role_responsable_etape varchar(50) default 'commercial' references _enum_user_role(description);
+delimiter $$
+create or replace function new_dossier(
+    p_id_client int(11),
+    p_id_produit int(11)
+) returns int(11) begin
+    select id_etat, description into @id_etat_initial, @initial_dossier_etat from etats_produit where id_produit = p_id_produit order by order_etat limit 1;
+    insert into dossiers(id_client, id_produit, etat_dossier) values (p_id_client, p_id_produit, @id_etat_initial);
+    set @id_dossier = last_insert_id();
+    select id_commercial into @id_commercial from clients_des_commerciaux where id_client = p_id_client;
+    insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (@id_dossier, @id_commercial, 'Initialisation état du dossier', concat('État du dossier : ', @initial_dossier_etat));
+    return @id_dossier;
+end
+$$
 
-create or replace view dossiers_enriched as
-    select a.id_commercial, c.nom_produit, b.*,
-           (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure desc limit 1) date_creation,
-           c.id_fournisseur, d.role_responsable_etape
-    from clients_des_commerciaux a, dossiers b, produits c, etats_produit d
-    where a.id_client = b.id_client and b.id_produit = c.id_produit and d.id_etat = b.etat_dossier;
-
-create table _enum_phases_dossier (
-    description varchar(50) primary key
-);
-insert into _enum_phases_dossier(description) values ('normal');
-insert into _enum_phases_dossier(description) values ('archiv�');
-
-alter table etats_produit add column
-    phase_etape varchar(50) default 'normal' not null references _enum_phases_dossier(description);
-
-alter table clients_des_commerciaux change commentaire_commercial
-    infos_client_supplementaires text default null;
-
-create or replace view dossiers_enriched as
-    select a.id_commercial, c.nom_produit, b.*,
-           (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure desc limit 1) date_creation,
-           c.id_fournisseur, d.role_responsable_etape, d.phase_etape
-    from clients_des_commerciaux a, dossiers b, produits c, etats_produit d
-    where a.id_client = b.id_client and b.id_produit = c.id_produit and d.id_etat = b.etat_dossier
-    order by d.phase_etape desc;
+alter table etats_produit change phase_etape
+    phase_etape varchar(50) default 'normal' not null;
 
 select 'Patch done';

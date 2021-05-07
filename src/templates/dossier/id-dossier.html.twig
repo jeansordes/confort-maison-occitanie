@@ -15,11 +15,13 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %} (commercial)</a>
+						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+							(commercial)</a>
 					</li>
 				{% endif %}
 				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %} (client)</a>
+					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %}
+						(client)</a>
 				</li>
 				<li class="breadcrumb-item active">«&nbsp;{{ dossier.nom_produit }}&nbsp;» (Dossier #{{ dossier.id_dossier }})</li>
 			</ol>
@@ -55,18 +57,34 @@
 			</form>
 		{% endif %}
 
-		<h4 class="my-3">Fichiers</h4>
-		<!-- Upload -->
-		<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
-			<span class="dz-message">
-				<i class="material-icons">add</i>
-				Ajouter des fichiers</span>
-		</form>
-		<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
-			<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
-		</a>
+		<div
+			class="row">
+			<!-- Upload -->
+			<div class="col-12 col-md">
+				<h4 class="my-3">Ajouter des fichiers ...</h4>
+				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3 w-100 text-center" id="dropzoneForm">
+					<span class="dz-message">
+						<i class="material-icons">add</i>
+						Ajouter des fichiers</span>
+				</form>
+				<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
+					<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
+				</a>
+			</div>
 
-		<!-- Fichiers -->
+			<!-- Commentaire -->
+			<div class="col-12 col-md">
+                <h4 class="my-3">... ou un commentaire</h4>
+				<form action="{{ currentUrl }}/new-comment" method="POST">
+					<div class="mb-2">
+						<textarea name="comment" class="form-control mb-3"></textarea>
+						<button class="btn btn-outline-primary">Enregistrer ce commentaire</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- ZIP + corbeille -->
 		<div class="mb-3">
 			{% if fichiers|length > 0 %}
 				<a href="{{ currentUrl }}/zip" class="btn btn-primary me-2 mb-2">
@@ -78,7 +96,7 @@
 				Accéder à la corbeille</a>
 		</div>
 
-		<!-- LISTE COMBINÉE DES FICHIERS ET LOGS -->
+		<!-- FICHIERS + LOGS -->
 		<div class="row">
 			{% for eventGroup in events %}
 				{% for event in eventGroup %}
@@ -93,7 +111,7 @@
 									{{ log.date_heure|timeago }}
 									<small class="text-muted">({{ log.date_heure }})</small>
 									par
-									{% include 'components/titre-personne.html.twig' with { personne: log} %}
+									<a href="/"></a>{% include 'components/titre-personne.html.twig' with { personne: log } %}
 									<small class="d-block text-muted">{{ log.desc_action }}</small>
 								</div>
 							</div>
