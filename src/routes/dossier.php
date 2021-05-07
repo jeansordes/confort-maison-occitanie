@@ -1,4 +1,5 @@
 <?php
+
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -46,6 +47,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req = $db->prepare(getSqlQueryString('get_client'));
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
+
         // récupérer liste des fichiers
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
         $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
@@ -59,6 +61,25 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req->execute(['id_dossier' => $args['idDossier']]);
         $logs = $req->fetchAll();
 
+        $events = [];
+        foreach ($logs as $log) {
+            $tmp = ['type' => 'log', 'object' => $log];
+            if (empty($events[$log['date_heure']])) {
+                $events[$log['date_heure']] = [$tmp];
+            } else {
+                $events[$log['date_heure']][] = $tmp;
+            }
+        }
+        foreach ($fichiers as $fichier) {
+            $tmp = ['type' => 'fichier', 'object' => $fichier];
+            if (empty($events[$fichier['updated_at']])) {
+                $events[$fichier['updated_at']] = [$tmp];
+            } else {
+                $events[$fichier['updated_at']][] = $tmp;
+            }
+        }
+        krsort($events);
+
         return $response->write($this->view->render(
             'dossier/id-dossier.html.twig',
             [
@@ -69,6 +90,7 @@ $app->group('/d/{idDossier}', function (App $app) {
                 'client' => $client,
                 'etats' => $etats,
                 'logs' => $logs,
+                'events' => $events,
             ]
         ));
     });
@@ -192,7 +214,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $img_data = new Imagick($directory . "/" . $filename . ($mime_type == 'application/pdf' ? "[0]" : ''));
         $img_data->setResolution("300", "300");
         $img_data->setImageFormat("png");
-        $img_data->thumbnailImage(300, 300, true);
+        $img_data->thumbnailImage(300, 300, true, true);
         file_put_contents($directory . "/preview/" . $filename . ".png", $img_data, FILE_USE_INCLUDE_PATH);
 
         // register file in the DB
@@ -208,7 +230,7 @@ $app->group('/d/{idDossier}', function (App $app) {
     $app->get('/corbeille', function (Request $request, Response $response, array $args): Response {
         $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
-        
+
         // récupérer infos sur commercial
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_commercial'));

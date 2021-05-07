@@ -15,25 +15,21 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a>
+						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %} (commercial)</a>
 					</li>
 				{% endif %}
 				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a>
+					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client} %} (client)</a>
 				</li>
-				<li title="Dossier #{{ dossier.id_dossier }}" class="breadcrumb-item active">«
-					{{ dossier.nom_produit }}
-					»</li>
+				<li class="breadcrumb-item active">«&nbsp;{{ dossier.nom_produit }}&nbsp;» (Dossier #{{ dossier.id_dossier }})</li>
 			</ol>
 		</nav>
 
-        <!-- Titre du produit -->
+		<!-- Titre du produit -->
 		<div class="mb-4">
 			<div>
 				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, «
 					{{ dossier.nom_produit }}
-					» du client «
-					<a href="/cl/{{client.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a>
 					»</h4>
 				<p class="text-muted">Ce produit est fourni par «
 					{% if isAdmin %}
@@ -43,83 +39,68 @@
 						{% if isAdmin %}
 						</a>
 					{% endif %}
-					», ce dossier est géré par «
-					{% if isAdmin %}
-						<a href="/admin/co/{{ commercial.id_personne }}">
-						{% endif %}
-						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
-						{% if isAdmin %}
-						</a>
-					{% endif %}
 					»</p>
 			</div>
 		</div>
 
+		<!-- Etats dossier -->
+		{% if etats|length > 0 %}
+			<form action="{{ currentUrl }}/changer-etat" method="post">
+				<select name="etat" class="form-select d-inline-block w-auto me-3">
+					{% for etat in etats %}
+						<option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
+					{% endfor %}
+				</select>
+				<button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
+			</form>
+		{% endif %}
+
+		<h4 class="my-3">Fichiers</h4>
+		<!-- Upload -->
+		<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
+			<span class="dz-message">
+				<i class="material-icons">add</i>
+				Ajouter des fichiers</span>
+		</form>
+		<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
+			<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
+		</a>
+
+		<!-- Fichiers -->
+		<div class="mb-3">
+			{% if fichiers|length > 0 %}
+				<a href="{{ currentUrl }}/zip" class="btn btn-primary me-2 mb-2">
+					<i class="material-icons">download</i>
+					Télécharger tous les fichiers ci dessous</a>
+			{% endif %}
+			<a href="{{ currentUrl }}/corbeille" class="btn btn-outline-secondary mb-2">
+				<i class="material-icons">delete</i>
+				Accéder à la corbeille</a>
+		</div>
+
+		<!-- LISTE COMBINÉE DES FICHIERS ET LOGS -->
 		<div class="row">
-			<div class="col-12 col-md-4">
-				<div>
-					<!-- Historique -->
-					<h4>Historique du dossier</h4>
-					{% if logs|length > 0 %}
-						<div class="card">
-							<ul class="list-group list-group-flush">
-								{% for log in logs %}
-									<li class="list-group-item">
-										<strong class="d-block">{{ log.nom_action }}</strong>
-										<div>
-											{{ log.date_heure|timeago }}
-											<small class="text-muted">({{ log.date_heure }})</small>
-											par
-											{% include 'components/titre-personne.html.twig' with { personne: log} %}
-										</div>
-										<small class="d-block text-muted">{{ log.desc_action }}</small>
-									</li>
-								{% endfor %}
-							</ul>
-						</div>
+			{% for eventGroup in events %}
+				{% for event in eventGroup %}
+					{% if event.type == 'fichier' %}
+						{% include "components/fichier.html.twig" with { fichier: event.object } %}
 					{% else %}
-						<p class="text-muted fst-italic">Il n'y a aucun historique à afficher</p>
+						{% set log = event.object %}
+						<div>
+							<div class="card mb-3">
+								<div class="card-body">
+									<strong class="d-block">{{ log.nom_action }}</strong>
+									{{ log.date_heure|timeago }}
+									<small class="text-muted">({{ log.date_heure }})</small>
+									par
+									{% include 'components/titre-personne.html.twig' with { personne: log} %}
+									<small class="d-block text-muted">{{ log.desc_action }}</small>
+								</div>
+							</div>
+						</div>
 					{% endif %}
-				</div>
-			</div>
-			<div
-				class="col-12 col-md-8">
-				<!-- Etats dossier -->
-				{% if etats|length > 0 %}
-					<form action="{{ currentUrl }}/changer-etat" method="post">
-						<select name="etat" class="form-select d-inline-block w-auto me-3">
-							{% for etat in etats %}
-								<option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
-							{% endfor %}
-						</select>
-						<button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
-					</form>
-				{% endif %}
-
-				<h4 class="my-3">Fichiers</h4>
-				<!-- Upload -->
-				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3" id="dropzoneForm">
-					<span class="dz-message">
-						<i class="material-icons">add</i>
-						Ajouter des fichiers</span>
-				</form>
-				<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
-					<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
-				</a>
-
-				<!-- Fichiers -->
-				<div class="mb-3">
-					{% if fichiers|length > 0 %}
-						<a href="{{ currentUrl }}/zip" class="btn btn-primary me-2">
-							<i class="material-icons">download</i>
-							Télécharger tous les fichiers ci dessous</a>
-					{% endif %}
-					<a href="{{ currentUrl }}/corbeille" class="btn btn-outline-secondary">
-						<i class="material-icons">delete</i>
-						Accéder à la corbeille</a>
-				</div>
-				{% include "components/fichiers.html.twig" with { fichiers: fichiers } %}
-			</div>
+				{% endfor %}
+			{% endfor %}
 		</div>
 	</div>
 {% endblock %}

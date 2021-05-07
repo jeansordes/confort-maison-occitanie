@@ -15,6 +15,7 @@ $app->group('/cl/{idClient}', function (App $app) {
             throw new Exception("Ce client n'existe pas");
         }
         $client = $req->fetch();
+        console_log($client);
         // vérifier si le demandeur a le droit de consulter ce client
         if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
             //     si fournisseur, vérifier qu'il y a des dossiers à afficher
@@ -53,7 +54,7 @@ $app->group('/cl/{idClient}', function (App $app) {
             ]
         ));
     });
-    
+
     $app->post('', function (Request $request, Response $response, array $args): Response {
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('update_personne'));
@@ -78,6 +79,12 @@ $app->group('/cl/{idClient}', function (App $app) {
             "tel2" => $_POST["tel2"],
             "id_personne" => $args['idClient'],
         ]);
+        $req = $db->prepare(getSqlQueryString('update_client'));
+        $req->execute([
+            "infos_client_supplementaires" => $_POST["infos_client_supplementaires"],
+            "id_client" => $args["idClient"],
+        ]);
+
         alert('Client modifié avec succès 👍', 1);
         return $response->withRedirect($request->getUri()->getPath());
     })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));

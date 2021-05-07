@@ -68,13 +68,13 @@ const sortTable = (n, tableDOM) => {
 
 document.querySelectorAll('table.sortable-table').forEach(tDOM => {
     tDOM.querySelectorAll('thead th').forEach((header, i) => {
-        header.innerHTML = `<i class="material-icons btn btn-sm btn-outline-secondary py-0 px-1 me-1">sort</i><span>` + header.innerHTML + `</span>`;
+        header.innerHTML = `<div>` + header.innerHTML + `</div><span class="cursor-pointer btn btn-sm btn-outline-secondary"><i class="material-icons">sort</i> Trier</span>`;
     });
     const sortBtns = tDOM.querySelectorAll('thead th .btn');
-    tDOM.querySelectorAll('thead th').forEach((header, i) => {
+    tDOM.querySelectorAll('thead th .btn').forEach((header, i) => {
         header.addEventListener('click', evt => {
             sortBtns.forEach(b => b.classList.remove('active'));
-            evt.target.parentNode.querySelector('.btn').classList.toggle('active');
+            evt.target.classList.toggle('active');
             sortTable(i, tDOM);
         });
     });

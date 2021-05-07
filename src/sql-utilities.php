@@ -18,6 +18,9 @@ function getSqlQueryString($key)
         'tous_dossiers_client' => 'select * from dossiers_enriched where id_client = :id_client order by date_creation desc',
         'tous_dossiers_client_filtre_fournisseur' => 'select * from dossiers_enriched where id_client = :id_client and id_fournisseur = :id_fournisseur order by date_creation desc',
         'tous_fichiers_dossier' => 'select ff.* from fichiers ff, fichiers_dossier fp where ff.id_fichier = fp.id_fichier and fp.id_dossier = :id_dossier and ff.in_trash = :in_trash',
+        'tous_roles' => 'select * from _enum_user_role',
+        'tous_dossiers_where_produit' => 'select * from dossiers_enriched where id_produit = :id_produit',
+        'tous_phases' => 'select * from _enum_phases_dossier',
         // new
         'new_user' => "select new_user(:user_type, :email, '', :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
         'new_client' => 'select new_client(:id_commercial, :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
@@ -46,7 +49,8 @@ function getSqlQueryString($key)
         'update_personne_noemail' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite where id_personne = :id_personne',
         'update_coordonnees' => 'update coordonnees set adresse = :adresse, code_postal = :code_postal, ville = :ville, pays = :pays, tel1 = :tel1, tel2 = :tel2 where id_coordonnees = (select id_coordonnees from personnes where id_personne = :id_personne)',
         'update_etat_dossier' => 'select update_etat_dossier(:id_dossier, :id_nouvel_etat, :id_author)',
-        'update_etat_produit' => 'update etats_produit set description = :description, order_etat = :order_etat where id_etat = :id_etat',
+        'update_etat_produit' => 'update etats_produit set description = :description, order_etat = :order_etat, role_responsable_etape = :role_responsable_etape, phase_etape = :phase_etape where id_etat = :id_etat',
+        'update_client' => 'update clients_des_commerciaux set infos_client_supplementaires = :infos_client_supplementaires where id_client = :id_client',
         // autre
         'toggle_fichier_trash' => 'update fichiers set in_trash = ((-1 * in_trash) + 1) where id_fichier = :id_fichier',
         'supprimer_etat_produit' => 'delete from etats_produit where id_etat = :id_etat',

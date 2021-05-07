@@ -16,15 +16,19 @@ insert into _enum_statut_societe(description) values ('autoentrepreneur');
 insert into _enum_statut_societe(description) values ('entreprise');
 insert into _enum_statut_societe(description) values ('vendeur à domicile');
 
--- https:$$developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
--- application/pdf ou image/png
 create or replace table _enum_mime_type (
-    description varchar(50) not null primary key
+    description varchar(50) not null primary key comment 'application/pdf ou image/png (https://developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types)'
 );
 insert into _enum_mime_type(description) values ('image/png');
 insert into _enum_mime_type(description) values ('image/jpeg');
 insert into _enum_mime_type(description) values ('image/gif');
 insert into _enum_mime_type(description) values ('application/pdf');
+
+create table _enum_phases_dossier (
+    description varchar(50) primary key
+);
+insert into _enum_phases_dossier(description) values ('normal');
+insert into _enum_phases_dossier(description) values ('archivé');
 
 create or replace table coordonnees (
     id_coordonnees int(11) not null auto_increment primary key,
@@ -40,8 +44,7 @@ create or replace table personnes (
     id_personne int(11) not null auto_increment primary key,
     prenom text default null,
     nom_famille text default null,
-    civilite enum('mr', 'mme', '') default null,
-    -- alter table user change civilite civilite enum('mr', 'mme', 'nouvelle_civilite') not null;
+    civilite enum('mr', 'mme', '') default null comment 'alter table user change civilite civilite enum(''mr'', ''mme'', ''nouvelle_civilite'') not null;',
     nom_entreprise text default null,
     numero_entreprise text default null,
     est_un_particulier boolean default 1,
@@ -64,7 +67,7 @@ create or replace table utilisateurs (
 create or replace table clients_des_commerciaux (
     id_client int(11) primary key not null,
     id_commercial int(11) not null,
-    commentaire_commercial text default null,
+    infos_client_supplementaires text default null,
     constraint
         foreign key (id_client) references personnes(id_personne),
         foreign key (id_commercial) references personnes(id_personne)
@@ -105,9 +108,9 @@ create or replace table etats_produit (
     id_etat int(11) not null auto_increment primary key,
     description varchar(50) not null,
     order_etat int(11) not null,
-    id_produit int(11) not null,
-    constraint
-        foreign key (id_produit) references produits(id_produit)
+    id_produit int(11) not null references produits(id_produit),
+    role_responsable_etape varchar(50) default 'commercial' references _enum_user_role(description),
+    phase_etape varchar(50) default 'normal' references _enum_phases_dossier(description)
 );
 
 create or replace table dossiers (
@@ -289,7 +292,7 @@ $$
 
 create or replace view clients as
     select
-        a.id_commercial,
+        a.*,
         u.*,
         coalesce((select count(p.id_dossier) nb_dossiers
             from dossiers p where u.id_personne = p.id_client group by p.id_client),0) nb_dossiers
@@ -314,9 +317,10 @@ create or replace view fournisseurs as
 create or replace view dossiers_enriched as
     select a.id_commercial, c.nom_produit, b.*,
            (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure desc limit 1) date_creation,
-           c.id_fournisseur
-    from clients_des_commerciaux a, dossiers b, produits c
-    where a.id_client = b.id_client and b.id_produit = c.id_produit;
+           c.id_fournisseur, d.role_responsable_etape, d.phase_etape
+    from clients_des_commerciaux a, dossiers b, produits c, etats_produit d
+    where a.id_client = b.id_client and b.id_produit = c.id_produit and d.id_etat = b.etat_dossier
+    order by d.phase_etape desc;
 
 create or replace view fichiers_enriched as
     select a.*, b.id_dossier

@@ -1,0 +1,47 @@
+{% if dossiers|length > 0 %}
+    <table class="table sortable-table">
+        <thead>
+            <tr>
+                <th scope="col">N°&nbsp;dossier</th>
+                {% if etats_dossier %}<th scope="col">Etat&nbsp;du&nbsp;dossier</th>{% endif %}
+                <th scope="col">Phase&nbsp;du&nbsp;projet</th>
+                <th scope="col">Produit&nbsp;fourni</th>
+                {% if commerciaux %}<th scope="col">Commercial</th>{% endif %}
+                {% if clients %}<th scope="col">Client</th>{% endif %}
+                {% if fournisseurs %}<th scope="col">Fournisseur</th>{% endif %}
+                <th scope="col">Date&nbsp;de&nbsp;modification</th>
+                <th scope="col">Personne&nbsp;en&nbsp;charge</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dossier in dossiers %}
+                {% set commercial = commerciaux[dossier.id_commercial] %}
+                {% set client = clients[dossier.id_client] %}
+                {% set fournisseur = fournisseurs[dossier.id_fournisseur] %}
+                <tr>
+                    <th scope="row">
+                        <a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
+                    </th>
+                    {% if etats_dossier %}<td>{{ etats_dossier[dossier.etat_dossier] }}</td>{% endif %}
+                    <td>{{ dossier.phase_etape }}</a></td>
+                    <td>
+                        <a href="/p/{{ dossier.id_produit }}">{{ dossier.nom_produit }}</a>
+                    </td>
+                    {% if commerciaux %}
+                        <td><a href="/admin/co/{{ dossier.id_commercial }}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a></td>
+                    {% endif %}
+                    {% if clients %}
+                        <td><a href="/cl/{{ dossier.id_client }}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a></td>
+                    {% endif %}
+                    {% if fournisseurs %}
+                        <td><a href="/admin/f/{{ dossier.id_fournisseur }}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}</a></td>
+                    {% endif %}
+                    <td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
+                    <td>{{ dossier.role_responsable_etape }}</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
+{% endif %}

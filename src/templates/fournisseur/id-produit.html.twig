@@ -16,18 +16,17 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-						<a title="Fournisseur #{{ fournisseur.id_personne }}" href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
-							{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}</a>
+						<a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
+							{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %} (fournisseur)</a>
 					</li>
 				{% endif %}
-				<li title="Produit #{{ produit.id_produit }}" class="breadcrumb-item active">Produit #{{ produit.id_produit }} «
+				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }} «
 					{{ produit.nom_produit }}
 					»</li>
 			</ol>
 		</nav>
 
 		<div class="row">
-
 			<div
 				class="col-12 col-md-4">
 				<!-- Informations produit -->
@@ -83,6 +82,23 @@
 									<div class="col p-1">
 										<input name="description[]" placeholder="Description de l'état" value="{{ etat.description }}" type="text" class="form-control"/>
 									</div>
+
+                                    <div class="col p-1">
+                                        <select name="role_responsable_etape[]" class="form-control form-select">
+                                            <option value="" {{ etat.role_responsable_etape=='' ? 'selected' : '' }}></option>
+                                            {% for role in roles %}
+                                                <option value="{{ role.description }}" {{ etat.role_responsable_etape == role.description ? 'selected' : '' }}>{{ role.description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col p-1">
+                                        <select name="phase_etape[]" class="form-control form-select">
+                                            {% for phase in phases %}
+                                                <option value="{{ phase.description }}" {{ etat.phase_etape == phase.description ? 'selected' : '' }}>{{ phase.description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 								</div>
 							{% endfor %}
 						</div>
@@ -91,6 +107,11 @@
 					<script src="{{ base_url }}/public/js/etats-produit.js"></script>
 				{% endif %}
 			</div>
+
 		</div>
+        <div class="row">
+            <h4>Dossiers correspondants à ce produit</h4>
+            {% include "components/liste-dossiers.html.twig" %}
+        </div>
 	</div>
 {% endblock %}

@@ -45,11 +45,27 @@ $app->group('/p/{idProduit}', function (App $app) {
         $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
         $req->execute(['id_produit' => $args['idProduit']]);
         $etats = $req->fetchAll();
+        
+        // Récupérer les roles (pour role_responsable_etape)
+        $req = $db->query(getSqlQueryString('tous_roles'));
+        $roles = $req->fetchAll();
+
+        // Récupérer les roles (pour role_responsable_etape)
+        $req = $db->query(getSqlQueryString('tous_phases'));
+        $phases = $req->fetchAll();
+        
+        // Récupérer les dossiers de ce produit
+        $req = $db->prepare(getSqlQueryString('tous_dossiers_where_produit'));
+        $req->execute(['id_produit' => $args['idProduit']]);
+        $dossiers = $req->fetchAll();
 
         return $response->write($this->view->render('fournisseur/id-produit.html.twig', [
             'fournisseur' => $fournisseur,
             'produit' => $produit,
             'etats' => $etats,
+            'dossiers' => $dossiers,
+            'roles' => $roles,
+            'phases' => $phases,
         ]));
     });
 
@@ -57,6 +73,8 @@ $app->group('/p/{idProduit}', function (App $app) {
         $produit = is_user_allowed__produit($args['idProduit']);
         if ($produit instanceof \Exception) throw $produit;
 
+        // ATTENTION : cette route ne gère qu'une partie des formulaires présent sur la route GET
+        // pour les états, il faut aller sur (POST) /etats-produit
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('update_produit'));
         $req->execute($_POST);
@@ -91,6 +109,8 @@ $app->group('/p/{idProduit}', function (App $app) {
                 'id_etat' => $value,
                 'description' => $_POST['description'][$key],
                 'order_etat' => $_POST['order_etat'][$key],
+                'phase_etape' => $_POST['phase_etape'][$key],
+                'role_responsable_etape' => $_POST['role_responsable_etape'][$key],
             ]);
         }
         alert('Vos modifications ont bien été enregistrés', 1);

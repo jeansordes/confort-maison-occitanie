@@ -15,7 +15,7 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
-						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %} (fournisseur)
 					</li>
 				</ol>
 			</nav>
@@ -23,44 +23,7 @@
 
 		<div class="row mb-5">
 			<h4>{{ isAdmin ? 'Liste des dossiers du fournisseur' : 'Liste de vos dossiers' }}</h4>
-			{% if dossiers|length > 0 %}
-				<table class="table sortable-table">
-					<thead>
-						<tr>
-							<th scope="col">N° dossier</th>
-							<th scope="col">Etat du dossier</th>
-							<th scope="col">Nom produit</th>
-							<th scope="col">Commercial</th>
-							<th scope="col">Client</th>
-							<th scope="col">Date de modification</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for dossier in dossiers %}
-							{% set commercial = commerciaux[dossier.id_commercial] %}
-							{% set client = clients[dossier.id_client] %}
-							<tr>
-								<th scope="row">
-									<a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
-								</th>
-								<td>{{ etats_dossier[dossier.etat_dossier] }}</td>
-								<td>
-									{{ dossier.nom_produit }}
-								</td>
-								<td>
-									{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
-								</td>
-								<td>
-									<a href="/cl/{{ dossier.id_client }}">{{ client.est_un_particulier ?  client.nom_famille|upper ~ ' ' ~ client.prenom : client.nom_entreprise }}</a>
-								</td>
-								<td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			{% else %}
-				<p class="text-muted fst-italic">Il n'y a aucun dossiers à afficher</p>
-			{% endif %}
+			{% include "components/liste-dossiers.html.twig" %}
 		</div>
 		<div
 			class="row g-lg-5 mb-5">
