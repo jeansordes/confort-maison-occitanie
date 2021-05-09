@@ -21,6 +21,7 @@ function getSqlQueryString($key)
         'tous_roles' => 'select * from _enum_user_role',
         'tous_dossiers_where_produit' => 'select * from dossiers_enriched where id_produit = :id_produit',
         'tous_phases' => 'select * from _enum_phases_dossier',
+        'tous_dossiers_commercial' => 'select * from dossiers_enriched where id_commercial = :id_commercial order by date_creation desc',
         // new
         'new_user' => "select new_user(:user_type, :email, '', :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid",
         'new_client' => 'select new_client(:id_commercial, :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',

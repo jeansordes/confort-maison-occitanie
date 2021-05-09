@@ -28,6 +28,35 @@ function is_user_allowed__dossier($idDossier)
     return $dossier;
 }
 
+function getDossierUtilities()
+{
+    $db = getPDO();
+    // récupérer tous les commerciaux
+    $commerciaux_from_db = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+    $commerciaux = [];
+    foreach ($commerciaux_from_db as $commercial) {
+        $commerciaux[$commercial['id_personne']] = $commercial;
+    }
+    // récupérer tous les clients
+    $clients_from_db = $db->query(getSqlQueryString('tous_clients'))->fetchAll();
+    $clients = [];
+    foreach ($clients_from_db as $client) {
+        $clients[$client['id_personne']] = $client;
+    }
+    // récupérer tous les etats_dossier
+    $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+    $etats_dossier = [];
+    foreach ($etats_from_db as $etat) {
+        $etats_dossier[$etat['id_etat']] = $etat['description'];
+    }
+
+    return [
+        'commerciaux' => $commerciaux,
+        'clients' => $clients,
+        'etats_dossier' => $etats_dossier,
+    ];
+}
+
 # /{idDossier}
 $app->group('/d/{idDossier}', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {

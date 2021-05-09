@@ -32,32 +32,15 @@ function routesFournisseur()
             $req = $db->prepare(getSqlQueryString('tous_dossiers_fournisseur'));
             $req->execute(['id_fournisseur' => $idFournisseur]);
             $dossiers = $req->fetchAll();
-            // récupérer tous les commerciaux
-            $commerciaux_from_db = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
-            $commerciaux = [];
-            foreach ($commerciaux_from_db as $commercial) {
-                $commerciaux[$commercial['id_personne']] = $commercial;
-            }
-            // récupérer tous les clients
-            $clients_from_db = $db->query(getSqlQueryString('tous_clients'))->fetchAll();
-            $clients = [];
-            foreach ($clients_from_db as $client) {
-                $clients[$client['id_personne']] = $client;
-            }
-            // récupérer tous les etats_dossier
-            $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
-            $etats_dossier = [];
-            foreach ($etats_from_db as $etat) {
-                $etats_dossier[$etat['id_etat']] = $etat['description'];
-            }
-            return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', [
+
+            $array2merge = getDossierUtilities();
+            unset($array2merge['commerciaux']);
+
+            return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', array_merge($array2merge, [
                 'fournisseur' => $fournisseur,
-                'commerciaux' => $commerciaux,
                 'produits' => $produits,
                 'dossiers' => $dossiers,
-                'clients' => $clients,
-                'etats_dossier' => $etats_dossier,
-            ]));
+            ])));
         });
         $app->post('', function (Request $request, Response $response, array $args): Response {
             $idFournisseur = getFournisseurId($args);

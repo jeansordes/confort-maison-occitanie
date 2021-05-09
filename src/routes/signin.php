@@ -127,6 +127,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
     ], 20);
 
     sendEmail(
+        $this, $response,
         $_POST['email'],
         "Confort maison occitanie : Vous avez oublié votre de mot de passe ?",
         $this->view->render(

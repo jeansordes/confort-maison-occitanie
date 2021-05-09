@@ -107,12 +107,8 @@
 						<div>
 							<div class="card mb-3">
 								<div class="card-body">
-									<strong class="d-block">{{ log.nom_action }}</strong>
-									{{ log.date_heure|timeago }}
-									<small class="text-muted">({{ log.date_heure }})</small>
-									par
-									<a href="/"></a>{% include 'components/titre-personne.html.twig' with { personne: log } %}
-									<small class="d-block text-muted">{{ log.desc_action }}</small>
+									<div>{{ log.desc_action }}</div>
+									<small class="d-block text-muted" title="{{ log.date_heure }}">{{ log.nom_action ~ ' ' ~ log.date_heure|timeago }} par {% include 'components/titre-personne.html.twig' with { personne: log } %}</small>
 								</div>
 							</div>
 						</div>

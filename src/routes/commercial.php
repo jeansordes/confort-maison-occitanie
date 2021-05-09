@@ -26,14 +26,32 @@ function routesCommercial()
             }
             $commercial = $req->fetch();
             $commercial['emailReadOnly'] = true;
-            // affiche tous les clients du commercial en question
+            // récupérer dossier du commercial
+            $req = $db->prepare(getSqlQueryString('tous_dossiers_commercial'));
+            $req->execute(['id_commercial' => $idCommercial]);
+            $dossiers = $req->fetchAll();
+
             $req = $db->prepare(getSqlQueryString('clients_commercial'));
             $req->execute(['id_commercial' => $idCommercial]);
-            $clients = $req->fetchAll();
-            return $response->write($this->view->render('commercial/id-commercial.html.twig', [
+            $clients_from_db = $req->fetchAll();
+            $clients = [];
+            foreach ($clients_from_db as $client) {
+                $clients[$client['id_personne']] = $client;
+            }
+
+            // récupérer tous les etats_dossier
+            $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+            $etats_dossier = [];
+            foreach ($etats_from_db as $etat) {
+                $etats_dossier[$etat['id_etat']] = $etat['description'];
+            }
+
+            return $response->write($this->view->render('commercial/id-commercial.html.twig', array_merge([
                 'commercial' => $commercial,
+                'dossiers' => $dossiers,
                 'clients' => $clients,
-            ]));
+                'etats_dossier' => $etats_dossier,
+            ])));
         });
         $app->post('', function (Request $request, Response $response, array $args): Response {
             $idCommercial = getCommercialId($args);

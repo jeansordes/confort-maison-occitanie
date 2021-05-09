@@ -95,6 +95,7 @@ $app->group('/admin', function (App $app) {
             "uid" => $new_uid,
         ], 60 * 24);
         sendEmail(
+            $this, $response,
             $_POST['email'],
             "Confort maison occitanie : Votre compte vient d'être créé",
             $this->view->render(

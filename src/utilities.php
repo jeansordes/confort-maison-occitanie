@@ -7,37 +7,49 @@ use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-function sendEmail($to, $subject, $body)
+function sendEmail($app, $response, $to, $subject, $body)
 {
-    $mail = new PHPMailer();
+    (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
+    if (!empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev') {
+        die($body);
+        return $response->write($app->view->render('base.html.twig', [
+            'title' => $subject,
+            'body' => '<div class="alert alert-warning">Vous êtes en mode "dev" '
+                . 'ce que vous voyez actuellement est le mail qu\'on aurait envoyé en mode "prod" à '
+                . $to . '</div>' . $body,
+        ]));
+    } else {
+        // envoyer un email à l'adresse renseignée
+        $mail = new PHPMailer();
 
-    //Server settings
-    $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-    $mail->isSMTP();
-    $mail->Host       = $_ENV['email_smtp_host'];
-    $mail->SMTPAuth   = true;
-    $mail->Username   = $_ENV['email_username'];
-    $mail->Password   = $_ENV['email_password'];
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = $_ENV['email_smtp_port'];
+        //Server settings
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        $mail->isSMTP();
+        $mail->Host       = $_ENV['email_smtp_host'];
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $_ENV['email_username'];
+        $mail->Password   = $_ENV['email_password'];
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = $_ENV['email_smtp_port'];
 
-    // NO OUTPUT
-    $mail->SMTPDebug = false;
-    $mail->do_debug = 0;
+        // NO OUTPUT
+        $mail->SMTPDebug = false;
+        $mail->do_debug = 0;
 
-    //Recipients
-    $mail->setFrom($_ENV['email_username']);
-    $mail->addAddress($to);
+        //Recipients
+        $mail->setFrom($_ENV['email_username']);
+        $mail->addAddress($to);
 
-    // Content
-    $mail->isHTML(true);
-    $mail->Subject = $subject;
-    $mail->Body = $body;
-    $mail->CharSet = 'UTF-8';
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+        $mail->CharSet = 'UTF-8';
 
-    if (!$mail->send()) {
-        throw new Exception("<p>Message could not be sent. Mailer Error: {$mail->ErrorInfo}</p>"
-            . json_encode(['TO' => $to, 'SUBJECT' => $subject, 'BODY' => $body]));
+        if (!$mail->send()) {
+            throw new Exception("<p>Message could not be sent. Mailer Error: {$mail->ErrorInfo}</p>"
+                . json_encode(['TO' => $to, 'SUBJECT' => $subject, 'BODY' => $body]));
+        }
     }
 }
 
