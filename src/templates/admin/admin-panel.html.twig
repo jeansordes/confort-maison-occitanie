@@ -63,8 +63,8 @@
 						<ul class="list-group list-group-flush">
 							{% for admin in admins %}
 								<li class="list-group-item">
-									<a href="{{currentUrl}}/f/{{admin.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: admin } %}
-										({{ admin.email }})</a>
+									{% include 'components/titre-personne.html.twig' with { personne: admin } %}
+                                     ({{ admin.email }})
 								</li>
 							{% endfor %}
 						</ul>
