@@ -28,6 +28,12 @@ $app->group('/admin', function (App $app) {
         foreach ($clients_from_db as $client) {
             $clients[$client['id_personne']] = $client;
         }
+        // récupérer tous les admins
+        $admins_from_db = $db->query(getSqlQueryString('tous_admins'))->fetchAll();
+        $admins = [];
+        foreach ($admins_from_db as $admin) {
+            $admins[$admin['id_personne']] = $admin;
+        }
         // récupérer tous les etats_dossier
         $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
         $etats_dossier = [];
@@ -37,6 +43,7 @@ $app->group('/admin', function (App $app) {
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
         return $response->write($this->view->render('admin/admin-panel.html.twig', [
+            'admins' => $admins,
             'commerciaux' => $commerciaux,
             'fournisseurs' => $fournisseurs,
             'dossiers' => $dossiers,

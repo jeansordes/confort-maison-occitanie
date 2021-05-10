@@ -7,6 +7,7 @@ function getSqlQueryString($key)
 {
     return [
         // tous
+        'tous_admins' => 'select * from admins',
         'tous_commerciaux' => 'select * from commerciaux',
         'tous_produits' => 'select * from produits',
         'tous_dossiers' => 'select * from dossiers_enriched',

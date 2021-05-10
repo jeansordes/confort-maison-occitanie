@@ -44,12 +44,27 @@
 				{% endif %}
 				<h5>Liste des fournisseurs</h5>
 				{% if fournisseurs|length > 0 %}
-					<div class="card">
+					<div class="card mb-3">
 						<ul class="list-group list-group-flush">
 							{% for fournisseur in fournisseurs %}
 								<li class="list-group-item">
 									<a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
 										({{ fournisseur.email }})</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun fournisseurs à afficher</p>
+				{% endif %}
+				<h5>Liste des admins</h5>
+				{% if admins|length > 0 %}
+					<div class="card mb-3">
+						<ul class="list-group list-group-flush">
+							{% for admin in admins %}
+								<li class="list-group-item">
+									<a href="{{currentUrl}}/f/{{admin.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: admin } %}
+										({{ admin.email }})</a>
 								</li>
 							{% endfor %}
 						</ul>

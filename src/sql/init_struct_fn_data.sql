@@ -314,6 +314,9 @@ create or replace view commerciaux as
 create or replace view fournisseurs as
     select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'fournisseur';
 
+create or replace view admins as
+    select u.* from personnes u, utilisateurs a where u.id_personne = a.id_utilisateur and user_role = 'admin';
+
 create or replace view dossiers_enriched as
     select a.id_commercial, c.nom_produit, b.*,
            (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure desc limit 1) date_creation,
