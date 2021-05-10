@@ -256,9 +256,10 @@ $app->group('/d/{idDossier}', function (App $app) {
         // Now that it's auto-rotated, make sure the EXIF data is correct in case the EXIF gets saved with the image!
         $img_data->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
 
-        $img_data->setResolution("800", "800");
+        $size = 600;
+        $img_data->setResolution("$size", "$size");
         $img_data->setImageFormat("png");
-        $img_data->thumbnailImage(800, 800, true, true);
+        $img_data->thumbnailImage($size, $size, true, true);
         file_put_contents($directory . "/preview/" . $filename . ".png", $img_data, FILE_USE_INCLUDE_PATH);
 
         // register file in the DB
