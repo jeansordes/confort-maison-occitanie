@@ -49,7 +49,7 @@ create or replace table personnes (
     numero_entreprise text default null,
     est_un_particulier boolean default 1,
     id_coordonnees int(11) default null,
-    email varchar(200) default null check (email REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
+    email varchar(200) default null check (email REGEXP '^[A-Z0-9._%-+]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'),
     constraint
         foreign key (id_coordonnees) references coordonnees(id_coordonnees)
 );
