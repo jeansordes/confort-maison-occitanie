@@ -1,21 +1,31 @@
 <div class="col-12 col-md-4 col-xl-3 mb-3">
-    <div class="card h-100">
-        <a href="/uploads/{{ fichier.file_name }}" target="_blank" class="card-img-top">
-            <img src="/uploads/preview/{{ fichier.file_name }}.png" class="w-100 p-1">
-        </a>
-        <div class="card-body d-flex flex-column">
-            <div class="mb-2">
-                <a href="/uploads/{{ fichier.file_name }}" target="_blank" class="card-title">{{ fichier.file_name }}</a>
-            </div>
-            <div class="mb-3">Ajouté
-                {{ fichier.updated_at|timeago }}
-                <small class="text-muted d-block">({{ fichier.updated_at }})</small>
-            </div>
-            <div class="mt-auto">
-                <a href="/f/{{ fichier.id_fichier }}/toggle-trash" class="btn btn-outline-secondary">
-                    <i class="material-icons">delete</i>
-                    {{ fichier.in_trash == 0 ? "Mettre à la corbeille" : "Restaurer ce fichier" }}</a>
-            </div>
-        </div>
-    </div>
+	<div class="card h-100">
+		<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="card-img-top">
+			<img src="/uploads/preview/{{ fichier.file_name }}.png" class="w-100 p-1">
+		</a>
+		<div class="card-body d-flex flex-column">
+			<div class="mb-2">
+				<a href="/uploads/{{ fichier.file_name }}" target="_blank" class="card-title">{{ fichier.file_name }}</a>
+			</div>
+			<div class="mb-3">Ajouté
+				{{ fichier.updated_at|timeago }}
+				<small class="text-muted d-block">({{ fichier.updated_at }})</small>
+			</div>
+			{% if fichier.mime_type != 'application/pdf' %}
+				<div class="mt-auto">
+					<a href="/f/{{ fichier.id_fichier }}/rotate-right" class="btn btn-outline-secondary me-2 mb-2">
+						<i class="material-icons">rotate_right</i>
+					</a>
+					<a href="/f/{{ fichier.id_fichier }}/rotate-left" class="btn btn-outline-secondary me-2 mb-2">
+						<i class="material-icons">rotate_left</i>
+					</a>
+				</div>
+			{% endif %}
+			<div class="mt-auto">
+				<a href="/f/{{ fichier.id_fichier }}/toggle-trash" class="btn btn-outline-secondary">
+					<i class="material-icons">delete</i>
+					{{ fichier.in_trash == 0 ? "Mettre à la corbeille" : "Restaurer ce fichier" }}</a>
+			</div>
+		</div>
+	</div>
 </div>

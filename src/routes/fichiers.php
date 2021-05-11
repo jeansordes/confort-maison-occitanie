@@ -79,3 +79,35 @@ $app->get('/f/{idFichier}/toggle-trash', function (Request $request, Response $r
 
     return $response->withRedirect('/d/' . $dossier['id_dossier']);
 });
+
+$app->get('/f/{idFichier}/rotate-{orientation:left|right}', function (Request $request, Response $response, array $args): Response {
+
+    // récupérer infos sur dossier
+    $db = getPDO();
+    $req = $db->prepare(getSqlQueryString('get_dossier_from_fichier'));
+    $req->execute(['id_fichier' => $args['idFichier']]);
+    if ($req->rowCount() == 0) {
+        throw new \Exception("Ce dossier n'existe pas");
+    }
+    $dossier = $req->fetch();
+    // vérifier si on doit empêcher la personne d'accéder au fichier
+    $role = $_SESSION['current_user']['user_role'];
+    $uid = $_SESSION['current_user']['uid'];
+    if (($role == 'commercial' && $uid != $dossier['id_commercial']) || ($role == 'fournisseur' && $uid != $dossier['id_fournisseur'])) {
+        throw new \Exception("Vous n'avez pas la permission d'accéder à ce fichier");
+    }
+
+    // faire la rotation de l'image SI C'EST UNE IMAGE
+    if ($dossier['mime_type'] != 'application/pdf') {
+        $imagick = new \Imagick(realpath(__DIR__ . '/../../uploads/' . $dossier['file_name']));
+        $imagick->rotateimage('#fff', $args['orientation'] == 'left' ? "-90" : "90");
+        file_put_contents(__DIR__ . "/../../uploads/" . $dossier['file_name'], $imagick, FILE_USE_INCLUDE_PATH);
+    }
+    
+    // faire la rotation de l'aperçu de l'image
+    $imagick = new \Imagick(realpath(__DIR__ . '/../../uploads/preview/' . $dossier['file_name'] . '.png'));
+    $imagick->rotateimage('#fff', $args['orientation'] == 'left' ? "-90" : "90");
+    file_put_contents(__DIR__ . "/../../uploads/preview/" . $dossier['file_name'] . '.png', $imagick, FILE_USE_INCLUDE_PATH);
+
+    return $response->withRedirect('/d/' . $dossier['id_dossier']);
+});
