@@ -42,7 +42,7 @@ $app->group('/admin', function (App $app) {
         }
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
-        return $response->write($this->view->render('admin/admin-panel.html.twig', [
+        return $response->write($this->view->render('admin/admin-panel_main.html.twig', [
             'admins' => $admins,
             'commerciaux' => $commerciaux,
             'fournisseurs' => $fournisseurs,

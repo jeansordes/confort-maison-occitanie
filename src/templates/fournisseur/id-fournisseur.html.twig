@@ -15,28 +15,34 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
-						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %} (fournisseur)
+						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+						(fournisseur)
 					</li>
 				</ol>
 			</nav>
 		{% endif %}
 
-		<div class="row mb-5">
-			<h4>{{ isAdmin ? 'Liste des dossiers du fournisseur' : 'Liste de vos dossiers' }}</h4>
-			{% include "components/liste-dossiers.html.twig" %}
-		</div>
-		<div
-			class="row g-lg-5 mb-5">
-			<!-- Coordonnées -->
-			<div class="col-12 col-lg-6">
-				<h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
-				<form method="POST">
-					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
-				</form>
+		<ul class="nav nav-tabs row row-cols-auto g-1 mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dossiers-tab" data-bs-toggle="tab" data-bs-target="#dossiers" type="button" role="tab" aria-controls="dossiers" aria-selected="true">
+                    <i class="material-icons me-2">folder</i>Dossiers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="false">
+                    <i class="material-icons me-2">store</i>Produits</button>
+            </li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+					<i class="material-icons me-2">settings</i>Paramètres</button>
+			</li>
+		</ul>
+		<div class="tab-content">
+            <div class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
+				<h4>{{ isAdmin ? 'Liste des dossiers du fournisseur' : 'Liste de vos dossiers' }}</h4>
+			    {% include "components/liste-dossiers.html.twig" %}
 			</div>
-			<!-- Liste produits -->
-			<div class="col-12 col-lg-6">
-				<h4 class="my-3">{{ isAdmin ? 'Liste des produits du fournisseur' : 'Liste de vos produits' }}</h4>
+			<div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
+                <h4 class="my-3">{{ isAdmin ? 'Liste des produits du fournisseur' : 'Liste de vos produits' }}</h4>
 				<div>
 					<a href="{{ currentUrl }}/new-produit" class="btn btn-primary mb-3">
 						<i class="material-icons">add</i>
@@ -48,13 +54,34 @@
 							<div class="card-body">
 								<h5 class="card-title">{{ produit.nom_produit }}</h5>
 								<div class="card-text mb-3">{{ produit.description_produit }}</div>
-                                <a href="{{ base_url }}/p/{{ produit.id_produit }}" class="btn btn-outline-primary card-link">Détails de ce produit</a>
+								<a href="{{ base_url }}/p/{{ produit.id_produit }}" class="btn btn-outline-primary card-link">Détails de ce produit</a>
 							</div>
 						</div>
 					{% endfor %}
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
 				{% endif %}
+			</div>
+            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                <h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
+				<form method="POST">
+					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
+				</form>
+            </div>
+		</div>
+
+		<div class="row mb-5">
+			
+		</div>
+		<div
+			class="row g-lg-5 mb-5">
+			<!-- Coordonnées -->
+			<div class="col-12 col-lg-6">
+				
+			</div>
+			<!-- Liste produits -->
+			<div class="col-12 col-lg-6">
+				
 			</div>
 		</div>
 	</div>

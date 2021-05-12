@@ -1,0 +1,51 @@
+<div class="mb-3">
+    <a href="/admin/new-user" class="btn btn-primary">
+        <i class="material-icons">person_add</i>
+        Ajouter un utilisateur</a>
+</div>
+<!-- Utilisateurs -->
+<h5>Liste des commerciaux</h5>
+{% if commerciaux|length > 0 %}
+    <div class="card mb-3">
+        <ul class="list-group list-group-flush">
+            {% for commercial in commerciaux %}
+                <li class="list-group-item">
+                    <a href="{{currentUrl}}/co/{{commercial.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+                        ({{ commercial.email }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <p class="text-muted fst-italic">Il n'y a aucun commerciaux à afficher</p>
+{% endif %}
+<h5>Liste des fournisseurs</h5>
+{% if fournisseurs|length > 0 %}
+    <div class="card mb-3">
+        <ul class="list-group list-group-flush">
+            {% for fournisseur in fournisseurs %}
+                <li class="list-group-item">
+                    <a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+                        ({{ fournisseur.email }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <p class="text-muted fst-italic">Il n'y a aucun fournisseurs à afficher</p>
+{% endif %}
+<h5>Liste des admins</h5>
+{% if admins|length > 0 %}
+    <div class="card mb-3">
+        <ul class="list-group list-group-flush">
+            {% for admin in admins %}
+                <li class="list-group-item">
+                    {% include 'components/titre-personne.html.twig' with { personne: admin } %}
+                     ({{ admin.email }})
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <p class="text-muted fst-italic">Il n'y a aucun fournisseurs à afficher</p>
+{% endif %}

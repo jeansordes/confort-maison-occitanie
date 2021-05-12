@@ -15,33 +15,37 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Commercial #{{ commercial.id_personne }}" class="breadcrumb-item active">
-						{% include 'components/titre-personne.html.twig' with { personne: commercial} %} (commercial)
+						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+						(commercial)
 					</li>
 				</ol>
 			</nav>
 		{% endif %}
 
-        <div class="row my-3">
-            {% include "components/liste-dossiers.html.twig" %}
-        </div>
-
-		<div class="row g-5">
-			<div class="col-12 col-lg-6">
-				<h4>
-					{{ isAdmin ? 'Détails du commercial' : 'Vos informations' }}
-				</h4>
-				<form method="POST">
-					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: commercial} %}
-				</form>
+		<ul class="nav nav-tabs row row-cols-auto g-1 mb-3" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="dossiers-tab" data-bs-toggle="tab" data-bs-target="#dossiers" type="button" role="tab" aria-controls="dossiers" aria-selected="true"><i class="material-icons me-2">folder</i>Dossiers</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false"><i class="material-icons me-2">people</i>Clients</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false"><i class="material-icons me-2">settings</i>Paramètres</button>
+			</li>
+		</ul>
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
+				{% include "components/liste-dossiers.html.twig" %}
 			</div>
-			<div class="col-12 col-lg-6">
+			<div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
 				<h4 class="my-3">
-                    {% if isAdmin %}
-                    Liste des clients de {% include 'components/titre-personne.html.twig' with { personne: commercial} %}
-                    {% else %}
-                    Liste de vos clients
-                    {% endif %}
-					</h4>
+					{% if isAdmin %}
+						Liste des clients de
+						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+					{% else %}
+						Liste de vos clients
+					{% endif %}
+				</h4>
 				<a href="{{ currentUrl }}/new-client" class="btn btn-primary mb-3">
 					<i class="material-icons">add</i>
 					Ajouter un client</a>
@@ -63,6 +67,14 @@
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun clients à afficher</p>
 				{% endif %}
+			</div>
+			<div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+				<h4>
+					{{ isAdmin ? 'Détails du commercial' : 'Vos informations' }}
+				</h4>
+				<form method="POST">
+					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: commercial} %}
+				</form>
 			</div>
 		</div>
 	</div>
