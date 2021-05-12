@@ -5,6 +5,7 @@ RewriteRule ^ index.php [QSA,L]
 
 php_flag display_errors on
 
+# https://stackoverflow.com/a/22892020/5736301
 <FilesMatch "\.(jpg|jpeg|png)$">
     FileETag None
     <IfModule mod_headers.c>
