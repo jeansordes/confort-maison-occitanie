@@ -49,11 +49,18 @@ function getDossierUtilities()
     foreach ($etats_from_db as $etat) {
         $etats_dossier[$etat['id_etat']] = $etat['description'];
     }
+    // récupérer tous les etats_workflow
+    $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
+    $etats_workflow = [];
+    foreach ($etats_from_db as $etat) {
+        $etats_workflow[$etat['id_etat']] = $etat['description'];
+    }
 
     return [
         'commerciaux' => $commerciaux,
         'clients' => $clients,
         'etats_dossier' => $etats_dossier,
+        'etats_workflow' => $etats_workflow,
     ];
 }
 
@@ -84,7 +91,13 @@ $app->group('/d/{idDossier}', function (App $app) {
         // récupérer les états possibles d'un dossier
         $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
         $req->execute(['id_produit' => $dossier['id_produit']]);
+        $old_etats = $req->fetchAll();
+
+        // récupérer id_workflow du produit
+        $req = $db->prepare(getSqlQueryString('get_etats_workflow_where_produit'));
+        $req->execute(['id_produit' => $dossier['id_produit']]);
         $etats = $req->fetchAll();
+
         // récupérer liste des logs
         $req = $db->prepare(getSqlQueryString('get_logs_dossiers'));
         $req->execute(['id_dossier' => $args['idDossier']]);
@@ -109,6 +122,25 @@ $app->group('/d/{idDossier}', function (App $app) {
         }
         krsort($events);
 
+        // récupérer le formulaire
+        $req = $db->prepare(getSqlQueryString('get_inputs_formulaire'));
+        $req->execute(['id_produit' => $dossier['id_produit']]);
+        $formulaire_inputs = $req->fetchAll();
+        foreach ($formulaire_inputs as $k => $input) {
+            $formulaire_inputs[$k]['input_name'] = strtolower(str_replace(' ', '_', preg_replace('/[^A-Za-z\s]/', '', $input['input_description'])));
+            if (in_array($input['input_type'], ['options_radio', 'options_checkbox'])) {
+                $formulaire_inputs[$k]['input_choices'] = explode(';', $input['input_choices']);
+            }
+        }
+
+        // récupérer les réponses du formulaire
+        $req = $db->prepare(getSqlQueryString('get_reponses_formulaire_dossier'));
+        $req->execute(['id_dossier' => $args['idDossier']]);
+        $reponses_formulaire = $req->fetchAll();
+
+        console_log($formulaire_inputs);
+        console_log($reponses_formulaire);
+
         return $response->write($this->view->render(
             'dossier/id-dossier.html.twig',
             [
@@ -118,8 +150,11 @@ $app->group('/d/{idDossier}', function (App $app) {
                 'fournisseur' => $fournisseur,
                 'client' => $client,
                 'etats' => $etats,
+                'old_etats' => $old_etats,
                 'logs' => $logs,
                 'events' => $events,
+                'formulaire_inputs' => $formulaire_inputs,
+                'reponses_formulaire' => $reponses_formulaire,
             ]
         ));
     });
@@ -182,7 +217,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         }
         // vérifier que l'état correspond bien au produit
         $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_etat_produit'));
+        $req = $db->prepare(getSqlQueryString('get_etat_workflow'));
         $req->execute(['id_etat' => $_POST['etat']]);
         if ($req->rowCount() == 0) {
             alert("État inconnu", 3);

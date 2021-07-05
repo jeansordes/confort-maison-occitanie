@@ -17,10 +17,12 @@
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
 						<a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
-							{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %} (fournisseur)</a>
+							{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+							(fournisseur)</a>
 					</li>
 				{% endif %}
-				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }} «
+				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }}
+					«
 					{{ produit.nom_produit }}
 					»</li>
 			</ol>
@@ -30,9 +32,9 @@
 			<div
 				class="col-12 col-md-4">
 				<!-- Informations produit -->
-                <h4>Informations produit</h4>
+				<h4>Informations produit</h4>
 				<form method="post" class="mb-5">
-                    <input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
+					<input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
 					<div class="mb-2">
 						<label class="form-label">Nom du produit</label>
 						<input name="nom_produit" value="{{ produit.nom_produit }}" type="text" class="form-control"/>
@@ -41,6 +43,28 @@
 						<label class="form-label">Description du produit</label>
 						<textarea class="form-control" name="description_produit" rows="3">{{ produit.description_produit }}</textarea>
 					</div>
+					<div class="mb-2">
+						<div class="mb-2">
+							<label class="form-label">Formulaire à compléter</label>
+							<select name="id_template_formulaire" class="form-control form-select">
+								<option value="" {{ produit.id_template_formulaire=='' ? 'selected' : '' }}></option>
+								{% for template in templates %}
+									<option value="{{ template.id_template }}" {{ produit.id_template_formulaire == template.id_template ? 'selected' : '' }}>{{ template.nom_template }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="mb-2">
+						<div class="mb-2">
+							<label class="form-label">Workflow du produit</label>
+							<select name="id_workflow" class="form-control form-select">
+								<option value="" {{ produit.id_workflow=='' ? 'selected' : '' }}></option>
+								{% for workflow in workflows %}
+									<option value="{{ workflow.id_workflow }}" {{ produit.id_workflow == workflow.id_workflow ? 'selected' : '' }}>{{ workflow.nom_workflow }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
 					<button class="btn btn-primary">Enregistrer produit</button>
 				</form>
 			</div>
@@ -48,8 +72,9 @@
 			<div
 				class="col-12 col-md-8">
 				<!-- Etats produit -->
-				<h4>États du produit</h4>
-				<form action="{{ currentUrl }}/new-etat" method="POST" class="my-3">
+				<h4>Workflow du produit</h4>
+                
+				<form action="{{ current_url }}/new-etat" method="POST" class="my-3">
 					<div class="input-group">
 						<input type="text" class="form-control" placeholder="Description d'un nouvel état" name="description">
 						<button class="btn btn-outline-primary">
@@ -58,10 +83,10 @@
 					</div>
 				</form>
 				{% if etats|length > 0 %}
-					<form action="{{ currentUrl }}/etats-produit" method="POST" id="etats_produit">
+					<form action="{{ current_url }}/etats-produit" method="POST" id="etats_produit">
 						<div class="d-flex flex-column">
 							{% for etat in etats %}
-								<div class="mb-2 row" style="order: {{ etat.order_etat }}" data-order="{{ etat.order_etat }}">
+								<div class="mb-2 row" {{ 'style="order:' ~ etat.order_etat ~ '"' }} data-order="{{ etat.order_etat }}">
 									<input type="hidden" name="id_etat[]" value="{{ etat.id_etat }}"/>
 									<input type="hidden" name="order_etat[]" id="order_etat_{{ etat.id_etat }}" value="{{ etat.order_etat }}"/>
 									<div class="col-auto pe-1 py-1">
@@ -75,7 +100,7 @@
 										</button>
 									</div>
 									<div class="col-auto p-1">
-										<a href="{{ currentUrl }}/{{ etat.id_etat }}/supprimer-etat" class="btn btn-outline-danger">
+										<a href="{{ current_url }}/{{ etat.id_etat }}/supprimer-etat" class="btn btn-outline-danger">
 											<i class="material-icons">delete</i>
 										</a>
 									</div>
@@ -83,35 +108,34 @@
 										<input name="description[]" placeholder="Description de l'état" value="{{ etat.description }}" type="text" class="form-control"/>
 									</div>
 
-                                    <div class="col p-1">
-                                        <select name="role_responsable_etape[]" class="form-control form-select">
-                                            <option value="" {{ etat.role_responsable_etape=='' ? 'selected' : '' }}></option>
-                                            {% for role in roles %}
-                                                <option value="{{ role.description }}" {{ etat.role_responsable_etape == role.description ? 'selected' : '' }}>{{ role.description }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="col p-1">
-                                        <select name="phase_etape[]" class="form-control form-select">
-                                            {% for phase in phases %}
-                                                <option value="{{ phase.description }}" {{ etat.phase_etape == phase.description ? 'selected' : '' }}>{{ phase.description }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+									<div class="col p-1">
+										<select name="role_responsable_etape[]" class="form-control form-select">
+											<option value="" {{ etat.role_responsable_etape=='' ? 'selected' : '' }}></option>
+											{% for role in roles %}
+												<option value="{{ role.description }}" {{ etat.role_responsable_etape == role.description ? 'selected' : '' }}>{{ role.description }}</option>
+											{% endfor %}
+										</select>
+									</div>
+
+									<div class="col p-1">
+										<select name="phase_etape[]" class="form-control form-select">
+											{% for phase in phases %}
+												<option value="{{ phase.description }}" {{ etat.phase_etape == phase.description ? 'selected' : '' }}>{{ phase.description }}</option>
+											{% endfor %}
+										</select>
+									</div>
 								</div>
 							{% endfor %}
 						</div>
-						<button class="btn btn-primary">Enregistrer états du produits</button>
+						<button class="btn btn-primary">Enregistrer workflow du produit</button>
 					</form>
 					<script src="{{ base_url }}/public/js/etats-produit.js"></script>
 				{% endif %}
 			</div>
-
 		</div>
-        <div class="row">
-            <h4>Dossiers correspondants à ce produit</h4>
-            {% include "components/liste-dossiers.html.twig" %}
-        </div>
+		<div class="row">
+			<h4>Dossiers correspondants à ce produit</h4>
+			{% include "components/liste-dossiers.html.twig" %}
+		</div>
 	</div>
 {% endblock %}

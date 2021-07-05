@@ -1,4 +1,16 @@
 {% if dossiers|length > 0 %}
+    <!-- <form method="get" class="row mb-3">
+        <div class="col-auto">
+            <select multiple name="etats_dossier[]" class="form-control form-select select-checkbox" size="5">
+                {% for key,etat in etats_dossier %}
+                    <option value="{{ key }}">{{ etat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col">
+            <button class="btn btn-primary">Appliquer filtre</button>
+        </div>
+    </form> -->
     <table class="table sortable-table">
         <thead>
             <tr>

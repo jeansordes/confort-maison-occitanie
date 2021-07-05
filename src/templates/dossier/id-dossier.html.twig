@@ -45,37 +45,83 @@
 			</div>
 		</div>
 
-		<!-- Etats dossier -->
-		{% if etats|length > 0 %}
-			<form action="{{ currentUrl }}/changer-etat" method="post">
-				<select name="etat" class="form-select d-inline-block w-auto me-3">
-					{% for etat in etats %}
-						<option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
-					{% endfor %}
-				</select>
-				<button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
-			</form>
-		{% endif %}
+        <!-- Etats dossier -->
+        <h5>Etat du dossier</h5>
+        <!-- TODO une fois que le site sera déployé, et que les états auront été transférés, supprimer cette partie -->
+        {% if old_etats|length > 0 %}
+            <span>Ancien états :
+            {% for etat in old_etats %}
+                {% if etat.id_etat == dossier.etat_dossier %}
+                    {{ etat.description}}
+                {% endif %}
+            {% endfor %}
+            </span>
+        {% endif %}
+        {% if etats|length > 0 %}
+            <form action="{{ current_url }}/changer-etat" method="post">
+                <select name="etat" class="form-select d-inline-block w-auto me-3">
+                    {% for etat in etats %}
+                        <option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_workflow_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
+            </form>
+        {% else %}
+            <small class="text-muted">Aucun workflow assigné à ce produit</small>
+        {% endif %}
+
+		{#
+        <!-- TODO Champs customisés d'un produit, tout s'affiche correctement, mais il n'est pas intéractif (gênant) -->
+        <div class="row">
+			{% for input in formulaire_inputs %}
+				{% if input.input_type == "text" or input.input_type == "date" or input.input_type == "tel" or input.input_type == "email" or input.input_type == "number" %}
+					<div class="mb-2 col-12 col-md-6 col-lg-4">
+						<label class="form-label">{{ input.input_description }}</label>
+						<input name="{{ input.input_name }}" type="{{ input.input_type }}" class="form-control"/>
+					</div>
+				{% elseif input.input_type == "textarea" %}
+					<div class="mb-2 col-12 col-md-6 col-lg-4">
+						<label class="form-label">{{ input.input_description }}</label>
+						<textarea name="{{ input.input_name }}" class="form-control"></textarea>
+					</div>
+				{% elseif input.input_type == "options_radio" or input.input_type == "options_checkbox" %}
+					<div class="mb-2 col-12 col-md-6 col-lg-4">
+						<label class="form-label">{{ input.input_description }}</label>
+						<div>
+							{% for option in input.input_choices %}
+                                <label class="d-block">
+                                    <input type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" name="{{ input.input_name }}">
+                                    <span class="ms-2 w-100">{{ option }}</span>
+                                </label>
+							{% endfor %}
+						</div>
+					</div>
+				{% elseif input.input_type == "html" %}
+					{{ input.input_choices|raw }}
+				{% endif %}
+			{% endfor %}
+		</div>
+        #}
 
 		<div
 			class="row">
 			<!-- Upload -->
 			<div class="col-12 col-md">
 				<h4 class="my-3">Ajouter des fichiers ...</h4>
-				<form action="{{currentUrl}}/new-fichier" class="dropzone mb-3 w-100 text-center" id="dropzoneForm">
+				<form action="{{current_url}}/new-fichier" class="dropzone mb-3 w-100 text-center" id="dropzoneForm">
 					<span class="dz-message">
 						<i class="material-icons">add</i>
 						Ajouter des fichiers</span>
 				</form>
-				<a href="{{currentUrl}}/new-fichier" class="d-block mb-3">
+				<a href="{{current_url}}/new-fichier" class="d-block mb-3">
 					<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
 				</a>
 			</div>
 
 			<!-- Commentaire -->
 			<div class="col-12 col-md">
-                <h4 class="my-3">... ou un commentaire</h4>
-				<form action="{{ currentUrl }}/new-comment" method="POST">
+				<h4 class="my-3">... ou un commentaire</h4>
+				<form action="{{ current_url }}/new-comment" method="POST">
 					<div class="mb-2">
 						<textarea name="comment" class="form-control mb-3"></textarea>
 						<button class="btn btn-outline-primary">Enregistrer ce commentaire</button>
@@ -87,11 +133,11 @@
 		<!-- ZIP + corbeille -->
 		<div class="mb-3">
 			{% if fichiers|length > 0 %}
-				<a href="{{ currentUrl }}/zip" class="btn btn-primary me-2 mb-2">
+				<a href="{{ current_url }}/zip" class="btn btn-primary me-2 mb-2">
 					<i class="material-icons">download</i>
 					Télécharger tous les fichiers ci dessous</a>
 			{% endif %}
-			<a href="{{ currentUrl }}/corbeille" class="btn btn-outline-secondary mb-2">
+			<a href="{{ current_url }}/corbeille" class="btn btn-outline-secondary mb-2">
 				<i class="material-icons">delete</i>
 				Accéder à la corbeille</a>
 		</div>
@@ -108,7 +154,9 @@
 							<div class="card mb-3">
 								<div class="card-body">
 									<div>{{ log.desc_action }}</div>
-									<small class="d-block text-muted" title="{{ log.date_heure }}">{{ log.nom_action ~ ' ' ~ log.date_heure|timeago }} par {% include 'components/titre-personne.html.twig' with { personne: log } %}</small>
+									<small class="d-block text-muted" title="{{ log.date_heure }}">{{ log.nom_action ~ ' ' ~ log.date_heure|timeago }}
+										par
+										{% include 'components/titre-personne.html.twig' with { personne: log } %}</small>
 								</div>
 							</div>
 						</div>

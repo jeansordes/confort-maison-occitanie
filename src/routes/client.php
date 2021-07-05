@@ -15,7 +15,6 @@ $app->group('/cl/{idClient}', function (App $app) {
             throw new Exception("Ce client n'existe pas");
         }
         $client = $req->fetch();
-        console_log($client);
         // vérifier si le demandeur a le droit de consulter ce client
         if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
             //     si fournisseur, vérifier qu'il y a des dossiers à afficher

@@ -18,7 +18,7 @@
 
 		<div class="col-lg-6">
 			<h4 class="mb-3">Liste des états possible de dossier</h4>
-			<form action="{{currentUrl}}/new-etat" method="post" class="mb-3">
+			<form action="{{current_url}}/new-etat" method="post" class="mb-3">
 				<div class="input-group">
 					<input type="text" name="description" class="form-control">
 					<button class="btn btn-primary">
@@ -32,7 +32,7 @@
 						{% for etat in etats %}
 							<li class="list-group-item d-flex align-items-center">
 								<pre class="m-0">{{ etat.description }}</pre>
-								<a href="{{currentUrl}}/{{etat.description}}/supprimer" class="btn btn-outline-danger btn-sm ms-auto">
+								<a href="{{current_url}}/{{etat.description}}/supprimer" class="btn btn-outline-danger btn-sm ms-auto">
 									<i class="material-icons">delete</i>
 								</a>
 							</li>

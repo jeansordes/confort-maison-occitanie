@@ -22,66 +22,117 @@
 			</nav>
 		{% endif %}
 
+		<!-- TABS -->
 		<ul class="nav nav-tabs row row-cols-auto g-1 mb-3" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="dossiers-tab" data-bs-toggle="tab" data-bs-target="#dossiers" type="button" role="tab" aria-controls="dossiers" aria-selected="true">
-                    <i class="material-icons me-2">folder</i>Dossiers</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="false">
-                    <i class="material-icons me-2">store</i>Produits</button>
-            </li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="dossiers-tab" data-bs-toggle="tab" data-bs-target="#dossiers" type="button" role="tab" aria-controls="dossiers" aria-selected="true">
+					<i class="material-icons me-2">folder</i>Dossiers</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="false">
+					<i class="material-icons me-2">store</i>Produits</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="workflows-tab" data-bs-toggle="tab" data-bs-target="#workflows" type="button" role="tab" aria-controls="workflows" aria-selected="false">
+					<i class="material-icons me-2">account_tree</i>Workflows</button>
+			</li>
 			<li class="nav-item" role="presentation">
 				<button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
-					<i class="material-icons me-2">settings</i>Paramètres</button>
+					<i class="material-icons me-2">settings</i>
+					{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</button>
 			</li>
 		</ul>
+		<!-- TABS CONTENT -->
 		<div class="tab-content">
-            <div class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
+			<div
+				class="tab-pane fade show active" id="dossiers" role="tabpanel" aria-labelledby="dossiers-tab">
+				<!-- Dossiers -->
 				<h4>{{ isAdmin ? 'Liste des dossiers du fournisseur' : 'Liste de vos dossiers' }}</h4>
-			    {% include "components/liste-dossiers.html.twig" %}
+				{% include "components/liste-dossiers.html.twig" %}
 			</div>
-			<div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
-                <h4 class="my-3">{{ isAdmin ? 'Liste des produits du fournisseur' : 'Liste de vos produits' }}</h4>
-				<div>
-					<a href="{{ currentUrl }}/new-produit" class="btn btn-primary mb-3">
-						<i class="material-icons">add</i>
-						Ajouter un produit</a>
-				</div>
-				{% if produits|length > 0 %}
-					{% for produit in produits %}
-						<div class="card d-inline-block me-3 mb-3 p-3">
-							<div class="card-body">
-								<h5 class="card-title">{{ produit.nom_produit }}</h5>
-								<div class="card-text mb-3">{{ produit.description_produit }}</div>
-								<a href="{{ base_url }}/p/{{ produit.id_produit }}" class="btn btn-outline-primary card-link">Détails de ce produit</a>
+			<div
+				class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
+				<!-- Produits -->
+				<div class="row">
+					<div class="col-4">
+						<h4 class="mb-3">Ajouter un produit</h4>
+						<form action="{{ current_url }}/new-produit" method="POST">
+							<div class="mb-3">
+								<label class="form-label">Nom du produit</label>
+								<input name="nom_produit" value="{{ nom_produit }}" type="text" class="form-control"/>
 							</div>
-						</div>
-					{% endfor %}
+							<div class="mb-3">
+								<label class="form-label">Description du produit</label>
+								<textarea name="description_produit" type="text" class="form-control">{{ description_produit }}</textarea>
+							</div>
+
+							<button class="btn btn-primary mt-3">Créer le produit</button>
+						</form>
+					</div>
+					<div class="col-8">
+						<h4 class="mb-4">{{ isAdmin ? 'Liste des produits du fournisseur' : 'Liste de vos produits' }}</h4>
+						{% if produits|length > 0 %}
+							<div class="card">
+								<ul class="list-group list-group-flush">
+									{% for produit in produits %}
+										<li class="list-group-item d-flex align-items-center">
+											<div class="col-10">
+												<h5 class="card-title">{{ produit.nom_produit }}</h5>
+												<div class="card-text mb-3">{{ produit.description_produit }}</div>
+											</div>
+											<div class="col-2 ps-3">
+												<a href="{{ base_url }}/p/{{ produit.id_produit }}" class="btn btn-outline-primary card-link">Détails de ce produit</a>
+											</div>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						{% else %}
+							<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div
+				class="tab-pane fade" id="workflows" role="tabpanel" aria-labelledby="workflows-tab">
+				<!-- Workflows -->
+				<h4>Workflows des produits</h4>
+
+                <!-- Formulaire pour new-workflow -->
+                <form action="{{ current_url }}/new-workflow" method="POST" class="mb-4">
+                    <div class="input-group">
+                        <input name="nom_workflow" value="{{ nom_workflow }}" type="text" class="form-control" placeholder="Nom d'un nouveau workflow">
+                        <button class="btn btn-outline-primary">
+                            <i class="material-icons">add</i>
+                            Ajouter un nouveau workflow</button>
+                    </div>
+                </form>
+
+                <!-- Liste des workflows existants -->
+				{% if workflows|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for workflow in workflows %}
+								<li class="list-group-item d-flex align-items-center">
+									<span>{{ workflow.nom_workflow }}</span>
+									<span class="ms-auto">
+										<a href="{{ base_url }}/workflow/{{ workflow.id_workflow }}" class="btn btn-primary">Paramètres du workflow</a>
+									</span>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
 				{% else %}
-					<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
+					<p class="text-muted fst-italic">Il n'y a aucun workflows à afficher</p>
 				{% endif %}
 			</div>
-            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                <h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
+			<div
+				class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+				<!-- Paramètres -->
+				<h4>{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</h4>
 				<form method="POST">
 					{% include 'components/personne-details-inputs.html.twig' with {btnText: 'Valider les modifications', user: fournisseur} %}
 				</form>
-            </div>
-		</div>
-
-		<div class="row mb-5">
-			
-		</div>
-		<div
-			class="row g-lg-5 mb-5">
-			<!-- Coordonnées -->
-			<div class="col-12 col-lg-6">
-				
-			</div>
-			<!-- Liste produits -->
-			<div class="col-12 col-lg-6">
-				
 			</div>
 		</div>
 	</div>

@@ -35,7 +35,7 @@
 				<p class="text-muted">Client appartenant au commercial "{% include 'components/titre-personne.html.twig' with { personne: commercial} %}"
 				</p>
                 {% if current_user.user_role != 'fournisseur' %}
-                    <a href="{{ currentUrl }}/new-dossier" class="btn btn-primary mb-3">
+                    <a href="{{ current_url }}/new-dossier" class="btn btn-primary mb-3">
                         <i class="material-icons">add</i>
                         Créer un nouveau dossier</a>
                 {% endif %}

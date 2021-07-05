@@ -5,7 +5,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 require_once 'commercial.php';
-require_once 'fournisseur.php';
+require_once 'fournisseur/id_fournisseur.php';
 
 $app->group('/admin', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
@@ -40,8 +40,12 @@ $app->group('/admin', function (App $app) {
         foreach ($etats_from_db as $etat) {
             $etats_dossier[$etat['id_etat']] = $etat['description'];
         }
+
+        console_log(filtersToWhereClause($_GET));
+
         // récupérer tous les dossiers
         $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
+
         return $response->write($this->view->render('admin/admin-panel_main.html.twig', [
             'admins' => $admins,
             'commerciaux' => $commerciaux,
@@ -60,13 +64,13 @@ $app->group('/admin', function (App $app) {
             alert($missing_fields_message, 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
-        
+
         // vérifier que l'email n'est pas déjà utilisé par un autre compte commercial/fournisseur
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('get_user_from_email'));
         $req->execute(['email' => $_POST['email']]);
         if ($req->rowCount() > 0) {
-            alert('Cette adresse email est déjà utilisée',3);
+            alert('Cette adresse email est déjà utilisée', 3);
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
 
@@ -102,7 +106,8 @@ $app->group('/admin', function (App $app) {
             "uid" => $new_uid,
         ], 60 * 24);
         sendEmail(
-            $this, $response,
+            $this,
+            $response,
             $_POST['email'],
             "Confort maison occitanie : Votre compte vient d'être créé",
             $this->view->render(
@@ -111,38 +116,9 @@ $app->group('/admin', function (App $app) {
             )
         );
 
-        alert("Le compte du commercial <b>" . $_POST['prenom'] . " " . $_POST['nom_famille'] . " ("
+        alert("Le compte du " . $_POST['user_type'] . " <b>" . $_POST['prenom'] . " " . $_POST['nom_famille'] . " ("
             . $_POST['email'] . ") a bien été créé, et un email lui a été envoyé</b>", 1);
         return $response->withRedirect($request->getUri()->getPath() . '/..');
-    });
-
-    $app->group('/etats-dossiers', function (App $app) {
-        $app->get('', function (Request $request, Response $response, array $args): Response {
-            // récupérer les états de dossier possible
-            $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('tous_etats_produit'));
-            $req->execute(['id_commercial' => $_SESSION['current_user']['uid']]);
-            $etats = $req->fetchAll();
-
-            return $response->write($this->view->render('admin/etats-dossiers.html.twig', [
-                'etats' => $etats
-            ]));
-        });
-
-        $app->post('/new-etat', function (Request $request, Response $response, array $args): Response {
-            $missing_fields_message = get_form_missing_fields_message(['description'], $_POST);
-            if ($missing_fields_message) {
-                alert($missing_fields_message, 3);
-                return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
-            }
-
-            $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('new_etat_dossier'));
-            $req->execute(['description' => $_POST['description']]);
-
-            alert('Le nouvel état "' . $_POST['description'] . '" a bien été créé', 1);
-            return $response->withRedirect($request->getUri()->getPath() . '/..');
-        });
     });
 
     $app->group('/co/{idCommercial}', routesCommercial());

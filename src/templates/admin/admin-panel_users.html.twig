@@ -10,7 +10,7 @@
         <ul class="list-group list-group-flush">
             {% for commercial in commerciaux %}
                 <li class="list-group-item">
-                    <a href="{{currentUrl}}/co/{{commercial.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+                    <a href="{{current_url}}/co/{{commercial.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
                         ({{ commercial.email }})</a>
                 </li>
             {% endfor %}
@@ -25,7 +25,7 @@
         <ul class="list-group list-group-flush">
             {% for fournisseur in fournisseurs %}
                 <li class="list-group-item">
-                    <a href="{{currentUrl}}/f/{{fournisseur.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+                    <a href="{{current_url}}/f/{{fournisseur.id_personne}}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
                         ({{ fournisseur.email }})</a>
                 </li>
             {% endfor %}

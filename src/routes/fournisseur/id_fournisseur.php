@@ -36,10 +36,16 @@ function routesFournisseur()
             $array2merge = getDossierUtilities();
             unset($array2merge['commerciaux']);
 
+            // Récupérer les workflows
+            $req = $db->prepare(getSqlQueryString('get_workflows_where_id_fournisseur'));
+            $req->execute(['id_fournisseur' => $idFournisseur]);
+            $workflows = $req->fetchAll();
+
             return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', array_merge($array2merge, [
                 'fournisseur' => $fournisseur,
                 'produits' => $produits,
                 'dossiers' => $dossiers,
+                'workflows' => $workflows,
             ])));
         });
         $app->post('', function (Request $request, Response $response, array $args): Response {
@@ -70,18 +76,20 @@ function routesFournisseur()
             return $response->withRedirect($request->getUri()->getPath());
         });
 
-        # /new-produit
-        $app->get('/new-produit', function (Request $request, Response $response, array $args): Response {
+        # /new workflow
+        $app->post('/new-workflow', function (Request $request, Response $response, array $args): Response {
             $idFournisseur = getFournisseurId($args);
             $db = getPDO();
-            $req = $db->prepare(getSqlQueryString('get_fournisseur'));
-            $req->execute(['uid' => $idFournisseur]);
-            $fournisseur = $req->fetch();
-            return $response->write($this->view->render(
-                'fournisseur/new-produit.html.twig',
-                array_merge($_GET, ['fournisseur' => $fournisseur])
-            ));
+            $req = $db->prepare(getSqlQueryString('new_workflow'));
+            $req->execute([
+                "nom_workflow" => $_POST["nom_workflow"],
+                "id_fournisseur" => $idFournisseur,
+            ]);
+            alert('Workflow ajouté avec succès 👍', 1);
+            return $response->withRedirect($request->getUri()->getPath() . '/..');
         });
+
+        # /new produit
         $app->post('/new-produit', function (Request $request, Response $response, array $args): Response {
             $idFournisseur = getFournisseurId($args);
             $db = getPDO();

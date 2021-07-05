@@ -1,17 +1,17 @@
 <?php
 require_once __DIR__ . '/src/sql-utilities.php';
 
-function deleteUploads()
+// This file is to be runned on the admin 
+function delTree($dir)
 {
-    // empty the "uploads" folder
-    foreach (['/uploads/*.*', '/uploads/preview/*.*'] as $folder) {
-        foreach (glob(__DIR__ . $folder) as $file) {
-            if (strpos($file, '.gitkeep') == false) {
-                unlink($file);
-            }
-        }
+    $files = array_diff(scandir($dir), ['.', '..', '.gitkeep']);
+
+    foreach ($files as $file) {
+        (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
     }
-    echo "The /uploads folder is now empty\n";
+    if (count(array_diff(scandir($dir), ['.', '..'])) == 0){
+        rmdir($dir);
+    }
 }
 
 $scripts = [
@@ -42,7 +42,15 @@ $scripts = [
     [
         'empty the "uploads" folder',
         function () {
-            deleteUploads();
+            delTree(__DIR__ . '/uploads');
+            echo "The /uploads folder is now empty\n";
+        }
+    ],
+    [
+        'clear the TWIG cache folder',
+        function () {
+            delTree(__DIR__ . "/src/templates/cache");
+            echo "The cache has been cleared";
         }
     ],
     [
@@ -51,7 +59,9 @@ $scripts = [
             runFile('init_struct_fn_data.sql');
             runFile('create_admin.sql');
             runFile('create_dummy_data.sql');
-            deleteUploads();
+            
+            delTree(__DIR__ . '/uploads');
+            echo "The /uploads folder is now empty\n";
         }
     ],
 ];
@@ -68,7 +78,12 @@ while ($keepRunning) {
     echo (count($scripts) + 1) . ". Exit this script\n";
 
     // $line = trim(fgets(STDIN)); // reads one line from STDIN
-    fscanf(STDIN, "%d\n", $option); // reads number from STDIN
+    if (!empty($argv[1])) {
+        $option = $argv[1];
+        $keepRunning = false;
+    } else {
+        fscanf(STDIN, "%d\n", $option); // reads number from STDIN
+    }
     $option--;
     if ($option >= 0 && $option < count($scripts)) {
         $scripts[$option][1]();

@@ -19,14 +19,7 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
     $path_infos = pathinfo($uploadedFile->getClientFilename());
 
     if (strlen($path_infos['filename']) > 200) {
-        $filename = substr(
-            $path_infos['filename'],
-            0,
-            strpos(wordwrap(
-                $path_infos['filename'],
-                200
-            ), "\n")
-        );
+        $filename = substr($path_infos['filename'], 0, strpos(wordwrap($path_infos['filename'], 200), "\n"));
     } else {
         $filename = $path_infos['filename'];
     }
@@ -103,7 +96,7 @@ $app->get('/f/{idFichier}/rotate-{orientation:left|right}', function (Request $r
         $imagick->rotateimage('#fff', $args['orientation'] == 'left' ? "-90" : "90");
         file_put_contents(__DIR__ . "/../../uploads/" . $dossier['file_name'], $imagick, FILE_USE_INCLUDE_PATH);
     }
-    
+
     // faire la rotation de l'aperçu de l'image
     $imagick = new \Imagick(realpath(__DIR__ . '/../../uploads/preview/' . $dossier['file_name'] . '.png'));
     $imagick->rotateimage('#fff', $args['orientation'] == 'left' ? "-90" : "90");

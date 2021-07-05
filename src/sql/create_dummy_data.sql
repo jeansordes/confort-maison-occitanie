@@ -31,4 +31,14 @@ select new_dossier(@cli1, @prod1);
 select new_dossier(@cli1, @prod2);
 select new_dossier(@cli3, @prod2);
 
+insert into workflows (nom_workflow, id_fournisseur) values ('Workflow par défaut', @fournisseur_representant);
+set @id_last_workflow = last_insert_id();
+
+insert into etats_workflow(description, order_etat, id_workflow) values ('Projet créé', 0, @id_last_workflow);
+insert into etats_workflow(description, order_etat, id_workflow) values ('Dossier à compléter', 1, @id_last_workflow);
+insert into etats_workflow(description, order_etat, id_workflow, phase_etape) values ('Cloturé', 2, @id_last_workflow, 'archivé');
+
+-- update workflow id pour TOUS les produits (comme il n'y a pas de WHERE)
+update produits set id_workflow = @id_last_workflow;
+
 select 'Query done';
