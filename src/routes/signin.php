@@ -109,7 +109,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
         alert("Cet email nous est inconnu : $_POST[email])", 3);
         return $response->withRedirect($request->getUri()->getPath());
     }
-    
+
     $id_user = $req->fetch()['id_personne'];
     // générer un token pour que l'utilisateur puisse réinitialiser son mot de passe
     $req = $db->prepare(getSqlQueryString('last_settings_update'));
@@ -127,8 +127,10 @@ $app->post('/password-reset', function (Request $request, Response $response): R
     ], 20);
 
     sendEmail(
-        $this, $response,
-        $_POST['email'],
+        $this,
+        $response,
+        [$_POST['email']],
+        [],
         "Confort maison occitanie : Vous avez oublié votre de mot de passe ?",
         $this->view->render(
             'emails/password-reset.html.twig',

@@ -15,7 +15,6 @@ function getSqlQueryString($key, $filters = [])
         'tous_dossiers' => buildSelectQuery("dossiers_enriched"),
         'tous_clients' => buildSelectQuery("clients"),
         'tous_fournisseurs' => buildSelectQuery("fournisseurs"),
-        'tous_etats_produit' => buildSelectQuery("etats_produit"),
         'tous_roles' => buildSelectQuery('_enum_user_role'),
         'tous_phases' => buildSelectQuery('_enum_phases_dossier'),
         'tous_templates' => buildSelectQuery("template_formulaire_produit"),
@@ -36,7 +35,7 @@ function getSqlQueryString($key, $filters = [])
         'tous_fichiers_dossier' => buildSelectQuery(
             'fichiers ff, fichiers_dossier fp',
             ['ff.*'],
-            ['ff.id_fichier = fp.id_fichier', 'fp.id_dossier = :id_dossier', 'ff.in_trash = :in_trash']
+            ['ff.id_fichier = fp.id_fichier', 'fp.id_dossier = :id_dossier', 'ff.fichier_in_trash = :fichier_in_trash']
         ),
         'tous_dossiers_where_produit' => buildSelectQuery('dossiers_enriched', [], ['id_produit = :id_produit']),
         'tous_dossiers_commercial' => buildSelectQuery(
@@ -54,7 +53,6 @@ function getSqlQueryString($key, $filters = [])
         'new_fichier_produit' => 'select new_fichier_produit(:file_name, :mime_type, :id_produit)',
         'new_produit' => 'insert into produits(id_fournisseur, description_produit, nom_produit) values (:id_fournisseur, :description_produit, :nom_produit)',
         'new_workflow' => 'insert into workflows (id_fournisseur, nom_workflow) values (:id_fournisseur, :nom_workflow)',
-        'new_etat_produit' => 'select new_etat_produit(:id_produit, :description)',
         'new_etat_workflow' => 'select new_etat_workflow(:id_workflow, :description)',
         'new_dossier_log' => 'insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (:id_dossier, :id_author, :nom_action, :desc_action)',
         // get
@@ -67,15 +65,14 @@ function getSqlQueryString($key, $filters = [])
         'get_logs_dossiers' => 'select * from logs_enriched where id_dossier = :id_dossier order by date_heure desc',
         'get_email' => 'select email from personnes where email = :email',
         'get_user_from_email' => 'select p.email from personnes p, utilisateurs u where p.id_personne = u.id_utilisateur and p.email = :email',
-        'get_etats_where_produit' => buildSelectQuery('etats_produit', [], ['id_produit = :id_produit'], 'order by order_etat'),
         'get_etats_where_workflow' => buildSelectQuery('etats_workflow', [], ['id_workflow = :id_workflow'], 'order by order_etat'),
         'get_etats_workflow_where_produit' =>  buildSelectQuery('etats_workflow a, produits b', [], ['b.id_produit = :id_produit', 'b.id_workflow = a.id_workflow'], 'order by a.order_etat'),
-        'get_etat_produit' => 'select * from etats_produit where id_etat = :id_etat',
         'get_etat_workflow' => 'select * from etats_workflow where id_etat = :id_etat',
         'get_reponses_formulaire_dossier' => buildSelectQuery('reponses_formulaire_produit', [], ['id_dossier = :id_dossier']),
         'get_inputs_formulaire' => 'select b.* from produits a, input_template_formulaire_produit b where a.id_produit = :id_produit and b.id_template = a.id_template_formulaire order by b.input_order',
         'get_workflow' => buildSelectQuery("workflows", [], ['id_workflow = :id_workflow']),
         'get_workflows_where_id_fournisseur' => buildSelectQuery("workflows", [], ['id_fournisseur = :id_fournisseur']),
+        'get_last_fichier_dossier' => 'select a.* from fichiers a, fichiers_dossier b where a.id_fichier = b.id_fichier and b.id_dossier = :id_dossier order by a.updated_at desc limit 1',
         // update
         'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :description_produit, id_template_formulaire = nullif(:id_template_formulaire,\'\'), id_workflow = nullif(:id_workflow,\'\') where id_produit = :id_produit',
         'update_pwd' => 'update utilisateurs set password_hash = :new_password_hash where id_utilisateur = :uid',
@@ -83,13 +80,11 @@ function getSqlQueryString($key, $filters = [])
         'update_personne_noemail' => 'update personnes set nom_entreprise = :nom_entreprise, numero_entreprise = :numero_entreprise, est_un_particulier = :est_un_particulier, prenom = :prenom, nom_famille = :nom_famille, civilite = :civilite where id_personne = :id_personne',
         'update_coordonnees' => 'update coordonnees set adresse = :adresse, code_postal = :code_postal, ville = :ville, pays = :pays, tel1 = :tel1, tel2 = :tel2 where id_coordonnees = (select id_coordonnees from personnes where id_personne = :id_personne)',
         'update_etat_dossier' => 'select update_etat_dossier(:id_dossier, :id_nouvel_etat, :id_author)',
-        'update_etat_produit' => 'update etats_produit set description = :description, order_etat = :order_etat, role_responsable_etape = :role_responsable_etape, phase_etape = :phase_etape where id_etat = :id_etat',
         'update_etat_workflow' => 'update etats_workflow set description = :description, order_etat = :order_etat, role_responsable_etape = :role_responsable_etape, phase_etape = :phase_etape where id_etat = :id_etat',
         'update_workflow' => 'update workflows set nom_workflow = :nom_workflow where id_workflow = :id_workflow',
         'update_client' => 'update clients_des_commerciaux set infos_client_supplementaires = :infos_client_supplementaires where id_client = :id_client',
         // autre
-        'toggle_fichier_trash' => 'update fichiers set in_trash = ((-1 * in_trash) + 1) where id_fichier = :id_fichier',
-        'supprimer_etat_produit' => 'delete from etats_produit where id_etat = :id_etat',
+        'toggle_fichier_trash' => 'update fichiers set fichier_in_trash = ((-1 * fichier_in_trash) + 1) where id_fichier = :id_fichier',
         'supprimer_etat_workflow' => 'delete from etats_workflow where id_etat = :id_etat',
         'clients_commercial' => 'select * from clients where id_commercial = :id_commercial',
         'last_settings_update' => 'select last_user_update from utilisateurs where id_utilisateur = :uid',

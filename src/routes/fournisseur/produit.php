@@ -46,7 +46,7 @@ function routesProduit()
                 $fournisseur = $req->fetch();
 
                 // récupérer tous les etats_dossier
-                $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+                $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
                 $etats_dossier = [];
                 foreach ($etats_from_db as $etat) {
                     $etats_dossier[$etat['id_etat']] = $etat['description'];
@@ -101,28 +101,13 @@ function routesProduit()
                 return $response->withRedirect($request->getUri()->getPath());
             });
 
-            $app->post('/new-etat', function (Request $request, Response $response, array $args): Response {
-                $produit = is_user_allowed__produit($args['idProduit']);
-                if ($produit instanceof \Exception) throw $produit;
-
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('new_etat_produit'));
-                $req->execute([
-                    'description' => $_POST['description'],
-                    'id_produit' => $args['idProduit'],
-                ]);
-
-                alert('Un état a bien été créé', 1);
-                return $response->withRedirect($request->getUri()->getPath() . '/..');
-            });
-
             $app->post('/etats-produit', function (Request $request, Response $response, array $args): Response {
                 $produit = is_user_allowed__produit($args['idProduit']);
                 if ($produit instanceof \Exception) throw $produit;
 
                 $db = getPDO();
                 foreach ($_POST['id_etat'] as $key => $value) {
-                    $req = $db->prepare(getSqlQueryString('update_etat_produit'));
+                    $req = $db->prepare(getSqlQueryString('update_etat_workflow'));
                     $req->execute([
                         'id_etat' => $value,
                         'description' => $_POST['description'][$key],
@@ -142,17 +127,17 @@ function routesProduit()
 
                 // supprimer l'état
                 $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('supprimer_etat_produit'));
+                $req = $db->prepare(getSqlQueryString('supprimer_etat_workflow'));
                 $req->execute(['id_etat' => $args['idEtat']]);
 
                 // récupérer la liste des états
-                $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
+                $req = $db->prepare(getSqlQueryString('get_etats_workflow_where_produit'));
                 $req->execute(['id_produit' => $args['idProduit']]);
                 $etats = $req->fetchAll();
 
                 // les renuméroter
                 foreach ($etats as $key => $value) {
-                    $req = $db->prepare(getSqlQueryString('update_etat_produit'));
+                    $req = $db->prepare(getSqlQueryString('update_etat_workflow'));
                     $req->execute([
                         'id_etat' => $value['id_etat'],
                         'description' => $value['description'],

@@ -5,10 +5,10 @@ document.querySelectorAll('.etatOrderBtn').forEach(btn => {
         let originInput = document.querySelector('#order_etat_' + idEtat);
         // si (up + pas le 1e) OU (down + pas le dernier)
         if ((action == 'up' && originInput.value > 0)
-            || (action == "down" && originInput.value < (document.getElementById('etats_produit').querySelectorAll('[data-order]').length - 1))) {
+            || (action == "down" && originInput.value < (document.getElementById('etats_workflow').querySelectorAll('[data-order]').length - 1))) {
             // on va switcher les valeurs entre origin et target
             let [originValue, targetValue] = [originInput.value, parseInt(originInput.value) + (action == 'up' ? -1 : 1)];
-            let [originDiv, targetDiv] = [originValue, targetValue].map(v => document.getElementById('etats_produit').querySelector('[data-order="' + v + '"]'));
+            let [originDiv, targetDiv] = [originValue, targetValue].map(v => document.getElementById('etats_workflow').querySelector('[data-order="' + v + '"]'));
             let targetInput = targetDiv.querySelector('input[name="order_etat[]"]');
             // js : div [data-order=x], css : div [style="order x"], html : input [value=x]
             // origin

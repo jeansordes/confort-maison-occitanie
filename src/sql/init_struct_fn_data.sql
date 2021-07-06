@@ -5,30 +5,18 @@ use :cmo_db_name;
 create or replace table _enum_user_role (
     description varchar(50) not null primary key
 );
-insert into _enum_user_role(description) values ('admin');
-insert into _enum_user_role(description) values ('commercial');
-insert into _enum_user_role(description) values ('fournisseur');
 
 create or replace table _enum_statut_societe (
     description varchar(50) not null primary key
 );
-insert into _enum_statut_societe(description) values ('autoentrepreneur');
-insert into _enum_statut_societe(description) values ('entreprise');
-insert into _enum_statut_societe(description) values ('vendeur à domicile');
 
 create or replace table _enum_mime_type (
     description varchar(50) not null primary key comment 'application/pdf ou image/png (https://developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types)'
 );
-insert into _enum_mime_type(description) values ('image/png');
-insert into _enum_mime_type(description) values ('image/jpeg');
-insert into _enum_mime_type(description) values ('image/gif');
-insert into _enum_mime_type(description) values ('application/pdf');
 
 create table _enum_phases_dossier (
     description varchar(50) primary key
 );
-insert into _enum_phases_dossier(description) values ('normal');
-insert into _enum_phases_dossier(description) values ('archivé');
 
 create or replace table coordonnees (
     id_coordonnees int(11) not null auto_increment primary key,
@@ -106,17 +94,7 @@ create or replace table produits (
     id_fournisseur int(11) not null references utilisateurs(id_utilisateur),
     description_produit text default null,
     id_workflow int(11) default null references workflows(id_workflow),
-    id_template_formulaire int(11) default 1 references template_formulaire_produit(id_template)
-);
-
--- // TODO à retirer, mais il faudra retirer également les autres références
-create or replace table etats_produit (
-    id_etat int(11) not null auto_increment primary key,
-    description varchar(50) not null,
-    order_etat int(11) not null,
-    id_produit int(11) not null references produits(id_produit),
-    role_responsable_etape varchar(50) default 'commercial' references _enum_user_role(description),
-    phase_etape varchar(50) default 'normal' not null references _enum_phases_dossier(description)
+    id_template_formulaire int(11) default null references template_formulaire_produit(id_template)
 );
 
 create or replace table workflows (
@@ -137,15 +115,6 @@ create or replace table etats_workflow (
 create or replace table _enum_input_type (
     description varchar(50) not null primary key
 );
-insert into _enum_input_type(description) values ('text');
-insert into _enum_input_type(description) values ('textarea');
-insert into _enum_input_type(description) values ('options_radio');
-insert into _enum_input_type(description) values ('options_checkbox');
-insert into _enum_input_type(description) values ('date');
-insert into _enum_input_type(description) values ('tel');
-insert into _enum_input_type(description) values ('email');
-insert into _enum_input_type(description) values ('number');
-insert into _enum_input_type(description) values ('html');
 
 create or replace table input_template_formulaire_produit (
     id_input int(11) not null auto_increment primary key,
@@ -157,29 +126,15 @@ create or replace table input_template_formulaire_produit (
     input_order int(11) not null
 );
 
-insert into template_formulaire_produit(nom_template) values ('Template par défaut');
-
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Adresse du lieu d''exploitation',0);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Code postal du lieu d''exploitation',1);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Ville du lieu d''exploitation',2);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'tel','Numéro de téléphone personnel de l''exploitant',3);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order, input_html_attributes) values (1, 'number','Puissance souscrite (en kVa)',4,'min="0" step="1"');
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_radio','Type de contrat','Formule bleue;Formule jaune;Formule verte',5);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_checkbox','Type client','PME;Crée depuis moins de 2 ans;Plusieurs dirigeants',6);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'date','Date de signature du contrat précédent',7);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_html_attributes, input_order) values (1, 'html','Script de test','<script>console.log("script du template correctement chargé")</script>',7);
-
 create or replace table dossiers (
     id_dossier int(11) not null auto_increment primary key,
     id_client int(11) not null,
     id_produit int(11) not null,
     commentaire text default null,
-    etat_dossier int(11) not null,
     etat_workflow_dossier int(11) default null references etats_workflow(id_etat),
     constraint
         foreign key (id_client) references clients_des_commerciaux (id_client),
-        foreign key (id_produit) references produits(id_produit),
-        foreign key (etat_dossier) references etats_produit(id_etat)
+        foreign key (id_produit) references produits(id_produit)
 );
 
 create or replace table reponses_formulaire_produit (
@@ -194,7 +149,7 @@ create or replace table fichiers (
     file_name text not null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
-    in_trash boolean default 0,
+    fichier_in_trash boolean default 0,
     constraint
         foreign key (mime_type) references _enum_mime_type(description)
 );
@@ -320,8 +275,12 @@ create or replace function new_dossier(
     p_id_client int(11),
     p_id_produit int(11)
 ) returns int(11) begin
-    select id_etat, description into @id_etat_initial, @initial_dossier_etat from etats_produit where id_produit = p_id_produit order by order_etat limit 1;
-    insert into dossiers(id_client, id_produit, etat_dossier) values (p_id_client, p_id_produit, @id_etat_initial);
+    select a.id_etat, a.description into @id_etat_initial, @initial_dossier_etat
+    from etats_workflow a, produits b
+    where a.id_workflow = b.id_workflow
+      and b.id_produit = p_id_produit
+    order by a.order_etat limit 1;
+    insert into dossiers(id_client, id_produit, etat_workflow_dossier) values (p_id_client, p_id_produit, @id_etat_initial);
     set @id_dossier = last_insert_id();
     select id_commercial into @id_commercial from clients_des_commerciaux where id_client = p_id_client;
     insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (@id_dossier, @id_commercial, 'Initialisation état du dossier', concat('État du dossier : ', @initial_dossier_etat));
@@ -340,17 +299,6 @@ create or replace function update_etat_dossier(
     insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action)
         values (p_id_dossier, p_id_author, 'Changement de l''état du dossier', concat('État du dossier : ', @nouvel_etat));
     return p_id_dossier;
-end
-$$
-
-$$
-create or replace function new_etat_produit(
-    p_id_produit int(11),
-    p_description varchar(50)
-) returns int(11) begin
-    select count(*) into @new_order_etat from etats_produit where id_produit = p_id_produit;
-    insert into etats_produit(description, id_produit, order_etat) values (p_description, p_id_produit, @new_order_etat);
-    return p_id_produit;
 end
 $$
 
@@ -396,8 +344,8 @@ create or replace view dossiers_enriched as
     select a.id_commercial, c.nom_produit, b.*,
            (select date_heure from logs_dossiers l where l.id_dossier = b.id_dossier order by date_heure desc limit 1) date_creation,
            c.id_fournisseur, d.role_responsable_etape, d.phase_etape
-    from clients_des_commerciaux a, dossiers b, produits c, etats_produit d
-    where a.id_client = b.id_client and b.id_produit = c.id_produit and d.id_etat = b.etat_dossier
+    from clients_des_commerciaux a, dossiers b, produits c, etats_workflow d
+    where a.id_client = b.id_client and b.id_produit = c.id_produit and d.id_etat = b.etat_workflow_dossier
     order by d.phase_etape desc;
 
 create or replace view fichiers_enriched as
@@ -409,5 +357,43 @@ create or replace view logs_enriched as
     select l.*, p.*
     from logs_dossiers l, personnes p where p.id_personne = l.id_utilisateur
     order by date_heure;
+
+insert into _enum_statut_societe(description) values ('autoentrepreneur');
+insert into _enum_statut_societe(description) values ('entreprise');
+insert into _enum_statut_societe(description) values ('vendeur à domicile');
+
+insert into _enum_user_role(description) values ('admin');
+insert into _enum_user_role(description) values ('commercial');
+insert into _enum_user_role(description) values ('fournisseur');
+
+insert into _enum_mime_type(description) values ('image/png');
+insert into _enum_mime_type(description) values ('image/jpeg');
+insert into _enum_mime_type(description) values ('image/gif');
+insert into _enum_mime_type(description) values ('application/pdf');
+
+insert into _enum_phases_dossier(description) values ('normal');
+insert into _enum_phases_dossier(description) values ('archivé');
+
+insert into _enum_input_type(description) values ('text');
+insert into _enum_input_type(description) values ('textarea');
+insert into _enum_input_type(description) values ('options_radio');
+insert into _enum_input_type(description) values ('options_checkbox');
+insert into _enum_input_type(description) values ('date');
+insert into _enum_input_type(description) values ('tel');
+insert into _enum_input_type(description) values ('email');
+insert into _enum_input_type(description) values ('number');
+insert into _enum_input_type(description) values ('html');
+
+insert into template_formulaire_produit(nom_template) values ('Template par défaut');
+
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Adresse du lieu d''exploitation',0);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Code postal du lieu d''exploitation',1);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Ville du lieu d''exploitation',2);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'tel','Numéro de téléphone personnel de l''exploitant',3);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order, input_html_attributes) values (1, 'number','Puissance souscrite (en kVa)',4,'min="0" step="1"');
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_radio','Type de contrat','Formule bleue;Formule jaune;Formule verte',5);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_checkbox','Type client','PME;Crée depuis moins de 2 ans;Plusieurs dirigeants',6);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'date','Date de signature du contrat précédent',7);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_html_attributes, input_order) values (1, 'html','Script de test','<script>console.log("script du template correctement chargé")</script>',7);
 
 select 'Query done';

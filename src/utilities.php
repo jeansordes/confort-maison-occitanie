@@ -7,16 +7,18 @@ use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-function sendEmail($app, $response, $to, $subject, $body)
+function sendEmail($app, $response, $to = [], $bcc = [], $subject, $body)
 {
     (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
     if (!empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev') {
-        die($body);
-        return $response->write($app->view->render('base.html.twig', [
+        die($app->view->render('base.html.twig', [
             'title' => $subject,
             'body' => '<div class="alert alert-warning">Vous êtes en mode "dev" '
-                . 'ce que vous voyez actuellement est le mail qu\'on aurait envoyé en mode "prod" à '
-                . $to . '</div>' . $body,
+                . 'ce que vous voyez actuellement est le mail qu\'on aurait envoyé en mode "prod"</div>'
+                . (empty($to) ? '' : '<div class="border p-3 rounded mb-3">À : ' . join(', ', $to) . '</div>')
+                . (empty($bcc) ? '' : '<div class="border p-3 rounded mb-3">Cci : ' . join(', ', $bcc) . '</div>')
+                . '<div class="border p-3 rounded mb-3">Objet : ' . $subject . '</div>'
+                . '<div class=" border p-3 rounded">' . $body . '</div>',
         ]));
     } else {
         // envoyer un email à l'adresse renseignée
@@ -38,7 +40,13 @@ function sendEmail($app, $response, $to, $subject, $body)
 
         //Recipients
         $mail->setFrom($_ENV['email_username']);
-        $mail->addAddress($to);
+
+        foreach ($to as $dest) {
+            $mail->addAddress($dest);
+        }
+        foreach ($bcc as $dest) {
+            $mail->addBCC($dest);
+        }
 
         // Content
         $mail->isHTML(true);
@@ -141,7 +149,8 @@ function get_form_missing_fields_message(array $keys, array $arr)
     return il_manque_les_champs($diff_keys);
 }
 
-function il_manque_les_champs($fields) {
+function il_manque_les_champs($fields)
+{
     if (count($fields) == 0) return null;
     if (count($fields) == 1) return 'Il manque le champs <b>' . $fields[0] . '</b>';
     if (count($fields) > 1) return 'Il manque les champs <b>' . array_special_join('</b>, <b>', '</b> et <b>', $fields) . '</b>';
@@ -150,4 +159,34 @@ function il_manque_les_champs($fields) {
 function array_to_url_encoding($array)
 {
     return join('&', array_map((fn ($k, $v) => $k . '=' . $v), array_keys($array), $array));
+}
+
+function date_dernier_fichier_dossier($id_dossier)
+{
+    // récupérer dans la BDD fichiers (updated_at)
+    $db = getPDO();
+    $req = $db->prepare(getSqlQueryString('get_last_fichier_dossier'));
+    $req->execute(['id_dossier' => $id_dossier]);
+    $date = $req->fetch();
+    return empty($date) ? null : $date['updated_at'];
+}
+
+function get_liste_destinataires_notifications_dossier($dossier)
+{
+    // Tout le monde sauf les Admins, et sauf auteur de l'action
+    $liste = [];
+    $db = getPDO();
+    if ($_SESSION['current_user']['user_role'] != 'fournisseur') {
+        // Si ce n'est pas le fournisseur, le rajouté à la liste
+        $req = $db->prepare(getSqlQueryString('get_fournisseur'));
+        $req->execute(['uid' => $dossier['id_fournisseur']]);
+        $liste[] = $req->fetch()['email'];
+    }
+    if ($_SESSION['current_user']['user_role'] != 'commercial') {
+        // Si ce n'est pas le commercial, le rajouter à la liste
+        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req->execute(['uid' => $dossier['id_commercial']]);
+        $liste[] = $req->fetch()['email'];
+    }
+    return $liste;
 }

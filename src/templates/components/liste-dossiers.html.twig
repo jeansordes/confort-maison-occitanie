@@ -37,7 +37,11 @@
                     {% if etats_dossier %}<td>{{ etats_dossier[dossier.etat_dossier] }}</td>{% endif %}
                     <td>{{ dossier.phase_etape }}</a></td>
                     <td>
-                        <a href="/p/{{ dossier.id_produit }}">{{ dossier.nom_produit }}</a>
+                        {% if current_user.user_role != 'commercial' %}
+                            <a href="/p/{{ dossier.id_produit }}">{{ dossier.nom_produit }}</a>
+                        {% else %}
+                            {{ dossier.nom_produit }}
+                        {% endif %}
                     </td>
                     {% if commerciaux %}
                         <td><a href="/admin/co/{{ dossier.id_commercial }}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a></td>

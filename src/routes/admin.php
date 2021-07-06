@@ -35,7 +35,7 @@ $app->group('/admin', function (App $app) {
             $admins[$admin['id_personne']] = $admin;
         }
         // récupérer tous les etats_dossier
-        $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+        $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
         $etats_dossier = [];
         foreach ($etats_from_db as $etat) {
             $etats_dossier[$etat['id_etat']] = $etat['description'];
@@ -108,7 +108,8 @@ $app->group('/admin', function (App $app) {
         sendEmail(
             $this,
             $response,
-            $_POST['email'],
+            [$_POST['email']],
+            [],
             "Confort maison occitanie : Votre compte vient d'être créé",
             $this->view->render(
                 'emails/email-new-user.html.twig',

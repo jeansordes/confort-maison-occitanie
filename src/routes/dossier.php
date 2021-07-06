@@ -44,7 +44,7 @@ function getDossierUtilities()
         $clients[$client['id_personne']] = $client;
     }
     // récupérer tous les etats_dossier
-    $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+    $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
     $etats_dossier = [];
     foreach ($etats_from_db as $etat) {
         $etats_dossier[$etat['id_etat']] = $etat['description'];
@@ -86,12 +86,8 @@ $app->group('/d/{idDossier}', function (App $app) {
 
         // récupérer liste des fichiers
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 0]);
         $fichiers = $req->fetchAll();
-        // récupérer les états possibles d'un dossier
-        $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
-        $req->execute(['id_produit' => $dossier['id_produit']]);
-        $old_etats = $req->fetchAll();
 
         // récupérer id_workflow du produit
         $req = $db->prepare(getSqlQueryString('get_etats_workflow_where_produit'));
@@ -138,9 +134,6 @@ $app->group('/d/{idDossier}', function (App $app) {
         $req->execute(['id_dossier' => $args['idDossier']]);
         $reponses_formulaire = $req->fetchAll();
 
-        console_log($formulaire_inputs);
-        console_log($reponses_formulaire);
-
         return $response->write($this->view->render(
             'dossier/id-dossier.html.twig',
             [
@@ -150,7 +143,6 @@ $app->group('/d/{idDossier}', function (App $app) {
                 'fournisseur' => $fournisseur,
                 'client' => $client,
                 'etats' => $etats,
-                'old_etats' => $old_etats,
                 'logs' => $logs,
                 'events' => $events,
                 'formulaire_inputs' => $formulaire_inputs,
@@ -167,7 +159,7 @@ $app->group('/d/{idDossier}', function (App $app) {
 
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // création du fichier zip
@@ -232,6 +224,19 @@ $app->group('/d/{idDossier}', function (App $app) {
             'id_author' => $_SESSION['current_user']['uid'],
         ]);
 
+        // envoyer une notification aux personnes concernés
+        sendEmail(
+            $this,
+            $response,
+            [],
+            get_liste_destinataires_notifications_dossier($dossier),
+            'Un dossier qui vous concerne a changé d\'état',
+            $this->view->render(
+                'emails/notification-chgmt-dossier.html.twig',
+                ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+            ),
+        );
+
         alert("L'état du dossier a bien été mis à jour", 1);
         return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
@@ -257,6 +262,9 @@ $app->group('/d/{idDossier}', function (App $app) {
     $app->post('/new-fichier', function (Request $request, Response $response, array $args): Response {
         $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
+
+        // récupérer la date d'upload du dernier fichier avant qu'on upload un nouveau fichier
+        $date_dernier_fichier = date_dernier_fichier_dossier($dossier['id_dossier']);
 
         require_once 'fichiers.php';
         $directory = $this->get('upload_directory');
@@ -304,10 +312,32 @@ $app->group('/d/{idDossier}', function (App $app) {
             "mime_type" => $mime_type,
             "id_dossier" => $args['idDossier'],
         ]);
+
+        // récupérer la date d'upload du nouveau fichier
+        $date_nouveau_fichier = new DateTime(date_dernier_fichier_dossier($dossier['id_dossier']));
+        // si c'est le premier fichier du dossier, alors envoyer directement
+        // OU si la date actuelle et la date du dernier fichier sont suffisament espacées (2 minutes) alors envoyer une notification
+        if (empty($date_dernier_fichier) || (abs($date_nouveau_fichier->getTimestamp() - (new DateTime($date_dernier_fichier))->getTimestamp()) / 60) > 2) {
+            // envoyer une notification aux personnes concernés
+            sendEmail(
+                $this,
+                $response,
+                [],
+                get_liste_destinataires_notifications_dossier($dossier),
+                'Un nouveau fichier a été ajouté à un dossier qui vous concerne',
+                $this->view->render(
+                    'emails/notification-chgmt-dossier.html.twig',
+                    ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+                ),
+            );
+        }
         return $response->write('uploaded ' . $filename . '<br/>');
     });
 
     $app->post('/new-comment', function (Request $request, Response $response, array $args): Response {
+        $dossier = is_user_allowed__dossier($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
+
         if (empty($_POST['comment'])) {
             alert('Vous ne pouvez pas créer un commentaire vide', 2);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
@@ -320,6 +350,19 @@ $app->group('/d/{idDossier}', function (App $app) {
             'nom_action' => 'Nouveau commentaire',
             'desc_action' => $_POST['comment'],
         ]);
+
+        // envoyer une notification aux personnes concernés
+        sendEmail(
+            $this,
+            $response,
+            [],
+            get_liste_destinataires_notifications_dossier($dossier),
+            'Un nouveau commentaire a été ajouté à un dossier qui vous concerne',
+            $this->view->render(
+                'emails/notification-chgmt-dossier.html.twig',
+                ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+            ),
+        );
 
         alert('Votre commentaire a bien été enregistré', 1);
         return $response->withRedirect($request->getUri()->getPath() . '/..');
@@ -340,7 +383,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $client = $req->fetch();
         // récupérer liste des fichiers
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 1]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 1]);
         $fichiers = $req->fetchAll();
 
         return $response->write($this->view->render(

@@ -40,7 +40,7 @@ function routesCommercial()
             }
 
             // récupérer tous les etats_dossier
-            $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+            $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
             $etats_dossier = [];
             foreach ($etats_from_db as $etat) {
                 $etats_dossier[$etat['id_etat']] = $etat['description'];
