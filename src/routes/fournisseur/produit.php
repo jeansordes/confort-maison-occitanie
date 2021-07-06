@@ -45,10 +45,12 @@ function routesProduit()
                 }
                 $fournisseur = $req->fetch();
 
-                // Récupérer les états
-                $req = $db->prepare(getSqlQueryString('get_etats_where_produit'));
-                $req->execute(['id_produit' => $args['idProduit']]);
-                $etats = $req->fetchAll();
+                // récupérer tous les etats_dossier
+                $etats_from_db = $db->query(getSqlQueryString('tous_etats_produit'))->fetchAll();
+                $etats_dossier = [];
+                foreach ($etats_from_db as $etat) {
+                    $etats_dossier[$etat['id_etat']] = $etat['description'];
+                }
 
                 // Récupérer les roles (pour role_responsable_etape)
                 $req = $db->query(getSqlQueryString('tous_roles'));
@@ -62,6 +64,7 @@ function routesProduit()
                 $req = $db->prepare(getSqlQueryString('tous_dossiers_where_produit'));
                 $req->execute(['id_produit' => $args['idProduit']]);
                 $dossiers = $req->fetchAll();
+                console_log($dossiers);
 
                 // lister tous les templates de formulaire possible
                 $req = $db->query(getSqlQueryString('tous_templates'));
@@ -75,7 +78,7 @@ function routesProduit()
                 return $response->write($this->view->render('fournisseur/id-produit.html.twig', [
                     'fournisseur' => $fournisseur,
                     'produit' => $produit,
-                    'etats' => $etats,
+                    'etats_dossier' => $etats_dossier,
                     'dossiers' => $dossiers,
                     'roles' => $roles,
                     'phases' => $phases,
