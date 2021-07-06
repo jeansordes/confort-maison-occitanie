@@ -47,16 +47,6 @@
 
         <!-- Etats dossier -->
         <h5>Etat du dossier</h5>
-        <!-- TODO une fois que le site sera déployé, et que les états auront été transférés, supprimer cette partie -->
-        {% if old_etats|length > 0 %}
-            <span>Ancien états :
-            {% for etat in old_etats %}
-                {% if etat.id_etat == dossier.etat_dossier %}
-                    {{ etat.description}}
-                {% endif %}
-            {% endfor %}
-            </span>
-        {% endif %}
         {% if etats|length > 0 %}
             <form action="{{ current_url }}/changer-etat" method="post">
                 <select name="etat" class="form-select d-inline-block w-auto me-3">

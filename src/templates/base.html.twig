@@ -17,9 +17,6 @@
 	</head>
 
 	<body class="py-3 py-md-5">
-        <div class="alert alert-danger m-3" style="margin-top: -2rem !important">
-            ⚠ Attention, on fait une grosse mise à jour du CRM ce matin. Merci de ne pas modifier vos dossiers jusqu'à nouvel ordre ⚠
-        </div>
 		{% if session_alert %}
 			<div class="alert {{ session_alert.meaning }} alert-dismissible fade show m-3" role="alert" style="margin-top: -2rem !important">
 				{{ session_alert.message|raw }}

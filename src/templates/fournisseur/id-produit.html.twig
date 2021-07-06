@@ -30,7 +30,7 @@
 
 		<div class="row">
 			<div
-				class="col-12 col-md-4">
+				class="col-12 col-md-3">
 				<!-- Informations produit -->
 				<h4>Informations produit</h4>
 				<form method="post" class="mb-5">
@@ -41,7 +41,7 @@
 					</div>
 					<div class="mb-2">
 						<label class="form-label">Description du produit</label>
-						<textarea class="form-control" name="description_produit" rows="3">{{ produit.description_produit }}</textarea>
+						<textarea class="form-control" name="description_produit" rows="5">{{ produit.description_produit }}</textarea>
 					</div>
 					<div class="mb-2">
 						<div class="mb-2">
@@ -69,73 +69,10 @@
 				</form>
 			</div>
 
-			<div
-				class="col-12 col-md-8">
-				<!-- Etats produit -->
-				<h4>Workflow du produit</h4>
-                
-				<form action="{{ current_url }}/new-etat" method="POST" class="my-3">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Description d'un nouvel état" name="description">
-						<button class="btn btn-outline-primary">
-							<i class="material-icons">add</i>
-							Ajouter nouvel état</button>
-					</div>
-				</form>
-				{% if etats|length > 0 %}
-					<form action="{{ current_url }}/etats-produit" method="POST" id="etats_produit">
-						<div class="d-flex flex-column">
-							{% for etat in etats %}
-								<div class="mb-2 row" {{ 'style="order:' ~ etat.order_etat ~ '"' }} data-order="{{ etat.order_etat }}">
-									<input type="hidden" name="id_etat[]" value="{{ etat.id_etat }}"/>
-									<input type="hidden" name="order_etat[]" id="order_etat_{{ etat.id_etat }}" value="{{ etat.order_etat }}"/>
-									<div class="col-auto pe-1 py-1">
-										<button class="btn btn-outline-secondary etatOrderBtn" data-action="up" data-etat-id="{{ etat.id_etat }}">
-											<i class="material-icons">arrow_upward</i>
-										</button>
-									</div>
-									<div class="col-auto p-1">
-										<button class="btn btn-outline-secondary etatOrderBtn" data-action="down" data-etat-id="{{ etat.id_etat }}">
-											<i class="material-icons">arrow_downward</i>
-										</button>
-									</div>
-									<div class="col-auto p-1">
-										<a href="{{ current_url }}/{{ etat.id_etat }}/supprimer-etat" class="btn btn-outline-danger">
-											<i class="material-icons">delete</i>
-										</a>
-									</div>
-									<div class="col p-1">
-										<input name="description[]" placeholder="Description de l'état" value="{{ etat.description }}" type="text" class="form-control"/>
-									</div>
-
-									<div class="col p-1">
-										<select name="role_responsable_etape[]" class="form-control form-select">
-											<option value="" {{ etat.role_responsable_etape=='' ? 'selected' : '' }}></option>
-											{% for role in roles %}
-												<option value="{{ role.description }}" {{ etat.role_responsable_etape == role.description ? 'selected' : '' }}>{{ role.description }}</option>
-											{% endfor %}
-										</select>
-									</div>
-
-									<div class="col p-1">
-										<select name="phase_etape[]" class="form-control form-select">
-											{% for phase in phases %}
-												<option value="{{ phase.description }}" {{ etat.phase_etape == phase.description ? 'selected' : '' }}>{{ phase.description }}</option>
-											{% endfor %}
-										</select>
-									</div>
-								</div>
-							{% endfor %}
-						</div>
-						<button class="btn btn-primary">Enregistrer workflow du produit</button>
-					</form>
-					<script src="{{ base_url }}/public/js/etats-produit.js"></script>
-				{% endif %}
+			<div class="col-12 col-md-9">
+				<h4>Dossiers correspondants à ce produit</h4>
+				{% include "components/liste-dossiers.html.twig" %}
 			</div>
-		</div>
-		<div class="row">
-			<h4>Dossiers correspondants à ce produit</h4>
-			{% include "components/liste-dossiers.html.twig" %}
 		</div>
 	</div>
 {% endblock %}
