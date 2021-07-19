@@ -15,7 +15,7 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Commercial #{{ commercial.id_personne }}" class="breadcrumb-item active">
-						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+						{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}
 						(commercial)
 					</li>
 				</ol>
@@ -41,7 +41,7 @@
 				<h4 class="my-3">
 					{% if isAdmin %}
 						Liste des clients de
-						{% include 'components/titre-personne.html.twig' with { personne: commercial} %}
+						{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}
 					{% else %}
 						Liste de vos clients
 					{% endif %}
@@ -56,7 +56,7 @@
 							{% for client in clients %}
 								<li class="list-group-item">
 									<a class="text-decoration-none d-block" href="/cl/{{ client.id_personne }}">
-										<div>{% include 'components/titre-personne.html.twig' with { personne: client} %}</div>
+										<div>{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %}</div>
 										<small class="text-muted">{{ client.nb_dossiers }}
 											dossiers</small>
 									</a>

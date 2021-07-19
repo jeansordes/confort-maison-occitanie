@@ -1,1 +1,11 @@
-{{ personne.est_un_particulier ? personne.nom_famille|upper ~ ' ' ~ personne.prenom : personne.nom_entreprise ~ (personne.nom_famille or personne.prenom ? ' (' ~ personne.nom_famille|upper ~ (personne.nom_famille and personne.prenom ? ' ' : '') ~ personne.prenom ~ ')' : '') }}
+{% if personne_role %}
+    {% if personne_role == 'fournisseur' and current_user.user_role == 'commercial' %}
+    {{ personne.nom_entreprise }}
+    {% elseif personne_role == 'commercial' and current_user.user_role == 'fournisseur' %}
+    le commercial en charge du dossier
+    {% else %}
+    {{ personne.est_un_particulier ? personne.nom_famille|upper ~ ' ' ~ personne.prenom : personne.nom_entreprise ~ (personne.nom_famille or personne.prenom ? ' (' ~ personne.nom_famille|upper ~ (personne.nom_famille and personne.prenom ? ' ' : '') ~ personne.prenom ~ ')' : '') }}
+    {% endif %}
+{% else %}
+    <span class="text-danger"><b>personne_role</b> non défini, contactez admin</span>
+{% endif %}

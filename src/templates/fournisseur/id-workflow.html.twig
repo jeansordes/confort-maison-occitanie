@@ -19,7 +19,7 @@
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
 						<a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
-							{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+							{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
 							(fournisseur)</a>
 					</li>
 				{% endif %}

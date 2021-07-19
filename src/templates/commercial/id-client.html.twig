@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	Client « {% include 'components/titre-personne.html.twig' with { personne: client} %} »
+	Client « {% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} »
 {% endblock %}
 
 {% block body %}
@@ -15,10 +15,10 @@
 				</li>
 				{% if isAdmin %}
 					<li class="breadcrumb-item">
-                        <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial} %} (commercial)</a>
+                        <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
 					</li>
 				{% endif %}
-                <li title="Client #{{ client.id_personne }}" class="breadcrumb-item active">{% include 'components/titre-personne.html.twig' with { personne: client} %} (client)</li>
+                <li title="Client #{{ client.id_personne }}" class="breadcrumb-item active">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} (client)</li>
 			</ol>
 		</nav>
 
@@ -31,10 +31,9 @@
 			</div>
 			<div class="col-12 col-lg-6">
                 <!-- Dossiers -->
-				<h4 class="my-3">Dossiers du client « {% include 'components/titre-personne.html.twig' with { personne: client} %} »</h4>
-				<p class="text-muted">Client appartenant au commercial "{% include 'components/titre-personne.html.twig' with { personne: commercial} %}"
-				</p>
+				<h4 class="my-3">Dossiers du client « {% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} »</h4>
                 {% if current_user.user_role != 'fournisseur' %}
+                    <p class="text-muted">Client appartenant au commercial "{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}"</p>
                     <a href="{{ current_url }}/new-dossier" class="btn btn-primary mb-3">
                         <i class="material-icons">add</i>
                         Créer un nouveau dossier</a>

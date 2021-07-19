@@ -15,7 +15,7 @@
 						<a href="/">Accueil</a>
 					</li>
 					<li title="Fournisseur #{{ fournisseur.id_personne }}" class="breadcrumb-item active">
-						{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}
+						{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
 						(fournisseur)
 					</li>
 				</ol>

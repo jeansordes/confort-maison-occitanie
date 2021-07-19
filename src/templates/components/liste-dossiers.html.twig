@@ -44,13 +44,13 @@
                         {% endif %}
                     </td>
                     {% if commerciaux %}
-                        <td><a href="/admin/co/{{ dossier.id_commercial }}">{% include 'components/titre-personne.html.twig' with { personne: commercial} %}</a></td>
+                        <td><a href="/admin/co/{{ dossier.id_commercial }}">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}</a></td>
                     {% endif %}
                     {% if clients %}
-                        <td><a href="/cl/{{ dossier.id_client }}">{% include 'components/titre-personne.html.twig' with { personne: client} %}</a></td>
+                        <td><a href="/cl/{{ dossier.id_client }}">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %}</a></td>
                     {% endif %}
                     {% if fournisseurs %}
-                        <td><a href="/admin/f/{{ dossier.id_fournisseur }}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur} %}</a></td>
+                        <td><a href="/admin/f/{{ dossier.id_fournisseur }}">{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}</a></td>
                     {% endif %}
                     <td>{{ dossier.date_creation ~ ' (' ~ dossier.date_creation|timeago }})</td>
                     <td>{{ dossier.role_responsable_etape }}</a></td>
