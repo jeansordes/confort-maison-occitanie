@@ -25,6 +25,10 @@ $container['view'] = function ($container) {
     $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
     $_SESSION['session_alert'] = null;
 
+    $fixed_size_nbr = new \Twig\TwigFilter('fixed_size_nbr', function ($number, $digits_amount = 4) {
+        return is_numeric($digits_amount) && is_numeric($number) ? sprintf('%0' . $digits_amount . 'd', $number) : $number;
+    });
+    $twig->addFilter($fixed_size_nbr);
     $filter = new \Twig\TwigFilter('timeago', function ($datetime) {
         $time = time() - strtotime($datetime);
 
