@@ -33,5 +33,14 @@ set @prod2 = last_insert_id();
 select new_dossier(@cli1, @prod1);
 select new_dossier(@cli1, @prod2);
 select new_dossier(@cli3, @prod2);
+select new_dossier(@cli1, @prod1);
+select new_dossier(@cli1, @prod2);
+select new_dossier(@cli3, @prod2);
+select new_dossier(@cli1, @prod1);
+select new_dossier(@cli1, @prod2);
+select new_dossier(@cli3, @prod2);
+select new_dossier(@cli1, @prod1);
+select new_dossier(@cli1, @prod2);
+select new_dossier(@cli3, @prod2);
 
 select 'Query done';
