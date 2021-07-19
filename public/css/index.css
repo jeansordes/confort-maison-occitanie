@@ -97,3 +97,7 @@ a:hover {
 .select-checkbox option:checked::before {
     content: "\2611";
 }
+
+table .active-row {
+    background: hsla(0, 100%, 50%, .3) !important;
+}

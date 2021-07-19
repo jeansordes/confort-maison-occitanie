@@ -30,7 +30,7 @@
                 {% set commercial = commerciaux[dossier.id_commercial] %}
                 {% set client = clients[dossier.id_client] %}
                 {% set fournisseur = fournisseurs[dossier.id_fournisseur] %}
-                <tr>
+                <tr {{ dossier.role_responsable_etape == current_user.user_role ? 'class="active-row"' : '' }}>
                     <th scope="row">
                         <a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
                     </th>
