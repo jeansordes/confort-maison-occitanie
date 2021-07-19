@@ -34,7 +34,7 @@
                     <th scope="row">
                         <a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier }}</a>
                     </th>
-                    {% if etats_dossier %}<td>{{ etats_dossier[dossier.etat_dossier] }}</td>{% endif %}
+                    {% if etats_dossier %}<td>{{ etats_dossier[dossier.etat_workflow_dossier] }}</td>{% endif %}
                     <td>{{ dossier.phase_etape }}</a></td>
                     <td>
                         {% if current_user.user_role != 'commercial' %}

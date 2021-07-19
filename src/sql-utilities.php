@@ -93,7 +93,6 @@ function getSqlQueryString($key, $filters = [])
         'uid_from_primary_email' => 'select id_personne from personnes where email = :email',
         'check_mime_type' => 'select description from _enum_mime_type where description = :mime_type',
         'count_file' => 'select count(*) from fichiers where file_name = :file_name',
-        'edit_etat' => 'update dossiers set etat_dossier = :new_value where id_dossier = :id_dossier',
     ][$key] . $filter_str;
 }
 
