@@ -86,7 +86,7 @@ $app->group('/d/{idDossier}', function (App $app) {
 
         // récupérer liste des fichiers
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 0]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // récupérer id_workflow du produit
@@ -159,7 +159,7 @@ $app->group('/d/{idDossier}', function (App $app) {
 
         $db = getPDO();
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 0]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // création du fichier zip
@@ -383,7 +383,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         $client = $req->fetch();
         // récupérer liste des fichiers
         $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'fichier_in_trash' => 1]);
+        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 1]);
         $fichiers = $req->fetchAll();
 
         return $response->write($this->view->render(

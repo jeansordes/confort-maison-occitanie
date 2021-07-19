@@ -64,11 +64,11 @@ $app->get('/f/{idFichier}/toggle-trash', function (Request $request, Response $r
     $req->execute([
         'id_dossier' => $dossier['id_dossier'],
         'id_author' => $_SESSION['current_user']['uid'],
-        'nom_action' => $dossier['fichier_in_trash'] == 0 ? 'Suppression d\'un fichier' : 'Fichier restauré depuis la corbeille',
+        'nom_action' => $dossier['in_trash'] == 0 ? 'Suppression d\'un fichier' : 'Fichier restauré depuis la corbeille',
         'desc_action' => "« " . $dossier['file_name'] . " »",
     ]);
 
-    alert("Le fichier a bien été " . ($dossier['fichier_in_trash'] == 0 ? "mis à la corbeille" : "restauré"), 1);
+    alert("Le fichier a bien été " . ($dossier['in_trash'] == 0 ? "mis à la corbeille" : "restauré"), 1);
 
     return $response->withRedirect('/d/' . $dossier['id_dossier']);
 });

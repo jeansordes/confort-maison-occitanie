@@ -35,7 +35,7 @@ function getSqlQueryString($key, $filters = [])
         'tous_fichiers_dossier' => buildSelectQuery(
             'fichiers ff, fichiers_dossier fp',
             ['ff.*'],
-            ['ff.id_fichier = fp.id_fichier', 'fp.id_dossier = :id_dossier', 'ff.fichier_in_trash = :fichier_in_trash']
+            ['ff.id_fichier = fp.id_fichier', 'fp.id_dossier = :id_dossier', 'ff.in_trash = :in_trash']
         ),
         'tous_dossiers_where_produit' => buildSelectQuery('dossiers_enriched', [], ['id_produit = :id_produit']),
         'tous_dossiers_commercial' => buildSelectQuery(
@@ -84,7 +84,7 @@ function getSqlQueryString($key, $filters = [])
         'update_workflow' => 'update workflows set nom_workflow = :nom_workflow where id_workflow = :id_workflow',
         'update_client' => 'update clients_des_commerciaux set infos_client_supplementaires = :infos_client_supplementaires where id_client = :id_client',
         // autre
-        'toggle_fichier_trash' => 'update fichiers set fichier_in_trash = ((-1 * fichier_in_trash) + 1) where id_fichier = :id_fichier',
+        'toggle_fichier_trash' => 'update fichiers set in_trash = ((-1 * in_trash) + 1) where id_fichier = :id_fichier',
         'supprimer_etat_workflow' => 'delete from etats_workflow where id_etat = :id_etat',
         'clients_commercial' => 'select * from clients where id_commercial = :id_commercial',
         'last_settings_update' => 'select last_user_update from utilisateurs where id_utilisateur = :uid',

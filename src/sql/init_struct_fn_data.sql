@@ -149,7 +149,7 @@ create or replace table fichiers (
     file_name text not null,
     updated_at timestamp not null default current_timestamp(),
     mime_type varchar(50) not null,
-    fichier_in_trash boolean default 0,
+    in_trash boolean default 0,
     constraint
         foreign key (mime_type) references _enum_mime_type(description)
 );
