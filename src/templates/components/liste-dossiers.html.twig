@@ -34,7 +34,7 @@
                 {% set fournisseur = fournisseurs[dossier.id_fournisseur] %}
                 <tr {{ dossier.role_responsable_etape == current_user.user_role ? 'class="active-row"' : '' }}>
                     <th scope="row" class="num_dossier">
-                        <a href="/d/{{ dossier.id_dossier }}">{{ dossier.id_dossier }}</a>
+                        <a href="/d/{{ dossier.id_dossier }}">Dossier #{{ dossier.id_dossier|fixed_size_nbr(4) }}</a>
                     </th>
                     {% if etats_dossier %}<td class="etat_dossier">{{ etats_dossier[dossier.etat_workflow_dossier] }}</td>{% endif %}
                     <td class="phase_etape">{{ dossier.phase_etape }}</a></td>
