@@ -41,11 +41,17 @@ function routesFournisseur()
             $req->execute(['id_fournisseur' => $idFournisseur]);
             $workflows = $req->fetchAll();
 
+            // Récupérer les formulaires
+            $req = $db->prepare(getSqlQueryString('get_formulaires_where_id_fournisseur'));
+            $req->execute(['id_fournisseur' => $idFournisseur]);
+            $formulaires = $req->fetchAll();
+
             return $response->write($this->view->render('fournisseur/id-fournisseur.html.twig', array_merge($array2merge, [
                 'fournisseur' => $fournisseur,
                 'produits' => $produits,
                 'dossiers' => $dossiers,
                 'workflows' => $workflows,
+                'formulaires' => $formulaires,
             ])));
         });
         $app->post('', function (Request $request, Response $response, array $args): Response {

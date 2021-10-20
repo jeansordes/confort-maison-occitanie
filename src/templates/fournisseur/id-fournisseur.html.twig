@@ -37,6 +37,10 @@
 					<i class="material-icons me-2">account_tree</i>Workflows</button>
 			</li>
 			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="formulaires-tab" data-bs-toggle="tab" data-bs-target="#formulaires" type="button" role="tab" aria-controls="formulaires" aria-selected="false">
+					<i class="material-icons me-2">quiz</i>Templates formulaire</button>
+			</li>
+			<li class="nav-item" role="presentation">
 				<button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
 					<i class="material-icons me-2">settings</i>
 					{{ isAdmin ? 'Détails du fournisseur' : 'Vos informations' }}</button>
@@ -98,17 +102,17 @@
 				<!-- Workflows -->
 				<h4>Workflows des produits</h4>
 
-                <!-- Formulaire pour new-workflow -->
-                <form action="{{ current_url }}/new-workflow" method="POST" class="mb-4">
-                    <div class="input-group">
-                        <input name="nom_workflow" value="{{ nom_workflow }}" type="text" class="form-control" placeholder="Nom d'un nouveau workflow">
-                        <button class="btn btn-outline-primary">
-                            <i class="material-icons">add</i>
-                            Ajouter un nouveau workflow</button>
-                    </div>
-                </form>
+				<!-- Formulaire pour new-workflow -->
+				<form action="{{ current_url }}/new-workflow" method="POST" class="mb-4">
+					<div class="input-group">
+						<input name="nom_workflow" value="{{ nom_workflow }}" type="text" class="form-control" placeholder="Nom d'un nouveau workflow">
+						<button class="btn btn-outline-primary">
+							<i class="material-icons">add</i>
+							Ajouter un nouveau workflow</button>
+					</div>
+				</form>
 
-                <!-- Liste des workflows existants -->
+				<!-- Liste des workflows existants -->
 				{% if workflows|length > 0 %}
 					<div class="card">
 						<ul class="list-group list-group-flush">
@@ -124,6 +128,39 @@
 					</div>
 				{% else %}
 					<p class="text-muted fst-italic">Il n'y a aucun workflows à afficher</p>
+				{% endif %}
+			</div>
+			<div
+				class="tab-pane fade" id="formulaires" role="tabpanel" aria-labelledby="formulaires-tab">
+				<!-- Formulaires -->
+				<h4>Templates de formulaire à remplir dans les dossiers</h4>
+
+				<!-- Formulaire pour new-formulaire -->
+				<form action="{{ current_url }}/new-formulaire" method="POST" class="mb-4">
+					<div class="input-group">
+						<input name="nom_formulaire" value="{{ nom_formulaire }}" type="text" class="form-control" placeholder="Nom du nouveau template">
+						<button class="btn btn-outline-primary">
+							<i class="material-icons">add</i>
+							Ajouter un nouveau template de formulaire</button>
+					</div>
+				</form>
+
+				<!-- Liste des formulaires existants -->
+				{% if formulaires|length > 0 %}
+					<div class="card">
+						<ul class="list-group list-group-flush">
+							{% for formulaire in formulaires %}
+								<li class="list-group-item d-flex align-items-center">
+									<span>{{ formulaire.nom_template }}</span>
+									<span class="ms-auto">
+										<a href="{{ base_url }}/form-template/{{ formulaire.id_template }}" class="btn btn-primary">Paramètres du formulaire</a>
+									</span>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% else %}
+					<p class="text-muted fst-italic">Il n'y a aucun formulaires à afficher</p>
 				{% endif %}
 			</div>
 			<div

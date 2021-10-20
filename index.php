@@ -6,11 +6,6 @@ use Slim\Http\Response;
 require_once __DIR__ . '/vendor/autoload.php';
 session_start();
 
-if (!empty($_SESSION['app_name']) && $_SESSION['app_name'] != dirname(__FILE__)) {
-    unset($_SESSION['current_user']);
-}
-$_SESSION['app_name'] = dirname(__FILE__);
-
 // dotenv
 (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/.env');
 

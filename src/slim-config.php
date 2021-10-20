@@ -50,6 +50,8 @@ $container['view'] = function ($container) {
         }
     });
     $twig->addFilter($filter);
+    
+    $twig->addExtension(new \Twig\Extension\StringLoaderExtension());
 
     return $twig;
 };

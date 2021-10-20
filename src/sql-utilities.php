@@ -45,6 +45,7 @@ function getSqlQueryString($key, $filters = [])
             'order by date_creation desc'
         ),
         'tous_etats_workflow' => buildSelectQuery('etats_workflow'),
+        'tous_input_types' => buildSelectQuery('_enum_input_type'),
         // new
         'new_user' => 'select new_user(:user_type, :email, \'\', :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid',
         'new_client' => 'select new_client(:id_commercial, :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
@@ -55,6 +56,7 @@ function getSqlQueryString($key, $filters = [])
         'new_workflow' => 'insert into workflows (id_fournisseur, nom_workflow) values (:id_fournisseur, :nom_workflow)',
         'new_etat_workflow' => 'select new_etat_workflow(:id_workflow, :description)',
         'new_dossier_log' => 'insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (:id_dossier, :id_author, :nom_action, :desc_action)',
+        'new_input_formulaire' => 'select new_input_formulaire(:id_template, :input_type, :input_description, :input_choices, :input_html_attributes)',
         // get
         'get_commercial' => 'select c.*, co.* from commerciaux c, coordonnees co where co.id_coordonnees = c.id_coordonnees and id_personne = :uid',
         'get_fournisseur' => 'select f.*, c.* from fournisseurs f, coordonnees c where f.id_coordonnees = c.id_coordonnees and id_personne = :uid',
@@ -70,8 +72,11 @@ function getSqlQueryString($key, $filters = [])
         'get_etat_workflow' => 'select * from etats_workflow where id_etat = :id_etat',
         'get_reponses_formulaire_dossier' => buildSelectQuery('reponses_formulaire_produit', [], ['id_dossier = :id_dossier']),
         'get_inputs_formulaire' => 'select b.* from produits a, input_template_formulaire_produit b where a.id_produit = :id_produit and b.id_template = a.id_template_formulaire order by b.input_order',
+        'get_inputs_formulaire_where_id_template' => 'select * from input_template_formulaire_produit where id_template = :id_template order by input_order',
         'get_workflow' => buildSelectQuery("workflows", [], ['id_workflow = :id_workflow']),
         'get_workflows_where_id_fournisseur' => buildSelectQuery("workflows", [], ['id_fournisseur = :id_fournisseur']),
+        'get_formulaires_where_id_fournisseur' => buildSelectQuery("template_formulaire_produit", [], ['id_fournisseur = :id_fournisseur']),
+        'get_template_formulaire' => buildSelectQuery("template_formulaire_produit", [], ['id_template = :id_template']),
         'get_last_fichier_dossier' => 'select a.* from fichiers a, fichiers_dossier b where a.id_fichier = b.id_fichier and b.id_dossier = :id_dossier order by a.updated_at desc limit 1',
         // update
         'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :description_produit, id_template_formulaire = nullif(:id_template_formulaire,\'\'), id_workflow = nullif(:id_workflow,\'\') where id_produit = :id_produit',
@@ -83,6 +88,8 @@ function getSqlQueryString($key, $filters = [])
         'update_etat_workflow' => 'update etats_workflow set description = :description, order_etat = :order_etat, role_responsable_etape = :role_responsable_etape, phase_etape = :phase_etape where id_etat = :id_etat',
         'update_workflow' => 'update workflows set nom_workflow = :nom_workflow where id_workflow = :id_workflow',
         'update_client' => 'update clients_des_commerciaux set infos_client_supplementaires = :infos_client_supplementaires where id_client = :id_client',
+        'update_template_input' => 'update input_template_formulaire_produit set input_type = :input_type, input_description = :input_description, input_choices = :input_choices, input_html_attributes = :input_html_attributes where id_input = :id_input',
+        'update_template_name' => 'update template_formulaire_produit set nom_template = :nom_template where id_template = :id_template',
         // autre
         'toggle_fichier_trash' => 'update fichiers set in_trash = ((-1 * in_trash) + 1) where id_fichier = :id_fichier',
         'supprimer_etat_workflow' => 'delete from etats_workflow where id_etat = :id_etat',
@@ -129,13 +136,13 @@ function getPDO()
     return $db;
 }
 
-function runFile($filename)
+function runFile($filename, $sqlDir = __DIR__ . '/sql/')
 {
     $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . ' ' . $_ENV['db_name'] . ' --default-character-set=utf8';
     // echo $connexion_string . "\n";
 
     echo "--- $filename ---\n";
-    $tmpString = file_get_contents(__DIR__ . '/sql/' . $filename);
+    $tmpString = file_get_contents($sqlDir . $filename);
     $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
 
     $temp = tmpfile();

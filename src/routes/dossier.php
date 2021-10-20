@@ -233,7 +233,7 @@ $app->group('/d/{idDossier}', function (App $app) {
             'Un dossier qui vous concerne a changé d\'état',
             $this->view->render(
                 'emails/notification-chgmt-dossier.html.twig',
-                ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+                ['url' => 'http://' . $_SERVER["HTTP_HOST"] . '/d/' . $dossier['id_dossier']]
             ),
         );
 
@@ -327,7 +327,7 @@ $app->group('/d/{idDossier}', function (App $app) {
                 'Un nouveau fichier a été ajouté à un dossier qui vous concerne',
                 $this->view->render(
                     'emails/notification-chgmt-dossier.html.twig',
-                    ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+                    ['url' => 'http://' . $_SERVER["HTTP_HOST"] . '/d/' . $dossier['id_dossier']]
                 ),
             );
         }
@@ -360,7 +360,7 @@ $app->group('/d/{idDossier}', function (App $app) {
             'Un nouveau commentaire a été ajouté à un dossier qui vous concerne',
             $this->view->render(
                 'emails/notification-chgmt-dossier.html.twig',
-                ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/d/' . $dossier['id_dossier']]
+                ['url' => 'http://' . $_SERVER["HTTP_HOST"] . '/d/' . $dossier['id_dossier']]
             ),
         );
 
@@ -395,5 +395,13 @@ $app->group('/d/{idDossier}', function (App $app) {
                 'client' => $client,
             ]
         ));
+    });
+
+    $app->post('/form', function (Request $request, Response $response, array $args): Response {
+        $dossier = is_user_allowed__dossier($args['idDossier']);
+        if ($dossier instanceof \Exception) throw $dossier;
+
+        echo '<pre>'; print_r($_POST);
+        exit();
     });
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

@@ -1,1 +1,1 @@
-start http://localhost && php -S localhost:80
+start http://cmo.localhost && php -S localhost:80

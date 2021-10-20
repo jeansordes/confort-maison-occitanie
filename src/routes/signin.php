@@ -134,7 +134,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
         "Confort maison occitanie : Vous avez oublié votre de mot de passe ?",
         $this->view->render(
             'emails/password-reset.html.twig',
-            ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/?action=reset_password&token=' . $jwt]
+            ['url' => 'http://' . $_SERVER["HTTP_HOST"] . '/?action=reset_password&token=' . $jwt]
         )
     );
 

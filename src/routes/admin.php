@@ -41,6 +41,7 @@ $app->group('/admin', function (App $app) {
             $etats_dossier[$etat['id_etat']] = $etat['description'];
         }
 
+        // TODO début de système de pagination
         console_log(filtersToWhereClause($_GET));
 
         // récupérer tous les dossiers
@@ -113,7 +114,7 @@ $app->group('/admin', function (App $app) {
             "Confort maison occitanie : Votre compte vient d'être créé",
             $this->view->render(
                 'emails/email-new-user.html.twig',
-                ['url' => 'http://' . $_SERVER["SERVER_NAME"] . '/?action=init_password&token=' . $jwt]
+                ['url' => 'http://' . $_SERVER["HTTP_HOST"] . '/?action=init_password&token=' . $jwt]
             )
         );
 

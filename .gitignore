@@ -1,10 +1,11 @@
-vendor/*
-src/templates/cache/*
-!**/.htaccess
-!**/.gitkeep
 composer.lock
 composer.phar
 .env
+.vscode
+archives/*
+vendor/*
+src/templates/cache/*
 uploads/*
 uploads/preview/*
+!**/.htaccess
 !**/.gitkeep

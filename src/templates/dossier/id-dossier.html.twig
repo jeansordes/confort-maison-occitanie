@@ -1,162 +1,141 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}dossier {{ dossier.nom_produit }} {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
 
-{% block title %}dossier
-	{{ dossier.nom_produit }}
-{% endblock %}
-
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-
-		<nav aria-label="breadcrumb bg-white">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}
+    <nav aria-label="breadcrumb bg-white">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if isAdmin %}
+            <li class="breadcrumb-item">
+                <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}
 							(commercial)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %}
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item">
+                <a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %}
 						(client)</a>
-				</li>
-				<li class="breadcrumb-item active">«&nbsp;{{ dossier.nom_produit }}&nbsp;» (Dossier #{{ dossier.id_dossier }})</li>
-			</ol>
-		</nav>
+            </li>
+            <li class="breadcrumb-item active">«&nbsp;{{ dossier.nom_produit }}&nbsp;» (Dossier #{{ dossier.id_dossier }})</li>
+        </ol>
+    </nav>
 
-		<!-- Titre du produit -->
-		<div class="mb-4">
-			<div>
-				<h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, «
-					{{ dossier.nom_produit }}
-					»</h4>
-				<p class="text-muted">Ce produit est fourni par «
-					{% if isAdmin %}
-						<a href="/admin/f/{{ fournisseur.id_personne }}">
+    <!-- Titre du produit -->
+    <div class="mb-4">
+        <div>
+            <h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, « {{ dossier.nom_produit }} »
+            </h4>
+            <p class="text-muted">Ce produit est fourni par « {% if isAdmin %}
+                <a href="/admin/f/{{ fournisseur.id_personne }}">
 						{% endif %}
 						{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
 						{% if isAdmin %}
-						</a>
-					{% endif %}
-					»</p>
-			</div>
-		</div>
+						</a> {% endif %} »
+            </p>
+        </div>
+    </div>
 
-        <p>
-            {{ date_dernier_fichier }}
-        </p>
+    <p>
+        {{ date_dernier_fichier }}
+    </p>
 
-        <!-- Etats dossier -->
-        <h5>Etat du dossier</h5>
-        {% if etats|length > 0 %}
-            <form action="{{ current_url }}/changer-etat" method="post">
-                <select name="etat" class="form-select d-inline-block w-auto me-3">
+    <!-- TODO Champs customisés d'un produit, tout s'affiche correctement, mais il n'est pas intéractif (gênant) -->
+    <!-- ⚠ style="display: none;" -->
+    <form action="{{ current_url }}/form" method="POST" style="display: none;">
+        <div class="row">
+            {% for input in formulaire_inputs %} {% if input.input_type == "text" or input.input_type == "date" or input.input_type == "tel" or input.input_type == "email" or input.input_type == "number" %}
+            <div class="mb-2 col-12 col-md-6 col-lg-4">
+                <label class="form-label">{{ input.input_description }}</label>
+                <input name="inputs[{{ input.input_name }}]" type="{{ input.input_type }}" class="form-control" {{ input.input_html_attributes|raw }}/>
+            </div>
+            {% elseif input.input_type == "textarea" %}
+            <div class="mb-2 col-12 col-md-6 col-lg-4">
+                <label class="form-label">{{ input.input_description }}</label>
+                <textarea name="inputs[{{ input.input_name }}]" class="form-control" {{ input.input_html_attributes|raw }}></textarea>
+            </div>
+            {% elseif input.input_type == "options_radio" or input.input_type == "options_checkbox" %}
+            <div class="mb-2 col-12 col-md-6 col-lg-4">
+                <label class="form-label">{{ input.input_description }}</label>
+                <div>
+                    {% for option in input.input_choices %}
+                    <label class="d-block">
+                                        <input type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" name="inputs[{{ input.input_name }}][]" value="{{ option }}">
+                                        <span class="ms-2 w-100">{{ option }}</span>
+                                    </label> {% endfor %}
+                </div>
+            </div>
+            {% elseif input.input_type == "html" %} {{ input.input_html_attributes|raw }} {% endif %} {% endfor %}
+            <div class="my-3">
+                <button class="btn btn-primary">Enregistrer formulaire</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Etats dossier -->
+    <h5>Etat du dossier</h5>
+    {% if etats|length > 0 %}
+    <form action="{{ current_url }}/changer-etat" method="post">
+        <select name="etat" class="form-select d-inline-block w-auto me-3">
                     {% for etat in etats %}
                         <option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_workflow_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
                     {% endfor %}
                 </select>
-                <button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
-            </form>
-        {% else %}
-            <small class="text-muted">Aucun workflow assigné à ce produit</small>
-        {% endif %}
+        <button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
+    </form>
+    {% else %}
+    <small class="text-muted">Aucun workflow assigné à ce produit</small> {% endif %}
 
-		{#
-        <!-- TODO Champs customisés d'un produit, tout s'affiche correctement, mais il n'est pas intéractif (gênant) -->
-        <div class="row">
-			{% for input in formulaire_inputs %}
-				{% if input.input_type == "text" or input.input_type == "date" or input.input_type == "tel" or input.input_type == "email" or input.input_type == "number" %}
-					<div class="mb-2 col-12 col-md-6 col-lg-4">
-						<label class="form-label">{{ input.input_description }}</label>
-						<input name="{{ input.input_name }}" type="{{ input.input_type }}" class="form-control"/>
-					</div>
-				{% elseif input.input_type == "textarea" %}
-					<div class="mb-2 col-12 col-md-6 col-lg-4">
-						<label class="form-label">{{ input.input_description }}</label>
-						<textarea name="{{ input.input_name }}" class="form-control"></textarea>
-					</div>
-				{% elseif input.input_type == "options_radio" or input.input_type == "options_checkbox" %}
-					<div class="mb-2 col-12 col-md-6 col-lg-4">
-						<label class="form-label">{{ input.input_description }}</label>
-						<div>
-							{% for option in input.input_choices %}
-                                <label class="d-block">
-                                    <input type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" name="{{ input.input_name }}">
-                                    <span class="ms-2 w-100">{{ option }}</span>
-                                </label>
-							{% endfor %}
-						</div>
-					</div>
-				{% elseif input.input_type == "html" %}
-					{{ input.input_choices|raw }}
-				{% endif %}
-			{% endfor %}
-		</div>
-        #}
-
-		<div
-			class="row">
-			<!-- Upload -->
-			<div class="col-12 col-md">
-				<h4 class="my-3">Ajouter des fichiers ...</h4>
-				<form action="{{current_url}}/new-fichier" class="dropzone mb-3 w-100 text-center" id="dropzoneForm">
-					<span class="dz-message">
+    <div class="row">
+        <!-- Upload -->
+        <div class="col-12 col-md">
+            <h4 class="my-3">Ajouter des fichiers ...</h4>
+            <form action="{{current_url}}/new-fichier" class="dropzone mb-3 w-100 text-center" id="dropzoneForm">
+                <span class="dz-message">
 						<i class="material-icons">add</i>
 						Ajouter des fichiers</span>
-				</form>
-				<a href="{{current_url}}/new-fichier" class="d-block mb-3">
-					<i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
-				</a>
-			</div>
+            </form>
+            <a href="{{current_url}}/new-fichier" class="d-block mb-3">
+                <i>(ou si vous avez des difficultés pour uploader, essayez ce lien à la place)</i>
+            </a>
+        </div>
 
-			<!-- Commentaire -->
-			<div class="col-12 col-md">
-				<h4 class="my-3">... ou un commentaire</h4>
-				<form action="{{ current_url }}/new-comment" method="POST">
-					<div class="mb-2">
-						<textarea name="comment" class="form-control mb-3"></textarea>
-						<button class="btn btn-outline-primary">Enregistrer ce commentaire</button>
-					</div>
-				</form>
-			</div>
-		</div>
+        <!-- Commentaire -->
+        <div class="col-12 col-md">
+            <h4 class="my-3">... ou un commentaire</h4>
+            <form action="{{ current_url }}/new-comment" method="POST">
+                <div class="mb-2">
+                    <textarea name="comment" class="form-control mb-3"></textarea>
+                    <button class="btn btn-outline-primary">Enregistrer ce commentaire</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-		<!-- ZIP + corbeille -->
-		<div class="mb-3">
-			{% if fichiers|length > 0 %}
-				<a href="{{ current_url }}/zip" class="btn btn-primary me-2 mb-2">
-					<i class="material-icons">download</i>
-					Télécharger tous les fichiers ci dessous</a>
-			{% endif %}
-			<a href="{{ current_url }}/corbeille" class="btn btn-outline-secondary mb-2">
-				<i class="material-icons">delete</i>
-				Accéder à la corbeille</a>
-		</div>
+    <!-- ZIP + corbeille -->
+    <div class="mb-3">
+        {% if fichiers|length > 0 %}
+        <a href="{{ current_url }}/zip" class="btn btn-primary me-2 mb-2">
+            <i class="material-icons">download</i> Télécharger tous les fichiers ci dessous</a>
+        {% endif %}
+        <a href="{{ current_url }}/corbeille" class="btn btn-outline-secondary mb-2">
+            <i class="material-icons">delete</i> Accéder à la corbeille</a>
+    </div>
 
-		<!-- FICHIERS + LOGS -->
-		<div class="row">
-			{% for eventGroup in events %}
-				{% for event in eventGroup %}
-					{% if event.type == 'fichier' %}
-						{% include "components/fichier.html.twig" with { fichier: event.object } %}
-					{% else %}
-						{% set log = event.object %}
-						<div>
-							<div class="card mb-3">
-								<div class="card-body">
-									<div>{{ log.desc_action }}</div>
-									<small class="d-block text-muted" title="{{ log.date_heure }}">{{ log.nom_action ~ ' ' ~ log.date_heure|timeago }}
+    <!-- FICHIERS + LOGS -->
+    <div class="row">
+        {% for eventGroup in events %} {% for event in eventGroup %} {% if event.type == 'fichier' %} {% include "components/fichier.html.twig" with { fichier: event.object } %} {% else %} {% set log = event.object %}
+        <div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div>{{ log.desc_action }}</div>
+                    <small class="d-block text-muted" title="{{ log.date_heure }}">{{ log.nom_action ~ ' ' ~ log.date_heure|timeago }}
 										par
 										{% include 'components/titre-personne.html.twig' with { personne: log, personne_role: log.personne_role } %}</small>
-								</div>
-							</div>
-						</div>
-					{% endif %}
-				{% endfor %}
-			{% endfor %}
-		</div>
-	</div>
+                </div>
+            </div>
+        </div>
+        {% endif %} {% endfor %} {% endfor %}
+    </div>
+</div>
 {% endblock %}

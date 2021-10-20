@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/src/sql-utilities.php';
+require_once __DIR__ . '/src/utilities.php';
+
+use Ifsnop\Mysqldump as IMysqldump;
 
 // This file is to be runned on the admin 
 function delTree($dir)
@@ -9,16 +12,64 @@ function delTree($dir)
     foreach ($files as $file) {
         (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
     }
-    if (count(array_diff(scandir($dir), ['.', '..'])) == 0){
+    if (count(array_diff(scandir($dir), ['.', '..'])) == 0) {
         rmdir($dir);
     }
 }
 
 $scripts = [
     [
+        'create archive.zip (db_dump + uploads)',
+        function () {
+            // dump database
+            try {
+                $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
+                $dump->start('archives/' . 'db_dump.sql');
+            } catch (\Exception $e) {
+                echo 'mysqldump-php error: ' . $e->getMessage();
+            }
+
+            // create zip file with the dump + uploads
+            // Initialize archive object
+            $zip = new ZipArchive();
+            $zip->open('archives/archive-' . date('Y_m_d-H_i_s', time()) . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+            // Create recursive directory iterator
+            /** @var SplFileInfo[] $files */
+            $rootPath = realpath('uploads');
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($rootPath),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            );
+
+            foreach ($files as $name => $file) {
+                // Skip directories (they would be added automatically)
+                if (!$file->isDir()) {
+                    // Get real and relative path for current file
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($rootPath) + 1);
+
+                    // Add current file to archive
+                    $zip->addFile($filePath, 'uploads/' . $relativePath);
+                }
+            }
+            // add last db_dump SQL file
+            $zip->addFile('archives/db_dump.sql', 'db_dump.sql');
+
+            // Zip archive will be created only after closing object
+            $zip->close();
+
+            // remove tmp sql file
+            unlink('archives/db_dump.sql');
+        }
+    ],
+    [
         'drop database + rebuild it',
         function () {
-            runFile('init_struct_fn_data.sql');
+            runFile('wipe_database.sql');
+            runFile('init_struct.sql');
+            runFile('init_fn.sql');
+            runFile('init_data.sql');
         }
     ],
     [
@@ -54,14 +105,53 @@ $scripts = [
         }
     ],
     [
-        'DANGER ZONE : delete, then rebuild everything (db + uploads)',
+        'DANGER ZONE : delete everything (db + uploads), then rebuild a virgin database',
         function () {
-            runFile('init_struct_fn_data.sql');
+            runFile('wipe_database.sql');
+            runFile('init_struct.sql');
+            runFile('init_fn.sql');
+            runFile('init_data.sql');
             runFile('create_admin.sql');
             runFile('create_dummy_data.sql');
-            
+
             delTree(__DIR__ . '/uploads');
             echo "The /uploads folder is now empty\n";
+        }
+    ],
+    [
+        'DANGER ZONE : delete everything (db + uploads), then restore last archive',
+        function () {
+            $fileList = glob('archives/*.zip');
+
+            // get last file in alphabetical order
+            $i = 1;
+            do {
+                $file = $fileList[count($fileList) - $i];
+                $i++;
+            } while (!is_file($file) && $i < count($fileList));
+
+            // unzip
+            $extraction_folder = 'tmp_extraction_folder/';
+            mkdir($extraction_folder);
+            $zip = new ZipArchive;
+            if ($zip->open($file) !== TRUE) {
+                throw new Exception("⚠ Impossible d'ouvrir $file (fichier ZIP attendu)");
+            }
+            $zip->extractTo(realpath($extraction_folder));
+            $zip->close();
+
+            // move "uploads"
+            if (is_dir('uploads')) {
+                deleteNonEmptyFolder('uploads');
+            }
+            rename($extraction_folder . '/uploads', 'uploads');
+
+            // execute db_dump.sql
+            runFile('wipe_database.sql');
+            runFile('db_dump.sql', __DIR__ . '/' . $extraction_folder);
+            runFile('init_fn.sql');
+
+            deleteNonEmptyFolder($extraction_folder);
         }
     ],
 ];

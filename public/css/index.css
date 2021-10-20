@@ -101,3 +101,7 @@ a:hover {
 table .active-row {
     background: hsla(0, 100%, 50%, .3) !important;
 }
+
+.form-label {
+    color:#6c757d!important
+}
