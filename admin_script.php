@@ -19,7 +19,22 @@ function delTree($dir)
 
 $scripts = [
     [
-        'create archive (db + uploads)',
+        'create archive (db_dump.sql only)',
+        function () {
+            $archivePath = 'archives/archive-' . date('Y_m_d-H_i_s', time());
+            mkdir($archivePath);
+
+            // dump database
+            try {
+                $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
+                $dump->start($archivePath . '/db_dump.sql');
+            } catch (\Exception $e) {
+                echo 'mysqldump-php error: ' . $e->getMessage();
+            }
+        }
+    ],
+    [
+        'create archive (db_dump.sql + uploads folder)',
         function () {
             $archivePath = 'archives/archive-' . date('Y_m_d-H_i_s', time());
             mkdir($archivePath);
