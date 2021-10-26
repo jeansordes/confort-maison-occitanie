@@ -5,15 +5,31 @@ require_once __DIR__ . '/src/utilities.php';
 use Ifsnop\Mysqldump as IMysqldump;
 
 // This file is to be runned on the admin 
-function delTree($dir)
+function del_tree($dir)
 {
-    $files = array_diff(scandir($dir), ['.', '..', '.gitkeep']);
+    if (is_dir($dir)) {
 
-    foreach ($files as $file) {
-        (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+        $files = array_diff(scandir($dir), ['.', '..', '.gitkeep']);
+
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? del_tree("$dir/$file") : unlink("$dir/$file");
+        }
+        if (count(array_diff(scandir($dir), ['.', '..'])) == 0) {
+            rmdir($dir);
+        }
     }
-    if (count(array_diff(scandir($dir), ['.', '..'])) == 0) {
-        rmdir($dir);
+}
+
+function save_db_dump($archivePath) {
+    try {
+        $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
+        $dump->start($archivePath . '/db_dump.sql');
+        // Replace all the occurences of the database name by :cmo_db_name
+        $tmpString = file_get_contents($archivePath . '/db_dump.sql');
+        $tmpString = str_replace($_ENV['db_name'], ':cmo_db_name', $tmpString);
+        file_put_contents($archivePath . '/db_dump.sql', $tmpString);
+    } catch (\Exception $e) {
+        echo 'mysqldump-php error: ' . $e->getMessage();
     }
 }
 
@@ -24,13 +40,7 @@ $scripts = [
             $archivePath = 'archives/archive-' . date('Y_m_d-H_i_s', time());
             mkdir($archivePath);
 
-            // dump database
-            try {
-                $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
-                $dump->start($archivePath . '/db_dump.sql');
-            } catch (\Exception $e) {
-                echo 'mysqldump-php error: ' . $e->getMessage();
-            }
+            save_db_dump($archivePath);
         }
     ],
     [
@@ -40,12 +50,7 @@ $scripts = [
             mkdir($archivePath);
 
             // dump database
-            try {
-                $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
-                $dump->start($archivePath . '/db_dump.sql');
-            } catch (\Exception $e) {
-                echo 'mysqldump-php error: ' . $e->getMessage();
-            }
+            save_db_dump($archivePath);
 
             // copy upload folder
             recurseCopy('uploads', $archivePath, 'uploads');
@@ -64,17 +69,23 @@ $scripts = [
         }
     ],
     [
-        'empty the "uploads" folder',
+        'clear the TWIG cache folder',
         function () {
-            delTree(__DIR__ . '/uploads');
+            del_tree(__DIR__ . "/src/templates/cache");
+            echo "The cache has been cleared";
+        }
+    ],
+    [
+        'DANGER ZONE : empty the "uploads" folder',
+        function () {
+            del_tree(__DIR__ . '/uploads');
             echo "The /uploads folder is now empty\n";
         }
     ],
     [
-        'clear the TWIG cache folder',
+        'DANGER ZONE : wipe clean db',
         function () {
-            delTree(__DIR__ . "/src/templates/cache");
-            echo "The cache has been cleared";
+            runFile('wipe_database.sql');
         }
     ],
     [
@@ -84,7 +95,7 @@ $scripts = [
             runFile('init_struct.sql');
             runFile('init_fn.sql');
 
-            delTree(__DIR__ . '/uploads');
+            del_tree(__DIR__ . '/uploads');
             echo "The /uploads folder is now empty\n";
         }
     ],
@@ -102,11 +113,11 @@ $scripts = [
 
             echo $folder . "\n";
 
-            // move "uploads"
+            // replace "uploads" with a copy from the archive
             if (is_dir('uploads')) {
                 deleteNonEmptyFolder('uploads');
             }
-            rename($folder . '/uploads', 'uploads');
+            recurseCopy($folder . '/uploads', 'uploads');
 
             // execute db_dump.sql
             runFile('wipe_database.sql');

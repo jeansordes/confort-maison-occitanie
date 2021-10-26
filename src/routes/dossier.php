@@ -125,6 +125,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         foreach ($formulaire_inputs as $k => $input) {
             $formulaire_inputs[$k]['input_name'] = strtolower(str_replace(' ', '_', preg_replace('/[^A-Za-z\s]/', '', $input['input_description'])));
             if (in_array($input['input_type'], ['options_radio', 'options_checkbox'])) {
+                $formulaire_inputs[$k]['value_reponse'] = explode(';', $input['value_reponse']);
                 $formulaire_inputs[$k]['input_choices'] = explode(';', $input['input_choices']);
             }
         }
@@ -401,7 +402,24 @@ $app->group('/d/{idDossier}', function (App $app) {
         $dossier = is_user_allowed__dossier($args['idDossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
-        echo '<pre>'; print_r($_POST);
-        exit();
+        // Remove previous answers
+        $db = getPDO();
+        $req = $db->prepare(getSqlQueryString('delete_reponses_formulaire_produit'));
+        $req->execute(['id_dossier' => $dossier['id_dossier']]);
+
+        foreach ($_POST['inputs'] as $id_input => $input) {
+            if (is_array($input)) {
+                $input = join(';', $input);
+            }
+            $req = $db->prepare(getSqlQueryString('new_reponse_formulaire_dossier'));
+            $req->execute([
+                'id_dossier' => $dossier['id_dossier'],
+                'id_input' => $id_input,
+                'value_reponse' => $input,
+            ]);
+        }
+
+        alert('Le formulaire a bien été mis à jour', 1);
+        return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
 })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

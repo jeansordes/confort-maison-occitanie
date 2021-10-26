@@ -47,6 +47,7 @@ select new_dossier(@cli1, @prod2);
 select new_dossier(@cli3, @prod2);
 
 insert into template_formulaire_produit(nom_template, id_fournisseur) values ('Template par défaut', @fournisseur_representant);
+update produits set id_template_formulaire = last_insert_id() where id_produit in (@prod1, @prod2);
 
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Adresse du lieu d''exploitation',0);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Code postal du lieu d''exploitation',1);
@@ -57,5 +58,6 @@ insert into input_template_formulaire_produit(id_template, input_type, input_des
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_checkbox','Type client','PME;Crée depuis moins de 2 ans;Plusieurs dirigeants',6);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'date','Date de signature du contrat précédent',7);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_html_attributes, input_order) values (1, 'html','Script de test','<script>console.log("script du template correctement chargé")</script>',8);
+
 
 select 'Données fictives ajoutés';

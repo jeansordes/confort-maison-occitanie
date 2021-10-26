@@ -41,18 +41,18 @@
     </p>
 
     <!-- TODO Champs customisés d'un produit, tout s'affiche correctement, mais il n'est pas intéractif (gênant) -->
-    <!-- ⚠ style="display: none;" -->
-    <form action="{{ current_url }}/form" method="POST" style="display: none;">
+    {% if formulaire_inputs|length > 0 %}
+    <form action="{{ current_url }}/form" method="POST">
         <div class="row">
             {% for input in formulaire_inputs %} {% if input.input_type == "text" or input.input_type == "date" or input.input_type == "tel" or input.input_type == "email" or input.input_type == "number" %}
             <div class="mb-2 col-12 col-md-6 col-lg-4">
                 <label class="form-label">{{ input.input_description }}</label>
-                <input name="inputs[{{ input.input_name }}]" type="{{ input.input_type }}" class="form-control" {{ input.input_html_attributes|raw }}/>
+                <input name="inputs[{{ input.id_input }}]" type="{{ input.input_type }}" class="form-control" value="{{ input.value_reponse }}" {{ input.input_html_attributes|raw }}/>
             </div>
             {% elseif input.input_type == "textarea" %}
             <div class="mb-2 col-12 col-md-6 col-lg-4">
                 <label class="form-label">{{ input.input_description }}</label>
-                <textarea name="inputs[{{ input.input_name }}]" class="form-control" {{ input.input_html_attributes|raw }}></textarea>
+                <textarea name="inputs[{{ input.id_input }}]" class="form-control" {{ input.input_html_attributes|raw }}>{{ input.value_reponse }}</textarea>
             </div>
             {% elseif input.input_type == "options_radio" or input.input_type == "options_checkbox" %}
             <div class="mb-2 col-12 col-md-6 col-lg-4">
@@ -60,9 +60,9 @@
                 <div>
                     {% for option in input.input_choices %}
                     <label class="d-block">
-                                        <input type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" name="inputs[{{ input.input_name }}][]" value="{{ option }}">
-                                        <span class="ms-2 w-100">{{ option }}</span>
-                                    </label> {% endfor %}
+											<input type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" name="inputs[{{ input.id_input }}][]" value="{{ option }}" {{ option in input.value_reponse ? 'checked' : '' }}>
+											<span class="ms-2 w-100">{{ option }}</span>
+										</label> {% endfor %}
                 </div>
             </div>
             {% elseif input.input_type == "html" %} {{ input.input_html_attributes|raw }} {% endif %} {% endfor %}
@@ -71,16 +71,17 @@
             </div>
         </div>
     </form>
+    {% endif %}
 
     <!-- Etats dossier -->
     <h5>Etat du dossier</h5>
     {% if etats|length > 0 %}
     <form action="{{ current_url }}/changer-etat" method="post">
         <select name="etat" class="form-select d-inline-block w-auto me-3">
-                    {% for etat in etats %}
-                        <option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_workflow_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
-                    {% endfor %}
-                </select>
+					{% for etat in etats %}
+						<option value="{{ etat.id_etat }}" {{ etat.id_etat == dossier.etat_workflow_dossier ? ' selected' : ''}}>{{ etat.description}}</option>
+					{% endfor %}
+				</select>
         <button class="btn btn-outline-primary my-1">Sauvegarder état du projet</button>
     </form>
     {% else %}

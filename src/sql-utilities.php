@@ -57,6 +57,7 @@ function getSqlQueryString($key, $filters = [])
         'new_etat_workflow' => 'select new_etat_workflow(:id_workflow, :description)',
         'new_dossier_log' => 'insert into logs_dossiers(id_dossier, id_utilisateur, nom_action, desc_action) values (:id_dossier, :id_author, :nom_action, :desc_action)',
         'new_input_formulaire' => 'select new_input_formulaire(:id_template, :input_type, :input_description, :input_choices, :input_html_attributes)',
+        'new_reponse_formulaire_dossier' => 'insert into reponses_formulaire_produit (id_dossier, id_input, value_reponse) values (:id_dossier, :id_input, :value_reponse)',
         // get
         'get_commercial' => 'select c.*, co.* from commerciaux c, coordonnees co where co.id_coordonnees = c.id_coordonnees and id_personne = :uid',
         'get_fournisseur' => 'select f.*, c.* from fournisseurs f, coordonnees c where f.id_coordonnees = c.id_coordonnees and id_personne = :uid',
@@ -71,7 +72,7 @@ function getSqlQueryString($key, $filters = [])
         'get_etats_workflow_where_produit' =>  buildSelectQuery('etats_workflow a, produits b', [], ['b.id_produit = :id_produit', 'b.id_workflow = a.id_workflow'], 'order by a.order_etat'),
         'get_etat_workflow' => 'select * from etats_workflow where id_etat = :id_etat',
         'get_reponses_formulaire_dossier' => buildSelectQuery('reponses_formulaire_produit', [], ['id_dossier = :id_dossier']),
-        'get_inputs_formulaire' => 'select b.* from produits a, input_template_formulaire_produit b where a.id_produit = :id_produit and b.id_template = a.id_template_formulaire order by b.input_order',
+        'get_inputs_formulaire' => 'select b.*, (select c.value_reponse from reponses_formulaire_produit c where b.id_input = c.id_input) value_reponse from produits a, input_template_formulaire_produit b where a.id_produit = :id_produit and b.id_template = a.id_template_formulaire order by b.input_order',
         'get_inputs_formulaire_where_id_template' => 'select * from input_template_formulaire_produit where id_template = :id_template order by input_order',
         'get_workflow' => buildSelectQuery("workflows", [], ['id_workflow = :id_workflow']),
         'get_workflows_where_id_fournisseur' => buildSelectQuery("workflows", [], ['id_fournisseur = :id_fournisseur']),
@@ -100,6 +101,7 @@ function getSqlQueryString($key, $filters = [])
         'uid_from_primary_email' => 'select id_personne from personnes where email = :email',
         'check_mime_type' => 'select description from _enum_mime_type where description = :mime_type',
         'count_file' => 'select count(*) from fichiers where file_name = :file_name',
+        'delete_reponses_formulaire_produit' => 'delete from reponses_formulaire_produit where id_dossier = :id_dossier',
     ][$key] . $filter_str;
 }
 
@@ -136,13 +138,13 @@ function getPDO()
     return $db;
 }
 
-function runFile($filename, $sqlDir = __DIR__ . '/sql/')
+function runFile($filename, $sqlDir = __DIR__ . '/sql')
 {
     $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . ' ' . $_ENV['db_name'] . ' --default-character-set=utf8';
     // echo $connexion_string . "\n";
 
     echo "--- $filename ---\n";
-    $tmpString = file_get_contents($sqlDir . $filename);
+    $tmpString = file_get_contents($sqlDir . '/' . $filename);
     $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
 
     $temp = tmpfile();
