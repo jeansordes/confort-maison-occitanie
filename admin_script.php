@@ -20,7 +20,8 @@ function del_tree($dir)
     }
 }
 
-function save_db_dump($archivePath) {
+function save_db_dump($archivePath)
+{
     try {
         $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
         $dump->start($archivePath . '/db_dump.sql');
@@ -31,6 +32,25 @@ function save_db_dump($archivePath) {
     } catch (\Exception $e) {
         echo 'mysqldump-php error: ' . $e->getMessage();
     }
+}
+
+function restore_last_db_dump()
+{
+    $folderList = glob('archives/archive-*');
+
+    // get last folder in alphabetical order
+    $i = 1;
+    do {
+        $folder = $folderList[count($folderList) - $i];
+        $i++;
+    } while (is_file($folder) && $i < count($folderList));
+
+    // execute db_dump.sql
+    runFile('wipe_database.sql');
+    runFile('db_dump.sql', __DIR__ . '/' . $folder);
+    runFile('init_fn.sql');
+
+    return $folder;
 }
 
 $scripts = [
@@ -69,6 +89,13 @@ $scripts = [
         }
     ],
     [
+        'restore last db_dump.sql',
+        function () {
+            $folder = restore_last_db_dump();
+            echo $folder . " restored\n";
+        }
+    ],
+    [
         'clear the TWIG cache folder',
         function () {
             del_tree(__DIR__ . "/src/templates/cache");
@@ -102,27 +129,15 @@ $scripts = [
     [
         'DANGER ZONE : wipe clean everything (db + uploads), then restore last archive',
         function () {
-            $folderList = glob('archives/archive-*');
-
-            // get last folder in alphabetical order
-            $i = 1;
-            do {
-                $folder = $folderList[count($folderList) - $i];
-                $i++;
-            } while (is_file($folder) && $i < count($folderList));
-
-            echo $folder . "\n";
-
+            $folder = restore_last_db_dump();
+            
             // replace "uploads" with a copy from the archive
             if (is_dir('uploads')) {
                 deleteNonEmptyFolder('uploads');
             }
             recurseCopy($folder . '/uploads', 'uploads');
-
-            // execute db_dump.sql
-            runFile('wipe_database.sql');
-            runFile('db_dump.sql', __DIR__ . '/' . $folder);
-            runFile('init_fn.sql');
+            
+            echo $folder . " restored\n";
         }
     ],
 ];
