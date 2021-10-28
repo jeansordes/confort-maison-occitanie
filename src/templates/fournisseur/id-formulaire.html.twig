@@ -1,112 +1,95 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %} Formulaire « {{ formulaire.nom_template }} » {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
 
-{% block title %}
-	Formulaire «
-	{{ formulaire.nom_template }}
-	»
-{% endblock %}
-
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-
-		<nav aria-label="breadcrumb bg-white">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
+    <nav aria-label="breadcrumb bg-white">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if is_admin %}
+            <li class="breadcrumb-item">
+                <a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
 							{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
 							(fournisseur)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item active">Template formulaire #{{ formulaire.id_template }}
-					«
-					{{ formulaire.nom_template }}
-					»</li>
-			</ol>
-		</nav>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item active">Template formulaire #{{ formulaire.id_template }} « {{ formulaire.nom_template }} »
+            </li>
+        </ol>
+    </nav>
 
-		<div class="d-none" data-js-selector="input_option_template">
-			{% block inputOption %}
-				<div class="input-group mb-3">
-					<div class="input-group-text">
-						<input class="form-check-input mt-0" type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" disabled>
-					</div>
-					<input type="text" class="form-control" name="inputs[{{ input.id_input }}][input_choices][]" value="{{ choice }}">
-					<button class="btn btn-danger" data-js-selector="delete_input_option">
+    <div class="d-none" data-js-selector="input_option_template">
+        {% block inputOption %}
+        <div class="input-group mb-3">
+            <div class="input-group-text">
+                <input class="form-check-input mt-0" type="{{ input.input_type == 'options_radio' ? 'radio' : 'checkbox' }}" disabled>
+            </div>
+            <input type="text" class="form-control" name="inputs[{{ input.id_input }}][input_choices][]" value="{{ choice }}">
+            <button class="btn btn-danger" data-js-selector="delete_input_option">
 						<i class="material-icons">delete</i>
 					</button>
-				</div>
-			{% endblock %}
-		</div>
-		<div class="d-none" data-js-selector="input_template">
-			{% block input %}
-				<div class="col-4">
-					<div class="border bg-light rounded px-4 py-3" data-input-id="{{ input.id_input }}">
-						<div class="mb-3">
-							<label class="form-label">Description du champs</label>
-							<input name="inputs[{{ input.id_input }}][input_description]" value="{{ input.input_description }}" type="text" class="form-control"/>
-						</div>
+        </div>
+        {% endblock %}
+    </div>
+    <div class="d-none" data-js-selector="input_template">
+        {% block input %}
+        <div class="col-4">
+            <div class="border bg-light rounded px-4 py-3" data-input-id="{{ input.id_input }}">
+                <div class="mb-3">
+                    <label class="form-label">Description du champs</label>
+                    <input name="inputs[{{ input.id_input }}][input_description]" value="{{ input.input_description }}" type="text" class="form-control" />
+                </div>
 
-						<div class="mb-3">
-							<label class="form-label">Type de champs</label>
-							<select name="inputs[{{ input.id_input }}][input_type]" class="form-control form-select" data-js-selector='input_type_select'>
+                <div class="mb-3">
+                    <label class="form-label">Type de champs</label>
+                    <select name="inputs[{{ input.id_input }}][input_type]" class="form-control form-select" data-js-selector='input_type_select'>
 								<option value="" {{ input.input_type=='' ? 'selected' : '' }}></option>
 
 								{% for input_type in input_types %}
 									<option value="{{ input_type.description }}" {{ input.input_type==input_type.description ? 'selected' : '' }}>{{ input_type.description }}</option>
 								{% endfor %}
 							</select>
-						</div>
+                </div>
 
 
-						<div data-js-selector="input_options" class="mb-3 border rounded bg-white p-3 {{ (input.input_type == 'options_radio' or input.input_type == 'options_checkbox') ? '' : 'd-none'}}">
-							<label class="form-label d-block">Liste des choix possibles</label>
-							{% for choice in input.input_choices %}
-								{{ block('inputOption') }}
-							{% endfor %}
-							<button class="btn btn-outline-secondary" data-js-selector="add_input_option">Ajouter option</button>
-						</div>
+                <div data-js-selector="input_options" class="mb-3 border rounded bg-white p-3 {{ (input.input_type == 'options_radio' or input.input_type == 'options_checkbox') ? '' : 'd-none'}}">
+                    <label class="form-label d-block">Liste des choix possibles</label> {% for choice in input.input_choices %} {{ block('inputOption') }} {% endfor %}
+                    <button class="btn btn-outline-secondary" data-js-selector="add_input_option">Ajouter option</button>
+                </div>
 
-						<div class="mb-3">
-							<label class="form-label">Attributs HTML (optionel)</label>
-							<textarea name="inputs[{{ input.id_input }}][input_html_attributes]" type="text" rows="1" class="form-control">{{ input.input_html_attributes }}</textarea>
-						</div>
+                <div class="mb-3">
+                    <label class="form-label">Attributs HTML (optionel)</label>
+                    <textarea name="inputs[{{ input.id_input }}][input_html_attributes]" type="text" rows="1" class="form-control">{{ input.input_html_attributes }}</textarea>
+                </div>
 
-						<button class="btn btn-outline-danger" data-js-selector="delete_input">Supprimer le champs</button>
-					</div>
-				</div>
-			{% endblock %}
-		</div>
+                <button class="btn btn-outline-danger" data-js-selector="delete_input">Supprimer le champs</button>
+            </div>
+        </div>
+        {% endblock %}
+    </div>
 
-		<form action="{{ current_url }}" method="POST" id="etats_formulaire" class="container-fluid p-0">
-			<div class="mb-2 row">
-				<div class="col-12">
-					<label class="form-label" for="input_nom_template">Nom du formulaire</label>
-					<input name="nom_template" id="input_nom_template" value="{{ formulaire.nom_template }}" type="text" class="form-control"/>
-				</div>
-			</div>
-			<div class="row my-3 g-3">
-				{% if formulaire_inputs|length > 0 %}
-					{% for input in formulaire_inputs %}
-						{{ block('input') }}
-					{% endfor %}
-				{% endif %}
-				<div class="col-12">
-					<button class="btn btn-outline-primary" data-js-selector="add_input">
+    <form action="{{ current_url }}" method="POST" id="etats_formulaire" class="container-fluid p-0">
+        <div class="mb-2 row">
+            <div class="col-12">
+                <label class="form-label" for="input_nom_template">Nom du formulaire</label>
+                <input name="nom_template" id="input_nom_template" value="{{ formulaire.nom_template }}" type="text" class="form-control" />
+            </div>
+        </div>
+        <div class="row my-3 g-3">
+            {% if formulaire_inputs|length > 0 %} {% for input in formulaire_inputs %} {{ block('input') }} {% endfor %} {% endif %}
+            <div class="col-12">
+                <button class="btn btn-outline-primary" data-js-selector="add_input">
 						<i class="material-icons">add</i>
 						Ajouter un champs</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<button class="btn btn-primary">Enregistrer formulaire</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<script src="{{ base_url }}/public/js/form_template_editor.js"></script>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary">Enregistrer formulaire</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="{{ base_url }}/public/js/form_template_editor.js"></script>
 {% endblock %}

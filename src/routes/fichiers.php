@@ -27,8 +27,8 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
         // see http://php.net/manual/en/function.random-bytes.php
         $filename .= '-' . bin2hex(random_bytes(5)) . '.' . $path_infos['extension'];
 
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('count_file'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('count_file'));
         $req->execute(['file_name' => $filename]);
         $count = $req->fetchColumn();
         // vérifier que le nom de fichier n'existe pas déjà en BDD
@@ -39,11 +39,11 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
     return $filename;
 }
 
-$app->get('/f/{idFichier}/toggle-trash', function (Request $request, Response $response, array $args): Response {
+$app->get('/f/{id_fichier}/toggle-trash', function (Request $request, Response $response, array $args): Response {
     // récupérer infos sur dossier
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('get_dossier_from_fichier'));
-    $req->execute(['id_fichier' => $args['idFichier']]);
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('get_dossier_from_fichier'));
+    $req->execute(['id_fichier' => $args['id_fichier']]);
     if ($req->rowCount() == 0) {
         throw new \Exception("Ce dossier n'existe pas");
     }
@@ -56,11 +56,11 @@ $app->get('/f/{idFichier}/toggle-trash', function (Request $request, Response $r
     }
 
     // changer l'état du fichier
-    $req = $db->prepare(getSqlQueryString('toggle_fichier_trash'));
-    $req->execute(['id_fichier' => $args['idFichier']]);
+    $req = $db->prepare(get_sql_query_string('toggle_fichier_trash'));
+    $req->execute(['id_fichier' => $args['id_fichier']]);
 
     // ajouter l'événement aux logs
-    $req = $db->prepare(getSqlQueryString('new_dossier_log'));
+    $req = $db->prepare(get_sql_query_string('new_dossier_log'));
     $req->execute([
         'id_dossier' => $dossier['id_dossier'],
         'id_author' => $_SESSION['current_user']['uid'],
@@ -73,12 +73,12 @@ $app->get('/f/{idFichier}/toggle-trash', function (Request $request, Response $r
     return $response->withRedirect('/d/' . $dossier['id_dossier']);
 });
 
-$app->get('/f/{idFichier}/rotate-{orientation:left|right}', function (Request $request, Response $response, array $args): Response {
+$app->get('/f/{id_fichier}/rotate-{orientation:left|right}', function (Request $request, Response $response, array $args): Response {
 
     // récupérer infos sur dossier
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('get_dossier_from_fichier'));
-    $req->execute(['id_fichier' => $args['idFichier']]);
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('get_dossier_from_fichier'));
+    $req->execute(['id_fichier' => $args['id_fichier']]);
     if ($req->rowCount() == 0) {
         throw new \Exception("Ce dossier n'existe pas");
     }

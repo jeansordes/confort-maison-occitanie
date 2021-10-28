@@ -1,78 +1,68 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Produit « {{ produit.nom_produit }} » {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
 
-{% block title %}Produit «
-	{{ produit.nom_produit }}
-	»
-{% endblock %}
-
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-
-		<nav aria-label="breadcrumb bg-white">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
+    <nav aria-label="breadcrumb bg-white">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if is_admin %}
+            <li class="breadcrumb-item">
+                <a href="/admin/f/{{ fournisseur.id_personne }}" class="fw-bold">
 							{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
 							(fournisseur)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item active">Produit #{{ produit.id_produit }}
-					«
-					{{ produit.nom_produit }}
-					»</li>
-			</ol>
-		</nav>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item active">Produit #{{ produit.id_produit }} « {{ produit.nom_produit }} »
+            </li>
+        </ol>
+    </nav>
 
-		<div class="row">
-			<div
-				class="col-12 col-md-3">
-				<!-- Informations produit -->
-				<h4>Informations produit</h4>
-				<form method="post" class="mb-5">
-					<input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
-					<div class="mb-2">
-						<label class="form-label">Nom du produit</label>
-						<input name="nom_produit" value="{{ produit.nom_produit }}" type="text" class="form-control"/>
-					</div>
-					<div class="mb-2">
-						<label class="form-label">Description du produit</label>
-						<textarea class="form-control" name="description_produit" rows="5">{{ produit.description_produit }}</textarea>
-					</div>
-					<div class="mb-2">
-						<div class="mb-2">
-							<label class="form-label">Formulaire à compléter</label>
-							<select name="id_template_formulaire" class="form-control form-select">
+    <div class="row">
+        <div class="col-12 col-md-3">
+            <!-- Informations produit -->
+            <h4>Informations produit</h4>
+            <form method="post" class="mb-5">
+                <input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
+                <div class="mb-2">
+                    <label class="form-label">Nom du produit</label>
+                    <input name="nom_produit" value="{{ produit.nom_produit }}" type="text" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Description du produit</label>
+                    <textarea class="form-control" name="description_produit" rows="5">{{ produit.description_produit }}</textarea>
+                </div>
+                <div class="mb-2">
+                    <div class="mb-2">
+                        <label class="form-label">Formulaire à compléter</label>
+                        <select name="id_template_formulaire" class="form-control form-select">
 								<option value="" {{ produit.id_template_formulaire=='' ? 'selected' : '' }}></option>
 								{% for template in templates %}
 									<option value="{{ template.id_template }}" {{ produit.id_template_formulaire == template.id_template ? 'selected' : '' }}>{{ template.nom_template }}</option>
 								{% endfor %}
 							</select>
-						</div>
-					</div>
-					<div class="mb-2">
-						<div class="mb-2">
-							<label class="form-label">Workflow du produit</label>
-							<select name="id_workflow" class="form-control form-select">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="mb-2">
+                        <label class="form-label">Workflow du produit</label>
+                        <select name="id_workflow" class="form-control form-select">
 								<option value="" {{ produit.id_workflow=='' ? 'selected' : '' }}></option>
 								{% for workflow in workflows %}
 									<option value="{{ workflow.id_workflow }}" {{ produit.id_workflow == workflow.id_workflow ? 'selected' : '' }}>{{ workflow.nom_workflow }}</option>
 								{% endfor %}
 							</select>
-						</div>
-					</div>
-					<button class="btn btn-primary">Enregistrer produit</button>
-				</form>
-			</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Enregistrer produit</button>
+            </form>
+        </div>
 
-			<div class="col-12 col-md-9">
-				<h4>Dossiers correspondants à ce produit</h4>
-				{% include "components/liste-dossiers.html.twig" %}
-			</div>
-		</div>
-	</div>
+        <div class="col-12 col-md-9">
+            <h4>Dossiers correspondants à ce produit</h4>
+            {% include "components/liste-dossiers.html.twig" %}
+        </div>
+    </div>
+</div>
 {% endblock %}

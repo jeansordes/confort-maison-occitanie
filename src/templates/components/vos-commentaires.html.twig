@@ -1,13 +1,12 @@
 <div class="card mb-3">
-	<div class="card-header">Vos commentaires
-		{{ about }}</div>
-	<form method="post" action="{{ current_url }}/comment" class="card-body" id="commentForm" autocomplete="off">
-		<textarea name="comment" type="text" class="form-control mb-3">{{ comment }}</textarea>
-		<button class="btn btn-primary d-block">Enregistrer votre commentaire</button>
-		<small class="text-muted fst-italic">Remarque :
+    <div class="card-header">Vos commentaires {{ about }}</div>
+    <form method="post" action="{{ current_url }}/comment" class="card-body" id="commentForm" autocomplete="off">
+        <textarea name="comment" type="text" class="form-control mb-3">{{ comment }}</textarea>
+        <button class="btn btn-primary d-block">Enregistrer votre commentaire</button>
+        <small class="text-muted fst-italic">Remarque :
 			<code>ctrl+enter</code>
 			marche aussi</small>
-	</form>
-	<small class="card-footer text-muted">Ce commentaire est accessible/modifiable par vous et
-		{{ isAdmin ? 'le commercial' : 'les administrateurs' }}</small>
+    </form>
+    <small class="card-footer text-muted">Ce commentaire est accessible/modifiable par vous et
+		{{ is_admin ? 'le commercial' : 'les administrateurs' }}</small>
 </div>

@@ -22,8 +22,8 @@ $app->post('/password-edit', function (Request $request, Response $response, arr
         alert('Votre mot de passe doit contenir au moins 8 caractères', 2);
         return $response->withRedirect($request->getUri()->getPath());
     } else {
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('update_pwd'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('update_pwd'));
         $req->execute([
             "uid" => $_SESSION["current_user"]["uid"],
             "new_password_hash" => password_hash($_POST['password1'], PASSWORD_BCRYPT, ['cost' => 12]),

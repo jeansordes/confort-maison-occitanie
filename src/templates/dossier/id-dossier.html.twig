@@ -7,7 +7,7 @@
             <li class="breadcrumb-item">
                 <a href="/">Accueil</a>
             </li>
-            {% if isAdmin %}
+            {% if is_admin %}
             <li class="breadcrumb-item">
                 <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %}
 							(commercial)</a>
@@ -26,11 +26,11 @@
         <div>
             <h4 class="mb-0 mt-3">Dossier #{{ dossier.id_dossier }}, « {{ dossier.nom_produit }} »
             </h4>
-            <p class="text-muted">Ce produit est fourni par « {% if isAdmin %}
+            <p class="text-muted">Ce produit est fourni par « {% if is_admin %}
                 <a href="/admin/f/{{ fournisseur.id_personne }}">
 						{% endif %}
 						{% include 'components/titre-personne.html.twig' with { personne: fournisseur, personne_role: 'fournisseur' } %}
-						{% if isAdmin %}
+						{% if is_admin %}
 						</a> {% endif %} »
             </p>
         </div>

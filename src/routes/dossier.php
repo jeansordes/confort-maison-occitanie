@@ -9,12 +9,12 @@ require_once 'commercial.php';
 /**
  * Renvoie soit le dossier soit une exception dans le cas où l'utilisateur n'a pas le droit de consulter le dossier
  */
-function is_user_allowed__dossier($idDossier)
+function is_user_allowed__dossier($id_dossier)
 {
     // récupérer infos sur dossier
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('get_dossier'));
-    $req->execute(['id_dossier' => $idDossier]);
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('get_dossier'));
+    $req->execute(['id_dossier' => $id_dossier]);
     if ($req->rowCount() == 0) {
         throw new \Exception("Ce dossier n'existe pas");
     }
@@ -30,27 +30,27 @@ function is_user_allowed__dossier($idDossier)
 
 function getDossierUtilities()
 {
-    $db = getPDO();
+    $db = get_pdo();
     // récupérer tous les commerciaux
-    $commerciaux_from_db = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+    $commerciaux_from_db = $db->query(get_sql_query_string('tous_commerciaux'))->fetchAll();
     $commerciaux = [];
     foreach ($commerciaux_from_db as $commercial) {
         $commerciaux[$commercial['id_personne']] = $commercial;
     }
     // récupérer tous les clients
-    $clients_from_db = $db->query(getSqlQueryString('tous_clients'))->fetchAll();
+    $clients_from_db = $db->query(get_sql_query_string('tous_clients'))->fetchAll();
     $clients = [];
     foreach ($clients_from_db as $client) {
         $clients[$client['id_personne']] = $client;
     }
     // récupérer tous les etats_dossier
-    $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
+    $etats_from_db = $db->query(get_sql_query_string('tous_etats_workflow'))->fetchAll();
     $etats_dossier = [];
     foreach ($etats_from_db as $etat) {
         $etats_dossier[$etat['id_etat']] = $etat['description'];
     }
     // récupérer tous les etats_workflow
-    $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
+    $etats_from_db = $db->query(get_sql_query_string('tous_etats_workflow'))->fetchAll();
     $etats_workflow = [];
     foreach ($etats_from_db as $etat) {
         $etats_workflow[$etat['id_etat']] = $etat['description'];
@@ -64,39 +64,39 @@ function getDossierUtilities()
     ];
 }
 
-# /{idDossier}
-$app->group('/d/{idDossier}', function (App $app) {
+# /{id_dossier}
+$app->group('/d/{id_dossier}', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         // récupérer infos sur commercial
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $dossier['id_commercial']]);
         $commercial = $req->fetch();
         // récupérer infos sur fournisseur
-        $req = $db->prepare(getSqlQueryString('get_fournisseur'));
+        $req = $db->prepare(get_sql_query_string('get_fournisseur'));
         $req->execute(['uid' => $dossier['id_fournisseur']]);
         $fournisseur = $req->fetch();
         // récupérer infos sur client
-        $req = $db->prepare(getSqlQueryString('get_client'));
+        $req = $db->prepare(get_sql_query_string('get_client'));
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
 
         // récupérer liste des fichiers
-        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
+        $req = $db->prepare(get_sql_query_string('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['id_dossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // récupérer id_workflow du produit
-        $req = $db->prepare(getSqlQueryString('get_etats_workflow_where_produit'));
+        $req = $db->prepare(get_sql_query_string('get_etats_workflow_where_produit'));
         $req->execute(['id_produit' => $dossier['id_produit']]);
         $etats = $req->fetchAll();
 
         // récupérer liste des logs
-        $req = $db->prepare(getSqlQueryString('get_logs_dossiers'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
+        $req = $db->prepare(get_sql_query_string('get_logs_dossiers'));
+        $req->execute(['id_dossier' => $args['id_dossier']]);
         $logs = $req->fetchAll();
 
         $events = [];
@@ -119,7 +119,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         krsort($events);
 
         // récupérer le formulaire
-        $req = $db->prepare(getSqlQueryString('get_inputs_formulaire'));
+        $req = $db->prepare(get_sql_query_string('get_inputs_formulaire'));
         $req->execute(['id_produit' => $dossier['id_produit']]);
         $formulaire_inputs = $req->fetchAll();
         foreach ($formulaire_inputs as $k => $input) {
@@ -131,8 +131,8 @@ $app->group('/d/{idDossier}', function (App $app) {
         }
 
         // récupérer les réponses du formulaire
-        $req = $db->prepare(getSqlQueryString('get_reponses_formulaire_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier']]);
+        $req = $db->prepare(get_sql_query_string('get_reponses_formulaire_dossier'));
+        $req->execute(['id_dossier' => $args['id_dossier']]);
         $reponses_formulaire = $req->fetchAll();
 
         return $response->write($this->view->render(
@@ -153,14 +153,14 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /zip
     $app->get('/zip', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         $uploadFolder = realpath(__DIR__ . '/../../uploads');
 
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 0]);
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['id_dossier'], 'in_trash' => 0]);
         $fichiers = $req->fetchAll();
 
         // création du fichier zip
@@ -200,7 +200,7 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /changer-etat
     $app->post('/changer-etat', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         $missing_fields_message = get_form_missing_fields_message(['etat'], $_POST);
@@ -209,8 +209,8 @@ $app->group('/d/{idDossier}', function (App $app) {
             return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
         }
         // vérifier que l'état correspond bien au produit
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_etat_workflow'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_etat_workflow'));
         $req->execute(['id_etat' => $_POST['etat']]);
         if ($req->rowCount() == 0) {
             alert("État inconnu", 3);
@@ -218,15 +218,15 @@ $app->group('/d/{idDossier}', function (App $app) {
         }
 
         // update etat dossier
-        $req = $db->prepare(getSqlQueryString('update_etat_dossier'));
+        $req = $db->prepare(get_sql_query_string('update_etat_dossier'));
         $req->execute([
             'id_nouvel_etat' => $_POST['etat'],
-            'id_dossier' => $args['idDossier'],
+            'id_dossier' => $args['id_dossier'],
             'id_author' => $_SESSION['current_user']['uid'],
         ]);
 
         // envoyer une notification aux personnes concernés
-        sendEmail(
+        send_email(
             $this,
             $response,
             [],
@@ -243,15 +243,15 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
     # /new-fichier
     $app->get('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
         // get client
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_client'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_client'));
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
         // get commercial
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $dossier['id_commercial']]);
         $commercial = $req->fetch();
         return $response->write($this->view->render('dossier/new-file.html.twig', [
@@ -261,7 +261,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         ]));
     });
     $app->post('/new-fichier', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         // récupérer la date d'upload du dernier fichier avant qu'on upload un nouveau fichier
@@ -277,8 +277,8 @@ $app->group('/d/{idDossier}', function (App $app) {
         $filename = moveUploadedFile($directory, $uploadedFile);
         $mime_type = mime_content_type($directory . DIRECTORY_SEPARATOR . $filename);
         // check mime type
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('check_mime_type'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('check_mime_type'));
         $req->execute(['mime_type' => $mime_type]);
         if ($req->rowCount() == 0) {
             throw new \Exception("Ce type de fichier n'est pas accepté");
@@ -307,11 +307,11 @@ $app->group('/d/{idDossier}', function (App $app) {
         file_put_contents($directory . "/preview/" . $filename . ".png", $img_data, FILE_USE_INCLUDE_PATH);
 
         // register file in the DB
-        $req = $db->prepare(getSqlQueryString('new_fichier_dossier'));
+        $req = $db->prepare(get_sql_query_string('new_fichier_dossier'));
         $req->execute([
             "file_name" => $filename,
             "mime_type" => $mime_type,
-            "id_dossier" => $args['idDossier'],
+            "id_dossier" => $args['id_dossier'],
         ]);
 
         // récupérer la date d'upload du nouveau fichier
@@ -320,7 +320,7 @@ $app->group('/d/{idDossier}', function (App $app) {
         // OU si la date actuelle et la date du dernier fichier sont suffisament espacées (2 minutes) alors envoyer une notification
         if (empty($date_dernier_fichier) || (abs($date_nouveau_fichier->getTimestamp() - (new DateTime($date_dernier_fichier))->getTimestamp()) / 60) > 2) {
             // envoyer une notification aux personnes concernés
-            sendEmail(
+            send_email(
                 $this,
                 $response,
                 [],
@@ -336,24 +336,24 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
 
     $app->post('/new-comment', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         if (empty($_POST['comment'])) {
             alert('Vous ne pouvez pas créer un commentaire vide', 2);
             return $response->withRedirect($request->getUri()->getPath() . '/..');
         }
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('new_dossier_log'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('new_dossier_log'));
         $req->execute([
-            'id_dossier' => $args['idDossier'],
+            'id_dossier' => $args['id_dossier'],
             'id_author' => $_SESSION['current_user']['uid'],
             'nom_action' => 'Nouveau commentaire',
             'desc_action' => $_POST['comment'],
         ]);
 
         // envoyer une notification aux personnes concernés
-        sendEmail(
+        send_email(
             $this,
             $response,
             [],
@@ -370,21 +370,21 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
 
     $app->get('/corbeille', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         // récupérer infos sur commercial
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $dossier['id_commercial']]);
         $commercial = $req->fetch();
         // récupérer infos sur client
-        $req = $db->prepare(getSqlQueryString('get_client'));
+        $req = $db->prepare(get_sql_query_string('get_client'));
         $req->execute(['id_client' => $dossier['id_client']]);
         $client = $req->fetch();
         // récupérer liste des fichiers
-        $req = $db->prepare(getSqlQueryString('tous_fichiers_dossier'));
-        $req->execute(['id_dossier' => $args['idDossier'], 'in_trash' => 1]);
+        $req = $db->prepare(get_sql_query_string('tous_fichiers_dossier'));
+        $req->execute(['id_dossier' => $args['id_dossier'], 'in_trash' => 1]);
         $fichiers = $req->fetchAll();
 
         return $response->write($this->view->render(
@@ -399,19 +399,19 @@ $app->group('/d/{idDossier}', function (App $app) {
     });
 
     $app->post('/form', function (Request $request, Response $response, array $args): Response {
-        $dossier = is_user_allowed__dossier($args['idDossier']);
+        $dossier = is_user_allowed__dossier($args['id_dossier']);
         if ($dossier instanceof \Exception) throw $dossier;
 
         // Remove previous answers
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('delete_reponses_formulaire_produit'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('delete_reponses_formulaire_produit'));
         $req->execute(['id_dossier' => $dossier['id_dossier']]);
 
         foreach ($_POST['inputs'] as $id_input => $input) {
             if (is_array($input)) {
                 $input = join(';', $input);
             }
-            $req = $db->prepare(getSqlQueryString('new_reponse_formulaire_dossier'));
+            $req = $db->prepare(get_sql_query_string('new_reponse_formulaire_dossier'));
             $req->execute([
                 'id_dossier' => $dossier['id_dossier'],
                 'id_input' => $id_input,
@@ -422,4 +422,4 @@ $app->group('/d/{idDossier}', function (App $app) {
         alert('Le formulaire a bien été mis à jour', 1);
         return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
-})->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));
+})->add(fn ($req, $res, $next) => logged_in_slim_middleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

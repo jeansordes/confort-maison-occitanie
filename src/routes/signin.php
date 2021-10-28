@@ -13,8 +13,8 @@ $app->get('/', function (Request $request, Response $response, array $args): Res
 
         // vérifier le token (et récupérer les infos utiles au cas où)
         $payload = jwt_decode($_GET['token']);
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('account_infos_from_uid'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('account_infos_from_uid'));
         $req->execute(['uid' => $payload['uid']]);
         $res = $req->fetch();
         $user_infos = [
@@ -64,8 +64,8 @@ $app->post('/login', function (Request $request, Response $response): Response {
         alert($missing_fields_message, 3);
         return $response->withRedirect($request->getUri()->getPath() . '?' . array_to_url_encoding($_POST));
     }
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('account_infos_from_email'));
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('account_infos_from_email'));
     $req->execute(['email' => $_POST['email']]);
     if ($req->rowCount() == 0) {
         alert("Cet email est inconnu", 3);
@@ -102,8 +102,8 @@ $app->post('/password-reset', function (Request $request, Response $response): R
     }
 
     // faire des tests pour vérifier que l'email renseigné est bien un primary_email
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('uid_from_primary_email'));
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('uid_from_primary_email'));
     $req->execute(['email' => $_POST['email']]);
     if ($req->rowCount() == 0) {
         alert("Cet email nous est inconnu : $_POST[email])", 3);
@@ -112,7 +112,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
 
     $id_user = $req->fetch()['id_personne'];
     // générer un token pour que l'utilisateur puisse réinitialiser son mot de passe
-    $req = $db->prepare(getSqlQueryString('last_settings_update'));
+    $req = $db->prepare(get_sql_query_string('last_settings_update'));
     $req->execute(['uid' => $id_user]);
     if ($req->rowCount() == 0) {
         console_log($id_user);
@@ -126,7 +126,7 @@ $app->post('/password-reset', function (Request $request, Response $response): R
         "uid" => $id_user,
     ], 20);
 
-    sendEmail(
+    send_email(
         $this,
         $response,
         [$_POST['email']],

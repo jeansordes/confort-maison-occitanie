@@ -1,34 +1,29 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Ajouter un client {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
 
-{% block title %}Ajouter un client
-{% endblock %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if is_admin %}
+            <li class="breadcrumb-item">
+                <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item active">Ajouter un client</li>
+        </ol>
+    </nav>
 
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item active">Ajouter un client</li>
-			</ol>
-		</nav>
-
-		<h4 class="mb-3">Ajouter un client</h4>
-		<p class="alert alert-warning">
-			Remarque : aucun des champs ci dessous n'est obligatoire (mais on vous conseille d'au moins mettre le nom et le prénom 😉)
-		</p>
-		<div class="mb-3">
-            <form method="POST">
-                {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Créer ce client', user: client} %}
-            </form>
-		</div>
-	</div>
+    <h4 class="mb-3">Ajouter un client</h4>
+    <p class="alert alert-warning">
+        Remarque : aucun des champs ci dessous n'est obligatoire (mais on vous conseille d'au moins mettre le nom et le prénom 😉)
+    </p>
+    <div class="mb-3">
+        <form method="POST">
+            {% include 'components/personne-details-inputs.html.twig' with {btnText: 'Créer ce client', user: client} %}
+        </form>
+    </div>
+</div>
 {% endblock %}

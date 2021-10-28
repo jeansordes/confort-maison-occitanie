@@ -4,13 +4,13 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-# /{idClient}
-$app->group('/cl/{idClient}', function (App $app) {
+# /{id_client}
+$app->group('/cl/{id_client}', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
-        // récupérer les informations du client idClient
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_client'));
-        $req->execute(['id_client' => $args['idClient']]);
+        // récupérer les informations du client id_client
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_client'));
+        $req->execute(['id_client' => $args['id_client']]);
         if ($req->rowCount() == 0) {
             throw new Exception("Ce client n'existe pas");
         }
@@ -18,9 +18,9 @@ $app->group('/cl/{idClient}', function (App $app) {
         // vérifier si le demandeur a le droit de consulter ce client
         if ($_SESSION['current_user']['user_role'] == 'fournisseur') {
             //     si fournisseur, vérifier qu'il y a des dossiers à afficher
-            // récupérer les contrats du client idClient
-            $req = $db->prepare(getSqlQueryString('tous_dossiers_client_filtre_fournisseur'));
-            $req->execute(['id_client' => $args['idClient'], 'id_fournisseur' => $_SESSION['current_user']['uid']]);
+            // récupérer les contrats du client id_client
+            $req = $db->prepare(get_sql_query_string('tous_dossiers_client_filtre_fournisseur'));
+            $req->execute(['id_client' => $args['id_client'], 'id_fournisseur' => $_SESSION['current_user']['uid']]);
             if ($req->rowCount() == 0) {
                 throw new Exception("Vous n'avez pas la permission d'accéder à ce client");
             }
@@ -32,16 +32,16 @@ $app->group('/cl/{idClient}', function (App $app) {
             || $_SESSION['current_user']['user_role'] == 'admin'
         ) {
             //     commercial propriétaire du client OU admin
-            // récupérer les contrats du client idClient
-            $req = $db->prepare(getSqlQueryString('tous_dossiers_client'));
-            $req->execute(['id_client' => $args['idClient']]);
+            // récupérer les contrats du client id_client
+            $req = $db->prepare(get_sql_query_string('tous_dossiers_client'));
+            $req->execute(['id_client' => $args['id_client']]);
             $dossiers = $req->fetchAll();
         } else {
             throw new Exception("Vous n'avez pas la permission d'accéder à ce client");
         }
 
         // récupérer les infos du commercial
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $client['id_commercial']]);
         $commercial = $req->fetch();
         return $response->write($this->view->render(
@@ -55,8 +55,8 @@ $app->group('/cl/{idClient}', function (App $app) {
     });
 
     $app->post('', function (Request $request, Response $response, array $args): Response {
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('update_personne'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('update_personne'));
         $req->execute([
             'nom_entreprise' => $_POST['nom_entreprise'],
             'numero_entreprise' => $_POST['numero_entreprise'],
@@ -66,9 +66,9 @@ $app->group('/cl/{idClient}', function (App $app) {
             "nom_famille" => $_POST["nom_famille"],
             "civilite" => $_POST["civilite"],
             "email" => $_POST["email"],
-            "id_personne" => $args['idClient'],
+            "id_personne" => $args['id_client'],
         ]);
-        $req = $db->prepare(getSqlQueryString('update_coordonnees'));
+        $req = $db->prepare(get_sql_query_string('update_coordonnees'));
         $req->execute([
             "adresse" => $_POST["adresse"],
             "code_postal" => $_POST["code_postal"],
@@ -76,46 +76,46 @@ $app->group('/cl/{idClient}', function (App $app) {
             "pays" => $_POST["pays"],
             "tel1" => $_POST["tel1"],
             "tel2" => $_POST["tel2"],
-            "id_personne" => $args['idClient'],
+            "id_personne" => $args['id_client'],
         ]);
-        $req = $db->prepare(getSqlQueryString('update_client'));
+        $req = $db->prepare(get_sql_query_string('update_client'));
         $req->execute([
             "infos_client_supplementaires" => $_POST["infos_client_supplementaires"],
-            "id_client" => $args["idClient"],
+            "id_client" => $args["id_client"],
         ]);
 
         alert('Client modifié avec succès 👍', 1);
         return $response->withRedirect($request->getUri()->getPath());
-    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
+    })->add(fn ($req, $res, $next) => logged_in_slim_middleware(['commercial', 'admin'])($req, $res, $next));
 
     # /new-dossier
     $app->get('/new-dossier', function (Request $request, Response $response, array $args): Response {
         // get client
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_client'));
-        $req->execute(['id_client' => $args['idClient']]);
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_client'));
+        $req->execute(['id_client' => $args['id_client']]);
         $client = $req->fetch();
         // get commercial
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $client['id_commercial']]);
         $commercial = $req->fetch();
         return $response->write($this->view->render('dossier/new-dossier.html.twig', [
-            'produits' => getPDO()->query(getSqlQueryString("tous_produits"))->fetchAll(),
+            'produits' => get_pdo()->query(get_sql_query_string("tous_produits"))->fetchAll(),
             'client' => $client,
             'commercial' => $commercial,
         ]));
-    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
+    })->add(fn ($req, $res, $next) => logged_in_slim_middleware(['commercial', 'admin'])($req, $res, $next));
 
     $app->post('/new-dossier', function (Request $request, Response $response, array $args): Response {
         if (empty($_POST['id_produit'])) {
             alert("Vous devez selectionner un produit", 3);
             return $response->withRedirect($request->getUri()->getPath());
         }
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('new_dossier'));
-        $req->execute(['id_client' => $args['idClient'], 'id_produit' => $_POST['id_produit']]);
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('new_dossier'));
+        $req->execute(['id_client' => $args['id_client'], 'id_produit' => $_POST['id_produit']]);
         alert("Le dossier a bien été créé", 1);
-        $idDossier = $req->fetchColumn();
-        return $response->withRedirect('/d/' . $idDossier);
-    })->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin'])($req, $res, $next));
-})->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));
+        $id_dossier = $req->fetchColumn();
+        return $response->withRedirect('/d/' . $id_dossier);
+    })->add(fn ($req, $res, $next) => logged_in_slim_middleware(['commercial', 'admin'])($req, $res, $next));
+})->add(fn ($req, $res, $next) => logged_in_slim_middleware(['commercial', 'admin', 'fournisseur'])($req, $res, $next));

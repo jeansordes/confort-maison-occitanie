@@ -1,36 +1,31 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Fichiers supprimés (corbeille)
-{% endblock %}
-
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} (client)</a>
-				</li>
-				<li class="breadcrumb-item">
-					<a href="/d/{{ dossier.id_dossier }}">«
+{% extends 'base.html.twig' %} {% block title %}Fichiers supprimés (corbeille) {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if is_admin %}
+            <li class="breadcrumb-item">
+                <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item">
+                <a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} (client)</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/d/{{ dossier.id_dossier }}">«
 						{{ dossier.nom_produit }}
 						» (Dossier #{{ dossier.id_dossier }})</a>
-				</li>
-				<li class="breadcrumb-item active">Fichiers supprimés (corbeille)</li>
-			</ol>
-		</nav>
+            </li>
+            <li class="breadcrumb-item active">Fichiers supprimés (corbeille)</li>
+        </ol>
+    </nav>
 
-		<h4 class="mb-4"><i class="material-icons">delete</i> Fichiers supprimés</h4>
+    <h4 class="mb-4"><i class="material-icons">delete</i> Fichiers supprimés</h4>
 
-		<!-- Fichiers -->
-		{% include "components/fichiers.html.twig" with { fichiers: fichiers } %}
-	</div>
+    <!-- Fichiers -->
+    {% include "components/fichiers.html.twig" with { fichiers: fichiers } %}
+</div>
 {% endblock %}

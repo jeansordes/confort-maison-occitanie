@@ -19,8 +19,9 @@ $container['view'] = function ($container) {
 
     $twig->addGlobal('current_url', parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)); // https://stackoverflow.com/a/25944383/5736301
     $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
-    $twig->addGlobal('isAdmin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
-    $twig->addGlobal('isLocalhost', in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1','::1']));
+    $twig->addGlobal('is_admin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
+    $twig->addGlobal('is_localhost', in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1','::1']));
+    $twig->addGlobal('is_dev_mode', !empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev');
 
     $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
     $_SESSION['session_alert'] = null;
@@ -44,9 +45,9 @@ $container['view'] = function ($container) {
 
         foreach ($units as $unit => $val) {
             if ($time < $unit) continue;
-            $numberOfUnits = floor($time / $unit);
+            $number_of_units = floor($time / $unit);
             return ($unit <= 1) ? "à l'instant" :
-                'il y a ' . $numberOfUnits . ' ' . $val . (($numberOfUnits > 1 and $val != 'mois') ? 's' : '');
+                'il y a ' . $number_of_units . ' ' . $val . (($number_of_units > 1 and $val != 'mois') ? 's' : '');
         }
     });
     $twig->addFilter($filter);

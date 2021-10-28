@@ -3,49 +3,49 @@ require_once __DIR__ . '/../vendor/autoload.php';
 (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
 
 // { <nom_requete> : { sql: string, args: array<string> } }
-function getSqlQueryString($key, $filters = [])
+function get_sql_query_string($key, $filters = [])
 {
     $filter_str = "";
 
     return [
         // tous
-        'tous_admins' => buildSelectQuery("admins"),
-        'tous_commerciaux' => buildSelectQuery("commerciaux"),
-        'tous_produits' => buildSelectQuery("produits"),
-        'tous_dossiers' => buildSelectQuery("dossiers_enriched"),
-        'tous_clients' => buildSelectQuery("clients"),
-        'tous_fournisseurs' => buildSelectQuery("fournisseurs"),
-        'tous_roles' => buildSelectQuery('_enum_user_role'),
-        'tous_phases' => buildSelectQuery('_enum_phases_dossier'),
-        'tous_templates' => buildSelectQuery("template_formulaire_produit"),
-        'tous_produits_fournisseur' => buildSelectQuery("produits", [], ["id_fournisseur = :id_fournisseur"]),
-        'tous_dossiers_fournisseur' => buildSelectQuery("dossiers_enriched", [], ["id_fournisseur = :id_fournisseur"]),
-        'tous_dossiers_client' => buildSelectQuery(
+        'tous_admins' => build_select_query("admins"),
+        'tous_commerciaux' => build_select_query("commerciaux"),
+        'tous_produits' => build_select_query("produits"),
+        'tous_dossiers' => build_select_query("dossiers_enriched"),
+        'tous_clients' => build_select_query("clients"),
+        'tous_fournisseurs' => build_select_query("fournisseurs"),
+        'tous_roles' => build_select_query('_enum_user_role'),
+        'tous_phases' => build_select_query('_enum_phases_dossier'),
+        'tous_templates' => build_select_query("template_formulaire_produit"),
+        'tous_produits_fournisseur' => build_select_query("produits", [], ["id_fournisseur = :id_fournisseur"]),
+        'tous_dossiers_fournisseur' => build_select_query("dossiers_enriched", [], ["id_fournisseur = :id_fournisseur"]),
+        'tous_dossiers_client' => build_select_query(
             'dossiers_enriched',
             [],
             ['id_client = :id_client'],
             'order by date_creation desc'
         ),
-        'tous_dossiers_client_filtre_fournisseur' => buildSelectQuery(
+        'tous_dossiers_client_filtre_fournisseur' => build_select_query(
             'dossiers_enriched',
             [],
             ['id_client = :id_client', 'id_fournisseur = :id_fournisseur'],
             'order by date_creation desc'
         ),
-        'tous_fichiers_dossier' => buildSelectQuery(
+        'tous_fichiers_dossier' => build_select_query(
             'fichiers ff, fichiers_dossier fp',
             ['ff.*'],
             ['ff.id_fichier = fp.id_fichier', 'fp.id_dossier = :id_dossier', 'ff.in_trash = :in_trash']
         ),
-        'tous_dossiers_where_produit' => buildSelectQuery('dossiers_enriched', [], ['id_produit = :id_produit']),
-        'tous_dossiers_commercial' => buildSelectQuery(
+        'tous_dossiers_where_produit' => build_select_query('dossiers_enriched', [], ['id_produit = :id_produit']),
+        'tous_dossiers_commercial' => build_select_query(
             'dossiers_enriched',
             [],
             ['id_commercial = :id_commercial'],
             'order by date_creation desc'
         ),
-        'tous_etats_workflow' => buildSelectQuery('etats_workflow'),
-        'tous_input_types' => buildSelectQuery('_enum_input_type'),
+        'tous_etats_workflow' => build_select_query('etats_workflow'),
+        'tous_input_types' => build_select_query('_enum_input_type'),
         // new
         'new_user' => 'select new_user(:user_type, :email, \'\', :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2) new_uid',
         'new_client' => 'select new_client(:id_commercial, :nom_entreprise, :numero_entreprise, :est_un_particulier, :prenom, :nom_famille, :civilite, :adresse, :code_postal, :ville, :pays, :tel1, :tel2, :email)',
@@ -68,16 +68,16 @@ function getSqlQueryString($key, $filters = [])
         'get_logs_dossiers' => 'select * from logs_enriched where id_dossier = :id_dossier order by date_heure desc',
         'get_email' => 'select email from personnes where email = :email',
         'get_user_from_email' => 'select p.email from personnes p, utilisateurs u where p.id_personne = u.id_utilisateur and p.email = :email',
-        'get_etats_where_workflow' => buildSelectQuery('etats_workflow', [], ['id_workflow = :id_workflow'], 'order by order_etat'),
-        'get_etats_workflow_where_produit' =>  buildSelectQuery('etats_workflow a, produits b', [], ['b.id_produit = :id_produit', 'b.id_workflow = a.id_workflow'], 'order by a.order_etat'),
+        'get_etats_where_workflow' => build_select_query('etats_workflow', [], ['id_workflow = :id_workflow'], 'order by order_etat'),
+        'get_etats_workflow_where_produit' =>  build_select_query('etats_workflow a, produits b', [], ['b.id_produit = :id_produit', 'b.id_workflow = a.id_workflow'], 'order by a.order_etat'),
         'get_etat_workflow' => 'select * from etats_workflow where id_etat = :id_etat',
-        'get_reponses_formulaire_dossier' => buildSelectQuery('reponses_formulaire_produit', [], ['id_dossier = :id_dossier']),
+        'get_reponses_formulaire_dossier' => build_select_query('reponses_formulaire_produit', [], ['id_dossier = :id_dossier']),
         'get_inputs_formulaire' => 'select b.*, (select c.value_reponse from reponses_formulaire_produit c where b.id_input = c.id_input) value_reponse from produits a, input_template_formulaire_produit b where a.id_produit = :id_produit and b.id_template = a.id_template_formulaire order by b.input_order',
         'get_inputs_formulaire_where_id_template' => 'select * from input_template_formulaire_produit where id_template = :id_template order by input_order',
-        'get_workflow' => buildSelectQuery("workflows", [], ['id_workflow = :id_workflow']),
-        'get_workflows_where_id_fournisseur' => buildSelectQuery("workflows", [], ['id_fournisseur = :id_fournisseur']),
-        'get_formulaires_where_id_fournisseur' => buildSelectQuery("template_formulaire_produit", [], ['id_fournisseur = :id_fournisseur']),
-        'get_template_formulaire' => buildSelectQuery("template_formulaire_produit", [], ['id_template = :id_template']),
+        'get_workflow' => build_select_query("workflows", [], ['id_workflow = :id_workflow']),
+        'get_workflows_where_id_fournisseur' => build_select_query("workflows", [], ['id_fournisseur = :id_fournisseur']),
+        'get_formulaires_where_id_fournisseur' => build_select_query("template_formulaire_produit", [], ['id_fournisseur = :id_fournisseur']),
+        'get_template_formulaire' => build_select_query("template_formulaire_produit", [], ['id_template = :id_template']),
         'get_last_fichier_dossier' => 'select a.* from fichiers a, fichiers_dossier b where a.id_fichier = b.id_fichier and b.id_dossier = :id_dossier order by a.updated_at desc limit 1',
         // update
         'update_produit' => 'update produits set nom_produit = :nom_produit, description_produit = :description_produit, id_template_formulaire = nullif(:id_template_formulaire,\'\'), id_workflow = nullif(:id_workflow,\'\') where id_produit = :id_produit',
@@ -105,7 +105,7 @@ function getSqlQueryString($key, $filters = [])
     ][$key] . $filter_str;
 }
 
-function filtersToWhereClause($filters) {
+function filters_to_where_clause($filters) {
     $output = [];
     foreach ($filters as $filter_name => $filter) {
         $output[] = $filter_name . ' in (' . join(',', $filter) . ')';
@@ -113,12 +113,12 @@ function filtersToWhereClause($filters) {
     return '(' . join(') and (', $output) . ')';
 }
 
-function buildSelectQuery($table, $fields = [], $where = [], $options = "")
+function build_select_query($table, $fields = [], $where = [], $options = "")
 {
     return 'select ' . (count($fields) > 0 ? join(", ", $fields) : "*") . " from " . $table . (count($where) > 0 ? (" where " . join(" and ", $where)) : "") . ' ' . $options;
 }
 
-function getPDO()
+function get_pdo()
 {
     try {
         $db = new \PDO(
@@ -138,7 +138,7 @@ function getPDO()
     return $db;
 }
 
-function runFile($filename, $sqlDir = __DIR__ . '/sql')
+function run_file($filename, $sqlDir = __DIR__ . '/sql')
 {
     $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . ' ' . $_ENV['db_name'] . ' --default-character-set=utf8';
     // echo $connexion_string . "\n";

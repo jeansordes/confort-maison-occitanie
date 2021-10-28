@@ -1,48 +1,43 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Ajouter un dossier {% endblock %} {% block body %}
+<div class="container">
+    {% include 'components/connected-as.html.twig' %}
 
-{% block title %}Ajouter un dossier
-{% endblock %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 px-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="/">Accueil</a>
+            </li>
+            {% if is_admin %}
+            <li class="breadcrumb-item">
+                <a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item">
+                <a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} (client)</a>
+            </li>
+            <li class="breadcrumb-item active">Ajouter un dossier</li>
+        </ol>
+    </nav>
 
-{% block body %}
-	<div class="container">
-		{% include 'components/connected-as.html.twig' %}
-
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb bg-light p-2 px-3 rounded">
-				<li class="breadcrumb-item">
-					<a href="/">Accueil</a>
-				</li>
-				{% if isAdmin %}
-					<li class="breadcrumb-item">
-						<a title="Commercial #{{ commercial.id_personne }}" href="/admin/co/{{ commercial.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: commercial, personne_role: 'commercial' } %} (commercial)</a>
-					</li>
-				{% endif %}
-				<li class="breadcrumb-item">
-					<a title="Client #{{ client.id_personne }}" href="/cl/{{ client.id_personne }}" class="fw-bold">{% include 'components/titre-personne.html.twig' with { personne: client, personne_role: 'client' } %} (client)</a>
-				</li>
-				<li class="breadcrumb-item active">Ajouter un dossier</li>
-			</ol>
-		</nav>
-
-		<h4 class="mb-3">Ajouter un dossier</h4>
-		{% if produits|length > 0 %}
-            <div class="card">
-				<ul class="list-group list-group-flush">
-					{% for produit in produits %}
-						<li class="list-group-item">
-							<h5>{{ produit.nom_produit }}</h5>
-							<span class="text-muted fst-italic">{{ produit.description_produit ?? "Ce produit n'a pas de description" }}</span>
-							<form method="POST" class="mt-3">
-								<input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
-								<button class="btn btn-primary">Ajouter ce produit</button>
-                                <i class="btn disabled btn-warning ms-2"><b>Attention</b>, vous allez créer un dossier en cliquant sur ce bouton</i>
-							</form>
-						</li>
-					{% endfor %}
-				</ul>
-			</div>
-		{% else %}
-			<p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
-		{% endif %}
-	</div>
+    <h4 class="mb-3">Ajouter un dossier</h4>
+    {% if produits|length > 0 %}
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            {% for produit in produits %}
+            <li class="list-group-item">
+                <h5>{{ produit.nom_produit }}</h5>
+                <span class="text-muted fst-italic">{{ produit.description_produit ?? "Ce produit n'a pas de description" }}</span>
+                <form method="POST" class="mt-3">
+                    <input type="hidden" name="id_produit" value="{{ produit.id_produit }}">
+                    <button class="btn btn-primary">Ajouter ce produit</button>
+                    <i class="btn disabled btn-warning ms-2"><b>Attention</b>, vous allez créer un dossier en cliquant sur ce bouton</i>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <p class="text-muted fst-italic">Il n'y a aucun produits à afficher</p>
+    {% endif %}
+</div>
 {% endblock %}

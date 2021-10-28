@@ -9,12 +9,12 @@ require_once 'id_fournisseur.php';
 /**
  * Renvoie soit le produit soit une exception dans le cas où l'utilisateur n'a pas le droit de consulter le produit
  */
-function is_user_allowed__workflow($idWorkflow)
+function is_user_allowed__workflow($id_workflow)
 {
     // récupérer infos sur produit
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('get_workflow'));
-    $req->execute(['id_workflow' => $idWorkflow]);
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('get_workflow'));
+    $req->execute(['id_workflow' => $id_workflow]);
     if ($req->rowCount() == 0) {
         throw new \Exception("Ce workflow n'existe pas");
     }
@@ -32,34 +32,34 @@ function is_user_allowed__workflow($idWorkflow)
 function routesWorkflow()
 {
     return function (App $app) {
-        $app->group('/{idWorkflow}', function (App $app) {
+        $app->group('/{id_workflow}', function (App $app) {
             $app->get('', function (Request $request, Response $response, array $args): Response {
-                $workflow = is_user_allowed__workflow($args['idWorkflow']);
+                $workflow = is_user_allowed__workflow($args['id_workflow']);
                 if ($workflow instanceof \Exception) throw $workflow;
 
                 // Récupérer fournisseur
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('get_fournisseur'));
+                $db = get_pdo();
+                $req = $db->prepare(get_sql_query_string('get_fournisseur'));
                 $req->execute(['uid' => $workflow['id_fournisseur']]);
                 $fournisseur = $req->fetch();
 
                 // Récupérer véritable workflow
                 $workflow = ['nom_workflow' => 'Workflow par défaut', 'id_workflow' => 0];
-                $req = $db->prepare(getSqlQueryString('get_workflow'));
-                $req->execute(['id_workflow' => $args['idWorkflow']]);
+                $req = $db->prepare(get_sql_query_string('get_workflow'));
+                $req->execute(['id_workflow' => $args['id_workflow']]);
                 $workflow = $req->fetch();
 
                 // Récupérer les états
-                $req = $db->prepare(getSqlQueryString('get_etats_where_workflow'));
-                $req->execute(['id_workflow' => $args['idWorkflow']]);
+                $req = $db->prepare(get_sql_query_string('get_etats_where_workflow'));
+                $req->execute(['id_workflow' => $args['id_workflow']]);
                 $etats = $req->fetchAll();
 
                 // Récupérer les roles (pour role_responsable_etape)
-                $req = $db->query(getSqlQueryString('tous_roles'));
+                $req = $db->query(get_sql_query_string('tous_roles'));
                 $roles = $req->fetchAll();
 
                 // Récupérer les roles (pour role_responsable_etape)
-                $req = $db->query(getSqlQueryString('tous_phases'));
+                $req = $db->query(get_sql_query_string('tous_phases'));
                 $phases = $req->fetchAll();
 
                 return $response->write($this->view->render('fournisseur/id-workflow.html.twig', [
@@ -72,13 +72,13 @@ function routesWorkflow()
             });
 
             $app->post('', function (Request $request, Response $response, array $args): Response {
-                $workflow = is_user_allowed__workflow($args['idWorkflow']);
+                $workflow = is_user_allowed__workflow($args['id_workflow']);
                 if ($workflow instanceof \Exception) throw $workflow;
 
-                $db = getPDO();
+                $db = get_pdo();
                 // update nom du workflow
                 if ($_POST['nom_workflow'] != $workflow['id_workflow']) {
-                    $req = $db->prepare(getSqlQueryString('update_workflow'));
+                    $req = $db->prepare(get_sql_query_string('update_workflow'));
                     $req->execute([
                         'id_workflow' => $workflow['id_workflow'],
                         'nom_workflow' => $_POST['nom_workflow'],
@@ -87,7 +87,7 @@ function routesWorkflow()
 
                 // update les etats du workflow
                 foreach ($_POST['id_etat'] as $key => $value) {
-                    $req = $db->prepare(getSqlQueryString('update_etat_workflow'));
+                    $req = $db->prepare(get_sql_query_string('update_etat_workflow'));
                     $req->execute([
                         'id_etat' => $value,
                         'description' => $_POST['description'][$key],
@@ -102,37 +102,37 @@ function routesWorkflow()
             });
 
             $app->post('/new-etat', function (Request $request, Response $response, array $args): Response {
-                $workflow = is_user_allowed__workflow($args['idWorkflow']);
+                $workflow = is_user_allowed__workflow($args['id_workflow']);
                 if ($workflow instanceof \Exception) throw $workflow;
 
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('new_etat_workflow'));
+                $db = get_pdo();
+                $req = $db->prepare(get_sql_query_string('new_etat_workflow'));
                 $req->execute([
                     'description' => $_POST['description'],
-                    'id_workflow' => $args['idWorkflow'],
+                    'id_workflow' => $args['id_workflow'],
                 ]);
 
                 alert('Un état a bien été créé', 1);
                 return $response->withRedirect($request->getUri()->getPath() . '/..');
             });
 
-            $app->get('/{idEtat}/supprimer-etat', function (Request $request, Response $response, array $args): Response {
-                $workflow = is_user_allowed__workflow($args['idWorkflow']);
+            $app->get('/{id_etat}/supprimer-etat', function (Request $request, Response $response, array $args): Response {
+                $workflow = is_user_allowed__workflow($args['id_workflow']);
                 if ($workflow instanceof \Exception) throw $workflow;
 
                 // supprimer l'état
-                $db = getPDO();
-                $req = $db->prepare(getSqlQueryString('supprimer_etat_workflow'));
-                $req->execute(['id_etat' => $args['idEtat']]);
+                $db = get_pdo();
+                $req = $db->prepare(get_sql_query_string('supprimer_etat_workflow'));
+                $req->execute(['id_etat' => $args['id_etat']]);
 
                 // récupérer la liste des états
-                $req = $db->prepare(getSqlQueryString('get_etats_where_workflow'));
-                $req->execute(['id_workflow' => $args['idWorkflow']]);
+                $req = $db->prepare(get_sql_query_string('get_etats_where_workflow'));
+                $req->execute(['id_workflow' => $args['id_workflow']]);
                 $etats = $req->fetchAll();
 
                 // les renuméroter
                 foreach ($etats as $key => $value) {
-                    $req = $db->prepare(getSqlQueryString('update_etat_workflow'));
+                    $req = $db->prepare(get_sql_query_string('update_etat_workflow'));
                     $req->execute([
                         'id_etat' => $value['id_etat'],
                         'description' => $value['description'],
@@ -148,4 +148,4 @@ function routesWorkflow()
     };
 };
 
-$app->group('/workflow', routesWorkflow())->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['fournisseur', 'admin'])($req, $res, $next));
+$app->group('/workflow', routesWorkflow())->add(fn ($req, $res, $next) => logged_in_slim_middleware(['fournisseur', 'admin'])($req, $res, $next));

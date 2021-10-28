@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-function sendEmail($app, $response, $to = [], $bcc = [], $subject, $body)
+function send_email($app, $response, $to = [], $bcc = [], $subject, $body)
 {
     (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
     if (!empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev') {
@@ -61,7 +61,7 @@ function sendEmail($app, $response, $to = [], $bcc = [], $subject, $body)
     }
 }
 
-function getARandomString($length = 18, $keyspace = '')
+function get_a_random_string($length = 18, $keyspace = '')
 {
     $base62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str = '';
@@ -110,7 +110,7 @@ function alert($message, $meaning_code)
     ];
 }
 
-function loggedInSlimMiddleware(array $allowed_roles)
+function logged_in_slim_middleware(array $allowed_roles)
 {
     global $_allowed_roles;
     $_allowed_roles = $allowed_roles;
@@ -164,8 +164,8 @@ function array_to_url_encoding($array)
 function date_dernier_fichier_dossier($id_dossier)
 {
     // récupérer dans la BDD fichiers (updated_at)
-    $db = getPDO();
-    $req = $db->prepare(getSqlQueryString('get_last_fichier_dossier'));
+    $db = get_pdo();
+    $req = $db->prepare(get_sql_query_string('get_last_fichier_dossier'));
     $req->execute(['id_dossier' => $id_dossier]);
     $date = $req->fetch();
     return empty($date) ? null : $date['updated_at'];
@@ -175,23 +175,23 @@ function get_liste_destinataires_notifications_dossier($dossier)
 {
     // Tout le monde sauf les Admins, et sauf auteur de l'action
     $liste = [];
-    $db = getPDO();
+    $db = get_pdo();
     if ($_SESSION['current_user']['user_role'] != 'fournisseur') {
         // Si ce n'est pas le fournisseur, le rajouté à la liste
-        $req = $db->prepare(getSqlQueryString('get_fournisseur'));
+        $req = $db->prepare(get_sql_query_string('get_fournisseur'));
         $req->execute(['uid' => $dossier['id_fournisseur']]);
         $liste[] = $req->fetch()['email'];
     }
     if ($_SESSION['current_user']['user_role'] != 'commercial') {
         // Si ce n'est pas le commercial, le rajouter à la liste
-        $req = $db->prepare(getSqlQueryString('get_commercial'));
+        $req = $db->prepare(get_sql_query_string('get_commercial'));
         $req->execute(['uid' => $dossier['id_commercial']]);
         $liste[] = $req->fetch()['email'];
     }
     return $liste;
 }
 
-function deleteNonEmptyFolder($path)
+function delete_non_empty_folder($path)
 {
     if (is_dir($path) === true)
     {
@@ -199,7 +199,7 @@ function deleteNonEmptyFolder($path)
 
         foreach ($files as $file)
         {
-            deleteNonEmptyFolder(realpath($path) . '/' . $file);
+            delete_non_empty_folder(realpath($path) . '/' . $file);
         }
 
         return rmdir($path);
@@ -213,7 +213,7 @@ function deleteNonEmptyFolder($path)
     return false;
 }
 
-function recurseCopy(
+function recurse_copy(
     string $sourceDirectory,
     string $destinationDirectory,
     string $childFolder = ''
@@ -235,7 +235,7 @@ function recurseCopy(
             }
 
             if (is_dir("$sourceDirectory/$file") === true) {
-                recurseCopy("$sourceDirectory/$file", "$destinationDirectory/$childFolder/$file");
+                recurse_copy("$sourceDirectory/$file", "$destinationDirectory/$childFolder/$file");
             } else {
                 copy("$sourceDirectory/$file", "$destinationDirectory/$childFolder/$file");
             }
@@ -252,7 +252,7 @@ function recurseCopy(
         }
 
         if (is_dir("$sourceDirectory/$file") === true) {
-            recurseCopy("$sourceDirectory/$file", "$destinationDirectory/$file");
+            recurse_copy("$sourceDirectory/$file", "$destinationDirectory/$file");
         }
         else {
             copy("$sourceDirectory/$file", "$destinationDirectory/$file");

@@ -20,15 +20,15 @@ function del_tree($dir)
     }
 }
 
-function save_db_dump($archivePath)
+function save_db_dump($archive_path)
 {
     try {
         $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
-        $dump->start($archivePath . '/db_dump.sql');
+        $dump->start($archive_path . '/db_dump.sql');
         // Replace all the occurences of the database name by :cmo_db_name
-        $tmpString = file_get_contents($archivePath . '/db_dump.sql');
-        $tmpString = str_replace($_ENV['db_name'], ':cmo_db_name', $tmpString);
-        file_put_contents($archivePath . '/db_dump.sql', $tmpString);
+        $tmp_string = file_get_contents($archive_path . '/db_dump.sql');
+        $tmp_string = str_replace($_ENV['db_name'], ':cmo_db_name', $tmp_string);
+        file_put_contents($archive_path . '/db_dump.sql', $tmp_string);
     } catch (\Exception $e) {
         echo 'mysqldump-php error: ' . $e->getMessage();
     }
@@ -36,19 +36,19 @@ function save_db_dump($archivePath)
 
 function restore_last_db_dump()
 {
-    $folderList = glob('archives/archive-*');
+    $folder_list = glob('archives/archive-*');
 
     // get last folder in alphabetical order
     $i = 1;
     do {
-        $folder = $folderList[count($folderList) - $i];
+        $folder = $folder_list[count($folder_list) - $i];
         $i++;
-    } while (is_file($folder) && $i < count($folderList));
+    } while (is_file($folder) && $i < count($folder_list));
 
     // execute db_dump.sql
-    runFile('wipe_database.sql');
-    runFile('db_dump.sql', __DIR__ . '/' . $folder);
-    runFile('init_fn.sql');
+    run_file('wipe_database.sql');
+    run_file('db_dump.sql', __DIR__ . '/' . $folder);
+    run_file('init_fn.sql');
 
     return $folder;
 }
@@ -57,35 +57,35 @@ $scripts = [
     [
         'create archive (db_dump.sql only)',
         function () {
-            $archivePath = 'archives/archive-' . date('Y_m_d-H_i_s', time());
-            mkdir($archivePath);
+            $archive_path = 'archives/archive-' . date('Y_m_d-H_i_s', time());
+            mkdir($archive_path);
 
-            save_db_dump($archivePath);
+            save_db_dump($archive_path);
         }
     ],
     [
         'create archive (db_dump.sql + uploads folder)',
         function () {
-            $archivePath = 'archives/archive-' . date('Y_m_d-H_i_s', time());
-            mkdir($archivePath);
+            $archive_path = 'archives/archive-' . date('Y_m_d-H_i_s', time());
+            mkdir($archive_path);
 
             // dump database
-            save_db_dump($archivePath);
+            save_db_dump($archive_path);
 
             // copy upload folder
-            recurseCopy('uploads', $archivePath, 'uploads');
+            recurse_copy('uploads', $archive_path, 'uploads');
         }
     ],
     [
         'add fictitious data',
         function () {
-            runFile('add_fictitious_data.sql');
+            run_file('add_fictitious_data.sql');
         }
     ],
     [
         'apply patch.sql only',
         function () {
-            runFile('patch.sql');
+            run_file('patch.sql');
         }
     ],
     [
@@ -112,15 +112,15 @@ $scripts = [
     [
         'DANGER ZONE : wipe clean db',
         function () {
-            runFile('wipe_database.sql');
+            run_file('wipe_database.sql');
         }
     ],
     [
         'DANGER ZONE : wipe clean everything (db + uploads)',
         function () {
-            runFile('wipe_database.sql');
-            runFile('init_struct.sql');
-            runFile('init_fn.sql');
+            run_file('wipe_database.sql');
+            run_file('init_struct.sql');
+            run_file('init_fn.sql');
 
             del_tree(__DIR__ . '/uploads');
             echo "The /uploads folder is now empty\n";
@@ -133,17 +133,17 @@ $scripts = [
             
             // replace "uploads" with a copy from the archive
             if (is_dir('uploads')) {
-                deleteNonEmptyFolder('uploads');
+                delete_non_empty_folder('uploads');
             }
-            recurseCopy($folder . '/uploads', 'uploads');
+            recurse_copy($folder . '/uploads', 'uploads');
             
             echo $folder . " restored\n";
         }
     ],
 ];
 
-$keepRunning = true;
-while ($keepRunning) {
+$keep_running = true;
+while ($keep_running) {
     $option = 0;
     echo "Which script do you want to run ?\n";
     $i = 1;
@@ -156,7 +156,7 @@ while ($keepRunning) {
     // $line = trim(fgets(STDIN)); // reads one line from STDIN
     if (!empty($argv[1])) {
         $option = $argv[1];
-        $keepRunning = false;
+        $keep_running = false;
     } else {
         fscanf(STDIN, "%d\n", $option); // reads number from STDIN
     }
@@ -166,7 +166,7 @@ while ($keepRunning) {
         echo "\n";
     } else if ($option == count($scripts)) {
         echo "Alright, bye :)\n";
-        $keepRunning = false;
+        $keep_running = false;
     } else {
         echo "Uuuh ... I'm not sure I understand what you want ô_o\n";
     }

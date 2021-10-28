@@ -9,43 +9,43 @@ require_once 'fournisseur/id_fournisseur.php';
 
 $app->group('/admin', function (App $app) {
     $app->get('', function (Request $request, Response $response, array $args): Response {
-        $db = getPDO();
+        $db = get_pdo();
         // récupérer tous les commerciaux
-        $commerciaux_from_db = $db->query(getSqlQueryString('tous_commerciaux'))->fetchAll();
+        $commerciaux_from_db = $db->query(get_sql_query_string('tous_commerciaux'))->fetchAll();
         $commerciaux = [];
         foreach ($commerciaux_from_db as $commercial) {
             $commerciaux[$commercial['id_personne']] = $commercial;
         }
         // récupérer tous les fournisseurs
-        $fournisseurs_from_db = $db->query(getSqlQueryString('tous_fournisseurs'))->fetchAll();
+        $fournisseurs_from_db = $db->query(get_sql_query_string('tous_fournisseurs'))->fetchAll();
         $fournisseurs = [];
         foreach ($fournisseurs_from_db as $fournisseur) {
             $fournisseurs[$fournisseur['id_personne']] = $fournisseur;
         }
         // récupérer tous les clients
-        $clients_from_db = $db->query(getSqlQueryString('tous_clients'))->fetchAll();
+        $clients_from_db = $db->query(get_sql_query_string('tous_clients'))->fetchAll();
         $clients = [];
         foreach ($clients_from_db as $client) {
             $clients[$client['id_personne']] = $client;
         }
         // récupérer tous les admins
-        $admins_from_db = $db->query(getSqlQueryString('tous_admins'))->fetchAll();
+        $admins_from_db = $db->query(get_sql_query_string('tous_admins'))->fetchAll();
         $admins = [];
         foreach ($admins_from_db as $admin) {
             $admins[$admin['id_personne']] = $admin;
         }
         // récupérer tous les etats_dossier
-        $etats_from_db = $db->query(getSqlQueryString('tous_etats_workflow'))->fetchAll();
+        $etats_from_db = $db->query(get_sql_query_string('tous_etats_workflow'))->fetchAll();
         $etats_dossier = [];
         foreach ($etats_from_db as $etat) {
             $etats_dossier[$etat['id_etat']] = $etat['description'];
         }
 
         // TODO début de système de pagination
-        console_log(filtersToWhereClause($_GET));
+        console_log(filters_to_where_clause($_GET));
 
         // récupérer tous les dossiers
-        $dossiers = $db->query(getSqlQueryString('tous_dossiers'))->fetchAll();
+        $dossiers = $db->query(get_sql_query_string('tous_dossiers'))->fetchAll();
 
         return $response->write($this->view->render('admin/admin-panel_main.html.twig', [
             'admins' => $admins,
@@ -67,8 +67,8 @@ $app->group('/admin', function (App $app) {
         }
 
         // vérifier que l'email n'est pas déjà utilisé par un autre compte commercial/fournisseur
-        $db = getPDO();
-        $req = $db->prepare(getSqlQueryString('get_user_from_email'));
+        $db = get_pdo();
+        $req = $db->prepare(get_sql_query_string('get_user_from_email'));
         $req->execute(['email' => $_POST['email']]);
         if ($req->rowCount() > 0) {
             alert('Cette adresse email est déjà utilisée', 3);
@@ -76,7 +76,7 @@ $app->group('/admin', function (App $app) {
         }
 
         // créer le compte (1 : user, 2 : account)
-        $req = $db->prepare(getSqlQueryString('new_user'));
+        $req = $db->prepare(get_sql_query_string('new_user'));
         $req->execute([
             'user_type' => $_POST['user_type'],
             'email' => $_POST['email'],
@@ -98,7 +98,7 @@ $app->group('/admin', function (App $app) {
         $new_uid = $req->fetch()['new_uid'];
 
         // envoyer un email à l'adresse renseignée
-        $req = $db->prepare(getSqlQueryString('last_settings_update'));
+        $req = $db->prepare(get_sql_query_string('last_settings_update'));
         $req->execute(['uid' => $new_uid]);
         $last_user_update = $req->fetch()['last_user_update'];
 
@@ -106,7 +106,7 @@ $app->group('/admin', function (App $app) {
             "last_user_update" => $last_user_update,
             "uid" => $new_uid,
         ], 60 * 24);
-        sendEmail(
+        send_email(
             $this,
             $response,
             [$_POST['email']],
@@ -123,7 +123,7 @@ $app->group('/admin', function (App $app) {
         return $response->withRedirect($request->getUri()->getPath() . '/..');
     });
 
-    $app->group('/co/{idCommercial}', routesCommercial());
+    $app->group('/co/{id_commercial}', routes_commercial());
 
-    $app->group('/f/{idFournisseur}', routesFournisseur());
-})->add(fn ($req, $res, $next) => loggedInSlimMiddleware(['admin'])($req, $res, $next));
+    $app->group('/f/{id_fournisseur}', routes_fournisseur());
+})->add(fn ($req, $res, $next) => logged_in_slim_middleware(['admin'])($req, $res, $next));
