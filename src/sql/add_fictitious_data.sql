@@ -9,14 +9,14 @@ set @com1 = new_user('commercial','peter_parker@yopmail.com','$2y$12$U3EnKlIrojd
 -- commercial 2
 set @com2 = new_user('commercial', 'bruce_banner@yopmail.com', '', 'Hulk Co.', null, 0, 'Bruce', 'Banner', 'mr', null, null, null, null, null, null);
 -- client 1
-set @cli1 = new_client(@com1, 'Stark Industries', null, 0, 'Tony', 'Stark', 'mr', null, null, null, null, null, null, null);
+set @cli1 = new_client(@com1, 'X-Men Academy', null, 0, 'Charles', 'Xavier', 'mr', null, null, null, null, null, null, null);
 -- client 2
 set @cli2 = new_client(@com1, 'Batman Co.', null, 0, 'Bruce', 'Wayne', 'mr', null, null, null, null, null, null, null);
 -- client 3
 set @cli3 = new_client(@com2, 'Captain America', null, 0, 'Steve', 'Rogers', 'mr', null, null, null, null, null, null, null);
 -- fournisseur
-set @fournisseur_representant = new_user('fournisseur', 'charles_xavier@yopmail.com', '', 'X-men', null, 0, 'Charles', 'Xavier', 'mr', null, null, null, null, null, null);
-insert into societes(nom_societe, id_representant) values ('X-men construction', @fournisseur_representant);
+set @fournisseur_representant = new_user('fournisseur', 'tony_stark@yopmail.com', '', 'Stark Industries', null, 0, 'Tony', 'Stark', 'mr', null, null, null, null, null, null);
+insert into societes(nom_societe, id_representant) values ('Stark Industries', @fournisseur_representant);
 
 -- Création d'un workflow par défaut
 insert into workflows (nom_workflow, id_fournisseur) values ('Workflow par défaut', @fournisseur_representant);

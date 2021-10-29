@@ -48,7 +48,7 @@ function routes_form_template()
                 $formulaire_inputs = $req->fetchAll();
                 foreach ($formulaire_inputs as $k => $input) {
                     if (in_array($input['input_type'], ['options_radio', 'options_checkbox'])) {
-                        $formulaire_inputs[$k]['input_choices'] = explode(';', $input['input_choices']);
+                        $formulaire_inputs[$k]['input_choices'] = explode('★', $input['input_choices']);
                     }
                 }
 
@@ -79,7 +79,7 @@ function routes_form_template()
                                 'input_type' => empty($new_value['input_type']) ? '' : $new_value['input_type'],
                                 'input_description' => empty($new_value['input_description']) ? '' : $new_value['input_description'],
                                 'input_html_attributes' => empty($new_value['input_html_attributes']) ? '' : $new_value['input_html_attributes'],
-                                'input_choices' => empty($new_value['input_choices']) ? '' : join(';', $new_value['input_choices']),
+                                'input_choices' => empty($new_value['input_choices']) ? '' : join('★', $new_value['input_choices']),
                             ]);
                         }
                     } else {
@@ -90,7 +90,7 @@ function routes_form_template()
                             'input_type' => empty($value['input_type']) ? '' : $value['input_type'],
                             'input_description' => empty($value['input_description']) ? '' : $value['input_description'],
                             'input_html_attributes' => empty($value['input_html_attributes']) ? '' : $value['input_html_attributes'],
-                            'input_choices' => empty($value['input_choices']) ? '' : join(';', $value['input_choices']),
+                            'input_choices' => empty($value['input_choices']) ? '' : join('★', $value['input_choices']),
                         ]);
                     }
                 }

@@ -125,8 +125,8 @@ $app->group('/d/{id_dossier}', function (App $app) {
         foreach ($formulaire_inputs as $k => $input) {
             $formulaire_inputs[$k]['input_name'] = strtolower(str_replace(' ', '_', preg_replace('/[^A-Za-z\s]/', '', $input['input_description'])));
             if (in_array($input['input_type'], ['options_radio', 'options_checkbox'])) {
-                $formulaire_inputs[$k]['value_reponse'] = explode(';', $input['value_reponse']);
-                $formulaire_inputs[$k]['input_choices'] = explode(';', $input['input_choices']);
+                $formulaire_inputs[$k]['value_reponse'] = explode('★', $input['value_reponse']);
+                $formulaire_inputs[$k]['input_choices'] = explode('★', $input['input_choices']);
             }
         }
 
@@ -409,7 +409,7 @@ $app->group('/d/{id_dossier}', function (App $app) {
 
         foreach ($_POST['inputs'] as $id_input => $input) {
             if (is_array($input)) {
-                $input = join(';', $input);
+                $input = join('★', $input);
             }
             $req = $db->prepare(get_sql_query_string('new_reponse_formulaire_dossier'));
             $req->execute([
