@@ -21,7 +21,7 @@ $container['view'] = function ($container) {
     $twig->addGlobal('current_user', (empty($_SESSION['current_user']) ? null : $_SESSION['current_user']));
     $twig->addGlobal('is_admin', !empty($_SESSION['current_user']) && $_SESSION['current_user']['user_role'] == 'admin');
     $twig->addGlobal('is_localhost', in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1','::1']));
-    $twig->addGlobal('is_dev_mode', !empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev');
+    $twig->addGlobal('is_dev_mode', !empty($_ENV['APP_MODE']) && $_ENV['APP_MODE'] == 'dev');
 
     $twig->addGlobal('session_alert', (empty($_SESSION['session_alert']) ? null : $_SESSION['session_alert']));
     $_SESSION['session_alert'] = null;

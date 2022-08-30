@@ -1,0 +1,45 @@
+version: "3.1"
+
+volumes:
+  data:
+
+name: cmo
+
+services:
+  php-app-init:
+    image: composer
+    volumes:
+      - .:/app
+    command: "composer update --ignore-platform-reqs --no-scripts"
+  php-app:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www/html/
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - php-app-init
+      - database
+  database:
+    build:
+      context: ./db
+      dockerfile: db.dockerfile
+    image: cmo_db
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - data:/var/lib/mysql
+  adminer:
+    depends_on:
+      - database
+    image: adminer:4.8.0
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: database

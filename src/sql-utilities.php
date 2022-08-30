@@ -122,9 +122,9 @@ function get_pdo()
 {
     try {
         $db = new \PDO(
-            'mysql:host=localhost;dbname=' . $_ENV['db_name'] . ';charset=utf8mb4',
-            $_ENV['db_username'],
-            $_ENV['db_password'],
+            'mysql:host=' . $_ENV["DB_HOST"] . ';dbname=' . $_ENV['DB_NAME'] . ';charset=utf8mb4',
+            $_ENV['DB_USERNAME'],
+            $_ENV['DB_PASSWORD'],
         );
         $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         // Attention, la ligne suivante ne marche que si les timezone sont installés sur la machine
@@ -140,12 +140,12 @@ function get_pdo()
 
 function run_file($filename, $sqlDir = __DIR__ . '/sql')
 {
-    $connexion_string = "mysql --user=" . $_ENV['db_username'] . " -p" . $_ENV['db_password'] . ' ' . $_ENV['db_name'] . ' --default-character-set=utf8';
+    $connexion_string = "mysql --user=" . $_ENV['DB_USERNAME'] . " -p" . $_ENV['DB_PASSWORD'] . ' ' . $_ENV['DB_NAME'] . ' --default-character-set=utf8';
     // echo $connexion_string . "\n";
 
     echo "--- $filename ---\n";
     $tmpString = file_get_contents($sqlDir . '/' . $filename);
-    $tmpString = str_replace(':cmo_db_name', $_ENV['db_name'], $tmpString);
+    $tmpString = str_replace(':cmo_db_name', $_ENV['DB_NAME'], $tmpString);
 
     $temp = tmpfile();
     fwrite($temp, $tmpString);

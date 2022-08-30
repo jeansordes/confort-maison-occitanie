@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 function send_email($app, $response, $to = [], $bcc = [], $subject, $body)
 {
     (new \Symfony\Component\Dotenv\Dotenv())->load(__DIR__ . '/../.env');
-    if (!empty($_ENV['app_mode']) && $_ENV['app_mode'] == 'dev') {
+    if (!empty($_ENV['APP_MODE']) && $_ENV['APP_MODE'] == 'dev') {
         die($app->view->render('base.html.twig', [
             'title' => $subject,
             'body' => '<div class="alert alert-warning">Vous êtes en mode "dev" '
@@ -27,19 +27,19 @@ function send_email($app, $response, $to = [], $bcc = [], $subject, $body)
         //Server settings
         $mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $mail->isSMTP();
-        $mail->Host       = $_ENV['email_smtp_host'];
+        $mail->Host       = $_ENV['EMAIL_SMTP_HOST'];
         $mail->SMTPAuth   = true;
-        $mail->Username   = $_ENV['email_username'];
-        $mail->Password   = $_ENV['email_password'];
+        $mail->Username   = $_ENV['EMAIL_USERNAME'];
+        $mail->Password   = $_ENV['EMAIL_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = $_ENV['email_smtp_port'];
+        $mail->Port       = $_ENV['EMAIL_SMTP_PORT'];
 
         // NO OUTPUT
         $mail->SMTPDebug = false;
         $mail->do_debug = 0;
 
         //Recipients
-        $mail->setFrom($_ENV['email_username']);
+        $mail->setFrom($_ENV['EMAIL_USERNAME']);
 
         foreach ($to as $dest) {
             $mail->addAddress($dest);
@@ -88,12 +88,12 @@ function jwt_encode($payload, $expire_minutes)
     return Firebase\JWT\JWT::encode(array_merge([
         "iat" => $iat,
         "exp" => $exp,
-    ], $payload), $_ENV['jwt_key']);
+    ], $payload), $_ENV['JWT_KEY']);
 }
 
 function jwt_decode($token)
 {
-    return (array) Firebase\JWT\JWT::decode($token, $_ENV['jwt_key'], array('HS256'));
+    return (array) Firebase\JWT\JWT::decode($token, $_ENV['JWT_KEY'], array('HS256'));
 }
 
 /**

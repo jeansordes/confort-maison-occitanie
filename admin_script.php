@@ -23,11 +23,11 @@ function del_tree($dir)
 function save_db_dump($archive_path)
 {
     try {
-        $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['db_name'], $_ENV['db_username'], $_ENV['db_password']);
+        $dump = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=' . $_ENV['DB_NAME'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD']);
         $dump->start($archive_path . '/db_dump.sql');
         // Replace all the occurences of the database name by :cmo_db_name
         $tmp_string = file_get_contents($archive_path . '/db_dump.sql');
-        $tmp_string = str_replace($_ENV['db_name'], ':cmo_db_name', $tmp_string);
+        $tmp_string = str_replace($_ENV['DB_NAME'], ':cmo_db_name', $tmp_string);
         file_put_contents($archive_path . '/db_dump.sql', $tmp_string);
     } catch (\Exception $e) {
         echo 'mysqldump-php error: ' . $e->getMessage();
