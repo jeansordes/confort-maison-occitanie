@@ -55,8 +55,8 @@ insert into input_template_formulaire_produit(id_template, input_type, input_des
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'text','Ville du lieu d''exploitation',2);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'tel','Numéro de téléphone personnel de l''exploitant',3);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order, input_html_attributes) values (1, 'number','Puissance souscrite (en kVa)',4,'min="0" step="1"');
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_radio','Type de contrat','Formule bleue;Formule jaune;Formule verte',5);
-insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_checkbox','Type client','PME;Crée depuis moins de 2 ans;Plusieurs dirigeants',6);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_radio','Type de contrat','Formule bleue★Formule jaune★Formule verte',5);
+insert into input_template_formulaire_produit(id_template, input_type, input_description, input_choices, input_order) values (1, 'options_checkbox','Type client','PME★Crée depuis moins de 2 ans★Plusieurs dirigeants',6);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_order) values (1, 'date','Date de signature du contrat précédent',7);
 insert into input_template_formulaire_produit(id_template, input_type, input_description, input_html_attributes, input_order) values (1, 'html','Script de test','<script>console.log("script du template correctement chargé")</script>',8);
 
