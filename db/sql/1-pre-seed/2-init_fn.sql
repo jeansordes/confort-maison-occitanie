@@ -1,3 +1,6 @@
+use cwapgwkr_confort_maison_occitanie;
+set names utf8mb4;
+
 delimiter $$
 create or replace function new_user (
     p_role varchar(50),

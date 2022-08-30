@@ -8,7 +8,9 @@
 -- feel free to implement it here. It's just that I didn't think it
 -- was worth the effort. Keeping this empty file here is sufficiant)
 
--- If you put a dump file, put this at the beginning of your dump file
--- drop database cwapgwkr_confort_maison_occitanie;
--- create database cwapgwkr_confort_maison_occitanie;
+-- If you put a dump file, put this at the beginning of your dump file :
+
+-- drop database if exists cwapgwkr_confort_maison_occitanie;
+-- create database cwapgwkr_confort_maison_occitanie default character set utf8mb4 collate utf8mb4_general_ci;
 -- use cwapgwkr_confort_maison_occitanie;
+-- set names utf8mb4;

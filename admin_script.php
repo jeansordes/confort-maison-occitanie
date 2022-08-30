@@ -1,4 +1,8 @@
 <?php
+echo 'This script is disabled for now';
+// The SQL folder has been moved, so the script won't work
+exit;
+
 require_once __DIR__ . '/src/sql-utilities.php';
 require_once __DIR__ . '/src/utilities.php';
 

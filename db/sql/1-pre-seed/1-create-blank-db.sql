@@ -1,19 +1,16 @@
-create database cwapgwkr_confort_maison_occitanie;
+drop database if exists cwapgwkr_confort_maison_occitanie;
+create database cwapgwkr_confort_maison_occitanie default character set utf8mb4 collate utf8mb4_general_ci;
 use cwapgwkr_confort_maison_occitanie;
+set names utf8mb4;
 
-SET NAMES utf8;
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP VIEW IF EXISTS `admins`;
 CREATE TABLE `admins` (`id_personne` int(11), `prenom` text, `nom_famille` text, `civilite` enum('mr','mme',''), `nom_entreprise` text, `numero_entreprise` text, `est_un_particulier` tinyint(1), `id_coordonnees` int(11), `email` varchar(200));
 
-
 DROP VIEW IF EXISTS `clients`;
 CREATE TABLE `clients` (`id_client` int(11), `id_commercial` int(11), `infos_client_supplementaires` text, `id_personne` int(11), `prenom` text, `nom_famille` text, `civilite` enum('mr','mme',''), `nom_entreprise` text, `numero_entreprise` text, `est_un_particulier` tinyint(1), `id_coordonnees` int(11), `email` varchar(200), `nb_dossiers` bigint(21));
-
-
-SET NAMES utf8mb4;
 
 DROP TABLE IF EXISTS `clients_des_commerciaux`;
 CREATE TABLE `clients_des_commerciaux` (
@@ -26,10 +23,8 @@ CREATE TABLE `clients_des_commerciaux` (
   CONSTRAINT `clients_des_commerciaux_ibfk_2` FOREIGN KEY (`id_commercial`) REFERENCES `personnes` (`id_personne`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
 DROP VIEW IF EXISTS `commerciaux`;
 CREATE TABLE `commerciaux` (`nb_clients` bigint(21), `nb_dossiers` bigint(21), `id_personne` int(11), `prenom` text, `nom_famille` text, `civilite` enum('mr','mme',''), `nom_entreprise` text, `numero_entreprise` text, `est_un_particulier` tinyint(1), `id_coordonnees` int(11), `email` varchar(200));
-
 
 DROP TABLE IF EXISTS `coordonnees`;
 CREATE TABLE `coordonnees` (
@@ -42,7 +37,6 @@ CREATE TABLE `coordonnees` (
   `tel2` text DEFAULT NULL,
   PRIMARY KEY (`id_coordonnees`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 DROP TABLE IF EXISTS `dossiers`;
 CREATE TABLE `dossiers` (
