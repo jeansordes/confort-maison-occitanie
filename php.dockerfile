@@ -21,7 +21,15 @@ RUN apt-get update && apt-get install -y \
     libreadline-dev \
     libfreetype6-dev \
     libpq-dev \
-    g++
+    g++\
+    ghostscript\
+    libmagickwand-dev --no-install-recommends
+
+RUN rm -rf /var/lib/apt/lists/*
+RUN pecl install imagick
+
+ARG imagemagic_config=/etc/ImageMagick-6/policy.xml
+RUN if [ -f $imagemagic_config ] ; then sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/g' $imagemagic_config ; else echo did not see file $imagemagic_config ; fi
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
-RUN docker-php-ext-enable pdo_mysql
+RUN docker-php-ext-enable pdo_mysql imagick
